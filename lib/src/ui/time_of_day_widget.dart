@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'time_of_day_text.dart';
+
 class TimeOfDayWidget extends StatelessWidget {
   const TimeOfDayWidget(
       {required this.scheduleTime, required this.height, Key? key})
@@ -15,13 +17,10 @@ class TimeOfDayWidget extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            scheduleTime.time.format(context),
-            style: scheduleTime.availability == TimeOfDayAvailability.available
-                ? Theme.of(context).textTheme.caption
-                : Theme.of(context).textTheme.caption?.copyWith(
-              color: Colors.grey.shade400,
-            ),
+          TimeOfDayText(
+            time: scheduleTime.time,
+            availability: scheduleTime.availability,
+            context: context,
           ),
           const SizedBox(
             width: 8,

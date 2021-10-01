@@ -51,6 +51,8 @@ class _DynamicTopPositionContainerState
   ///The sum of last vertical drag gesture [DragUpdateDetails.delta.dy]  that does not
   ///caused View top to change because it is less than [widget.updateStep]
   double _pendingDeltaYForUpdateStep = 0;
+  Offset _oldOffsetFromOrigin = Offset.zero;
+  bool _didMove = false;
 
   @override
   void initState() {
@@ -67,29 +69,34 @@ class _DynamicTopPositionContainerState
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onVerticalDragDown: onVerticalDragDown,
-      onVerticalDragStart: onVerticalDragStart,
-      onVerticalDragEnd: onVerticalDragEnd,
-      onVerticalDragUpdate: onVerticalDragUpdate,
-      onVerticalDragCancel: onVerticalDragCancel,
+      onLongPress: onLongPressDown,
+      onLongPressStart: onLongPressStart,
+      onLongPressEnd: onLongPressEnd,
+      onLongPressMoveUpdate: onLongPressMoveUpdate,
       child: widget.child,
     );
   }
 
-  void onVerticalDragDown(DragDownDetails details) {
+  void onLongPressDown() {
     HapticFeedback.heavyImpact();
+    _pendingDeltaYForUpdateStep = 0;
+    _oldOffsetFromOrigin = Offset.zero;
+    _didMove = false;
+  }
+
+  void onLongPressStart(LongPressStartDetails details) {
     if(widget.onUpdateStart != null) {
       widget.onUpdateStart!();
     }
   }
 
-  void onVerticalDragStart(DragStartDetails details) {}
-
-  void onVerticalDragUpdate(DragUpdateDetails details) {
+  void onLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
+    _didMove = true;
     double? updateStep = widget.updateStep;
+    final offsetY = details.offsetFromOrigin.dy - _oldOffsetFromOrigin.dy;
     if (updateStep != null) {
       final double nextPendingIncrement =
-          _pendingDeltaYForUpdateStep + details.delta.dy;
+          _pendingDeltaYForUpdateStep + offsetY;
       if (nextPendingIncrement.abs() >= updateStep) {
         _performIncrementBy(
             updateStep * (nextPendingIncrement / nextPendingIncrement.abs()));
@@ -98,21 +105,69 @@ class _DynamicTopPositionContainerState
         _pendingDeltaYForUpdateStep = nextPendingIncrement;
       }
     } else {
-      _performIncrementBy(details.delta.dy);
+      _performIncrementBy(offsetY);
+    }
+    _oldOffsetFromOrigin = details.offsetFromOrigin;
+  }
+
+  void onLongPressEnd(LongPressEndDetails details) {
+    if(_didMove) {
+      debugPrint('end');
+      if(widget.canUpdateTopTo(_currentTop)) {
+        widget.onUpdateEnd(_currentTop);
+      }
+    }
+    else {
+      onLongPressCancel();
     }
   }
 
-  void onVerticalDragEnd(DragEndDetails details) {
-    if(widget.canUpdateTopTo(_currentTop)) {
-      widget.onUpdateEnd(_currentTop);
-    }
-  }
-
-  void onVerticalDragCancel(){
+  void onLongPressCancel(){
+    debugPrint('cancel');
     if(widget.onUpdateCancel != null) {
       widget.onUpdateCancel!();
     }
   }
+
+
+  // void onVerticalDragDown(DragDownDetails details) {
+  //   HapticFeedback.heavyImpact();
+  // }
+  //
+  // void onVerticalDragStart(DragStartDetails details) {
+  //   if(widget.onUpdateStart != null) {
+  //     widget.onUpdateStart!();
+  //   }
+  // }
+  //
+  // void onVerticalDragUpdate(DragUpdateDetails details) {
+  //   double? updateStep = widget.updateStep;
+  //   if (updateStep != null) {
+  //     final double nextPendingIncrement =
+  //         _pendingDeltaYForUpdateStep + details.delta.dy;
+  //     if (nextPendingIncrement.abs() >= updateStep) {
+  //       _performIncrementBy(
+  //           updateStep * (nextPendingIncrement / nextPendingIncrement.abs()));
+  //       _pendingDeltaYForUpdateStep = 0;
+  //     } else {
+  //       _pendingDeltaYForUpdateStep = nextPendingIncrement;
+  //     }
+  //   } else {
+  //     _performIncrementBy(details.delta.dy);
+  //   }
+  // }
+  //
+  // void onVerticalDragEnd(DragEndDetails details) {
+  //   if(widget.canUpdateTopTo(_currentTop)) {
+  //     widget.onUpdateEnd(_currentTop);
+  //   }
+  // }
+  //
+  // void onVerticalDragCancel(){
+  //   if(widget.onUpdateCancel != null) {
+  //     widget.onUpdateCancel!();
+  //   }
+  // }
 
   void _performIncrementBy(double value) {
     final localCurrentTop = _currentTop;

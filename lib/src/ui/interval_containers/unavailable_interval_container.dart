@@ -1,8 +1,8 @@
+import 'package:day_schedule_list/shelf.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/interval_range.dart';
 import '../../models/schedule_item_position.dart';
-import 'interval_container_position.dart';
 
 class UnavailableIntervalContainer extends StatelessWidget {
   const UnavailableIntervalContainer({
@@ -16,8 +16,10 @@ class UnavailableIntervalContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IntervalContainerPosition(
-      position: position,
+    return Positioned(
+      top: position.top,
+      right: 0,
+      left: DayScheduleList.intervalContainerLeftInset,
       child: Container(
         height: position.height,
         decoration: BoxDecoration(
