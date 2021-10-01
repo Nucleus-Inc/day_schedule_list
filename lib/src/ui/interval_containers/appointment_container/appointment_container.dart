@@ -1,6 +1,6 @@
-import 'package:day_schedule_list/shelf.dart';
 import 'package:flutter/material.dart';
 
+import '../../day_schedule_list_widget.dart';
 import '../../dynamic_height_container.dart';
 import '../../../models/schedule_item_position.dart';
 import '../dynamic_position_container.dart';
@@ -92,7 +92,7 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
           ),
           Padding(
             padding: const EdgeInsets.only(
-              left: DayScheduleList.intervalContainerLeftInset,
+              left: DayScheduleListWidget.intervalContainerLeftInset,
             ),
             child: DynamicTopPositionContainer(
               top: widget.position.top,

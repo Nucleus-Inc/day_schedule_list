@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/interval_range.dart';
 import '../models/minute_interval.dart';
 import '../models/schedule_item_position.dart';
-import 'day_schedule_list.dart';
+import 'day_schedule_list_widget.dart';
 import 'interval_containers/appointment_container_overlay.dart';
 import 'time_of_day_widget.dart';
 import '../helpers/time_of_day_extensions.dart';
