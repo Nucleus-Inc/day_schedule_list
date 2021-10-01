@@ -1,4 +1,4 @@
-import 'package:day_schedule_list/shelf.dart';
+import 'package:day_schedule_list/day_schedule_list.dart';
 import 'package:flutter/material.dart';
 
 class MyAppointment extends IntervalRange {
@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
           title: const Text('Teste'),
         ),
         body: SingleChildScrollView(
-          child: DayScheduleList<MyAppointment>(
+          child: DayScheduleListWidget<MyAppointment>(
             hourHeight: 100,
             referenceDate: DateTime.now(),
             appointments: myAppointments,

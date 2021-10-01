@@ -1,8 +1,8 @@
-import 'package:day_schedule_list/shelf.dart';
+import 'package:day_schedule_list/src/models/interval_range.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
 import 'package:flutter/material.dart';
 
-import '../day_schedule_list.dart';
+import '../day_schedule_list_widget.dart';
 import 'appointment_container/appointment_time_of_day_indicator_widget.dart';
 
 class AppointmentContainerOverlay extends StatefulWidget {
@@ -50,7 +50,7 @@ class _AppointmentContainerOverlayState
             ),
             Padding(
               padding: const EdgeInsets.only(
-                left: DayScheduleList.intervalContainerLeftInset,
+                left: DayScheduleListWidget.intervalContainerLeftInset,
               ),
               child: SizedBox(
                 width: double.infinity,
