@@ -2,10 +2,20 @@ import 'package:flutter/material.dart';
 import '../models/interval_range.dart';
 import '../models/minute_interval.dart';
 import '../models/schedule_item_position.dart';
+import 'day_schedule_list.dart';
+import 'interval_containers/appointment_container_overlay.dart';
 import 'time_of_day_widget.dart';
 import '../helpers/time_of_day_extensions.dart';
 
 mixin DayScheduleListMethods {
+  final LayerLink link = LayerLink();
+  late OverlayEntry appointmentOverlayEntry;
+  late ScheduleItemPosition appointmentOverlayPosition;
+
+  double calculateTimeOfDayIndicatorsInset(double timeOfDayWidgetHeight) {
+    return timeOfDayWidgetHeight / 2.0;
+  }
+
   ScheduleItemPosition calculateItemRangePosition<T extends IntervalRange>(
       {required T itemRange,
       required MinuteInterval minimumMinuteInterval,
@@ -97,6 +107,7 @@ mixin DayScheduleListMethods {
     required MinuteInterval appointmentMinimumDuration,
     required List<ScheduleTimeOfDay> validTimesList,
   }) {
+
     bool canUpdate = true;
     final interval = appointments[index];
     final possibleNewInterval = calculateItervalRangeFor(
@@ -145,4 +156,53 @@ mixin DayScheduleListMethods {
     final maxEnd = contentHeight - insetVertical;
     return newTop >= minTop && newTop + currentPosition.height <= maxEnd;
   }
+
+  void showUpdateTopOverlay<S extends IntervalRange>({
+    required BuildContext context,
+    required S interval,required double insetVertical,
+    required MinuteInterval minimumMinuteInterval,
+    required double minimumMinuteIntervalHeight,
+    required List<ScheduleTimeOfDay> validTimesList,
+    required double timeOfDayWidgetHeight,
+    required AppointmentWidgetBuilder<S> appointmentBuilder,
+  }) {
+    appointmentOverlayPosition = calculateItemRangePosition<S>(
+      itemRange: interval,
+      minimumMinuteInterval: minimumMinuteInterval,
+      minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
+      insetVertical: insetVertical,
+      firstValidTime: validTimesList.first,
+    );
+
+    appointmentOverlayEntry = OverlayEntry(
+      builder: (BuildContext context) {
+        final updatedInterval = calculateItervalRangeForNewTop(
+          range: interval,
+          newTop: appointmentOverlayPosition.top,
+          firstValidTime: validTimesList.first.time,
+          insetVertical: insetVertical,
+          minimumMinuteInterval: minimumMinuteInterval,
+          minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
+        );
+        return AppointmentContainerOverlay(
+          position: appointmentOverlayPosition,
+          interval: updatedInterval,
+          link: link,
+          timeIndicatorsInset: calculateTimeOfDayIndicatorsInset(timeOfDayWidgetHeight),
+          child: appointmentBuilder(context, interval),
+        );
+      },
+    );
+    Overlay.of(context)?.insert(appointmentOverlayEntry);
+  }
+
+  void updateAppointmentOverlay(double newTop) {
+    appointmentOverlayPosition = appointmentOverlayPosition.withNewTop(newTop);
+    appointmentOverlayEntry.markNeedsBuild();
+  }
+
+  void hideAppoinmentOverlay() {
+    appointmentOverlayEntry.remove();
+  }
+
 }

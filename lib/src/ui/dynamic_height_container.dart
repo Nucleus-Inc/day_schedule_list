@@ -67,6 +67,9 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
   ///The sum of last vertical drag gesture [DragUpdateDetails.delta.dy]  that does not
   ///caused View height to change because it is less than [widget.updateStep]
   double _pendingDeltaYForUpdateStep = 0;
+  Offset _oldOffsetFromOrigin = Offset.zero;
+  bool _didMove = false;
+
   @override
   void initState() {
     _currentHeight = ValueNotifier(widget.currentHeight);
@@ -105,11 +108,10 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
           left: 0,
           bottom: -2,
           child: GestureDetector(
-            onVerticalDragDown: onVerticalDragDown,
-            onVerticalDragCancel: onVerticalDragCancel,
-            onVerticalDragStart: onVerticalDragStart,
-            onVerticalDragEnd: onVerticalDragEnd,
-            onVerticalDragUpdate: onVerticalDragUpdate,
+            onLongPress: onLongPressDown,
+            onLongPressStart: onLongPressStart,
+            onLongPressEnd: onLongPressEnd,
+            onLongPressMoveUpdate: onLongPressMoveUpdate,
             behavior: HitTestBehavior.opaque,
             child: Container(
               alignment: Alignment.centerRight,
@@ -138,22 +140,24 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
     );
   }
 
-  void onVerticalDragDown(DragDownDetails details) {
-    debugPrint('down');
+  void onLongPressDown() {
     HapticFeedback.heavyImpact();
+    _pendingDeltaYForUpdateStep = 0;
+    _oldOffsetFromOrigin = Offset.zero;
+    _didMove = false;
+  }
+
+  void onLongPressStart(LongPressStartDetails details) {
     _informUpdateStart();
   }
 
-  void onVerticalDragStart(DragStartDetails details) {
-    debugPrint('start');
-  }
-
-  void onVerticalDragUpdate(DragUpdateDetails details) {
-    debugPrint('update');
+  void onLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
+    _didMove = true;
     double? updateStep = widget.updateStep;
+    final offsetY = details.offsetFromOrigin.dy - _oldOffsetFromOrigin.dy;
     if (updateStep != null) {
       final double nextPendingIncrement =
-          _pendingDeltaYForUpdateStep + details.delta.dy;
+          _pendingDeltaYForUpdateStep + offsetY;
       if (nextPendingIncrement.abs() >= updateStep) {
         _performIncrementBy(
           updateStep * (nextPendingIncrement / nextPendingIncrement.abs()),
@@ -163,16 +167,22 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
         _pendingDeltaYForUpdateStep = nextPendingIncrement;
       }
     } else {
-      _performIncrementBy(details.delta.dy);
+      _performIncrementBy(offsetY);
+    }
+    _oldOffsetFromOrigin = details.offsetFromOrigin;
+  }
+
+  void onLongPressEnd(LongPressEndDetails details) {
+    if(_didMove) {
+      debugPrint('end');
+      _informUpdateEnd();
+    }
+    else {
+      onLongPressCancel();
     }
   }
 
-  void onVerticalDragEnd(DragEndDetails details) {
-    debugPrint('end');
-    _informUpdateEnd();
-  }
-
-  void onVerticalDragCancel() {
+  void onLongPressCancel() {
     debugPrint('cancel');
     _informUpdateCancel();
   }
