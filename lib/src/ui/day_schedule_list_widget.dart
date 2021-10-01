@@ -1,11 +1,10 @@
-import 'package:day_schedule_list/shelf.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
 import 'package:day_schedule_list/src/ui/valid_time_of_day_list_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../models/interval_range.dart';
 import '../models/minute_interval.dart';
-import 'day_schedule_list_extensions.dart';
+import 'day_schedule_list_widget_extensions.dart';
 import 'interval_containers/appointment_container_overlay.dart';
 import 'interval_containers/appointment_container/appointment_container.dart';
 import 'interval_containers/unavailable_interval_container.dart';
@@ -18,9 +17,9 @@ typedef AppointmentWidgetBuilder<K extends IntervalRange> = Widget Function(
 typedef UpdateAppointDuration<K extends IntervalRange> = Future<bool> Function(
     K appointment, IntervalRange newInterval);
 
-class DayScheduleList<T extends IntervalRange> extends StatefulWidget {
+class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
   static const double intervalContainerLeftInset = 40;
-  const DayScheduleList({
+  const DayScheduleListWidget({
     required this.referenceDate,
     required this.unavailableIntervals,
     required this.appointments,
@@ -38,11 +37,11 @@ class DayScheduleList<T extends IntervalRange> extends StatefulWidget {
   final double hourHeight;
 
   @override
-  _DayScheduleListState<T> createState() => _DayScheduleListState<T>();
+  _DayScheduleListWidgetState<T> createState() => _DayScheduleListWidgetState<T>();
 }
 
-class _DayScheduleListState<S extends IntervalRange>
-    extends State<DayScheduleList<S>> with DayScheduleListMethods {
+class _DayScheduleListWidgetState<S extends IntervalRange>
+    extends State<DayScheduleListWidget<S>> with DayScheduleListMethods {
   final MinuteInterval minimumMinuteInterval = MinuteInterval.one;
   final MinuteInterval appointmentMinimumDuration = MinuteInterval.thirty;
   double get minimumMinuteIntervalHeight =>
@@ -60,7 +59,7 @@ class _DayScheduleListState<S extends IntervalRange>
   }
 
   @override
-  void didUpdateWidget(covariant DayScheduleList<S> oldWidget) {
+  void didUpdateWidget(covariant DayScheduleListWidget<S> oldWidget) {
     super.didUpdateWidget(oldWidget);
     widget.appointments.sort((a, b) => a.start <= b.start ? -1 : 1);
     //if(oldWidget.unavailableIntervals != widget.unavailableIntervals) {
