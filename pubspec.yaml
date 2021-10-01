@@ -1,6 +1,6 @@
 name: day_schedule_list
 description: Day schedule list package based on design of Google Calendar app
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/Nucleus-Inc/day_schedule_list/branches
 homepage:
 
