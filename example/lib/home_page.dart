@@ -113,6 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appointment.start = newInterval.start;
       appointment.end = newInterval.end;
     });
+    ///Save on server or locally the change and inform the success or not
     return Future.value(true);
   }
 }
