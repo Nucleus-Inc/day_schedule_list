@@ -68,25 +68,23 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: const Text('Teste'),
         ),
-        body: SingleChildScrollView(
-          child: DayScheduleListWidget<MyAppointment>(
-            hourHeight: 100,
-            referenceDate: DateTime.now(),
-            appointments: myAppointments,
-            updateAppointDuration: _updateAppointmentDuration,
-            appointmentBuilder: _buildItem,
-            unavailableIntervals: [
-              IntervalRange(
-                  start: const TimeOfDay(hour: 0, minute: 0),
-                  end: const TimeOfDay(hour: 8, minute: 30)),
-              IntervalRange(
-                  start: const TimeOfDay(hour: 12, minute: 0),
-                  end: const TimeOfDay(hour: 13, minute: 15)),
-              IntervalRange(
-                  start: const TimeOfDay(hour: 18, minute: 43),
-                  end: const TimeOfDay(hour: 23, minute: 59))
-            ],
-          ),
+        body: DayScheduleListWidget<MyAppointment>(
+          hourHeight: 100,
+          referenceDate: DateTime.now(),
+          appointments: myAppointments,
+          updateAppointDuration: _updateAppointmentDuration,
+          appointmentBuilder: _buildItem,
+          unavailableIntervals: [
+            IntervalRange(
+                start: const TimeOfDay(hour: 0, minute: 0),
+                end: const TimeOfDay(hour: 8, minute: 30)),
+            IntervalRange(
+                start: const TimeOfDay(hour: 12, minute: 0),
+                end: const TimeOfDay(hour: 13, minute: 15)),
+            IntervalRange(
+                start: const TimeOfDay(hour: 18, minute: 43),
+                end: const TimeOfDay(hour: 23, minute: 59))
+          ],
         ));
   }
 
