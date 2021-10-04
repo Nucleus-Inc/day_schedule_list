@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 typedef CanUpdateToTopPosition = bool Function(double);
 typedef UpdateTopPositionCallback = void Function(double top);
 
-
 class DynamicTopPositionContainer extends StatefulWidget {
   const DynamicTopPositionContainer({
     required this.top,
@@ -46,8 +45,8 @@ class DynamicTopPositionContainer extends StatefulWidget {
 
 class _DynamicTopPositionContainerState
     extends State<DynamicTopPositionContainer> {
-
   late double _currentTop;
+
   ///The sum of last vertical drag gesture [DragUpdateDetails.delta.dy]  that does not
   ///caused View top to change because it is less than [widget.updateStep]
   double _pendingDeltaYForUpdateStep = 0;
@@ -85,7 +84,7 @@ class _DynamicTopPositionContainerState
   }
 
   void onLongPressStart(LongPressStartDetails details) {
-    if(widget.onUpdateStart != null) {
+    if (widget.onUpdateStart != null) {
       widget.onUpdateStart!();
     }
   }
@@ -95,8 +94,7 @@ class _DynamicTopPositionContainerState
     double? updateStep = widget.updateStep;
     final offsetY = details.offsetFromOrigin.dy - _oldOffsetFromOrigin.dy;
     if (updateStep != null) {
-      final double nextPendingIncrement =
-          _pendingDeltaYForUpdateStep + offsetY;
+      final double nextPendingIncrement = _pendingDeltaYForUpdateStep + offsetY;
       if (nextPendingIncrement.abs() >= updateStep) {
         _performIncrementBy(
             updateStep * (nextPendingIncrement / nextPendingIncrement.abs()));
@@ -111,24 +109,22 @@ class _DynamicTopPositionContainerState
   }
 
   void onLongPressEnd(LongPressEndDetails details) {
-    if(_didMove) {
+    if (_didMove) {
       debugPrint('end');
-      if(widget.canUpdateTopTo(_currentTop)) {
+      if (widget.canUpdateTopTo(_currentTop)) {
         widget.onUpdateEnd(_currentTop);
       }
-    }
-    else {
+    } else {
       onLongPressCancel();
     }
   }
 
-  void onLongPressCancel(){
+  void onLongPressCancel() {
     debugPrint('cancel');
-    if(widget.onUpdateCancel != null) {
+    if (widget.onUpdateCancel != null) {
       widget.onUpdateCancel!();
     }
   }
-
 
   // void onVerticalDragDown(DragDownDetails details) {
   //   HapticFeedback.heavyImpact();
@@ -172,7 +168,7 @@ class _DynamicTopPositionContainerState
   void _performIncrementBy(double value) {
     final localCurrentTop = _currentTop;
     final finalTop = localCurrentTop + value;
-    if(widget.canUpdateTopTo(finalTop)) {
+    if (widget.canUpdateTopTo(finalTop)) {
       _currentTop = finalTop;
       widget.onNewUpdate(_currentTop);
     }

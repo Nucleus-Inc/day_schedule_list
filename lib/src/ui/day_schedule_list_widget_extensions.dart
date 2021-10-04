@@ -107,7 +107,6 @@ mixin DayScheduleListMethods {
     required MinuteInterval appointmentMinimumDuration,
     required List<ScheduleTimeOfDay> validTimesList,
   }) {
-
     bool canUpdate = true;
     final interval = appointments[index];
     final possibleNewInterval = calculateItervalRangeFor(
@@ -159,7 +158,8 @@ mixin DayScheduleListMethods {
 
   void showUpdateTopOverlay<S extends IntervalRange>({
     required BuildContext context,
-    required S interval,required double insetVertical,
+    required S interval,
+    required double insetVertical,
     required MinuteInterval minimumMinuteInterval,
     required double minimumMinuteIntervalHeight,
     required List<ScheduleTimeOfDay> validTimesList,
@@ -188,7 +188,8 @@ mixin DayScheduleListMethods {
           position: appointmentOverlayPosition,
           interval: updatedInterval,
           link: link,
-          timeIndicatorsInset: calculateTimeOfDayIndicatorsInset(timeOfDayWidgetHeight),
+          timeIndicatorsInset:
+              calculateTimeOfDayIndicatorsInset(timeOfDayWidgetHeight),
           child: appointmentBuilder(context, interval),
         );
       },
@@ -204,5 +205,4 @@ mixin DayScheduleListMethods {
   void hideAppoinmentOverlay() {
     appointmentOverlayEntry.remove();
   }
-
 }

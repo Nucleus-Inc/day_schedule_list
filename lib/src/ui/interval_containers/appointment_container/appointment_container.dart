@@ -10,19 +10,15 @@ class AppointmentContainer extends StatefulWidget {
   const AppointmentContainer({
     required this.position,
     required this.timeIndicatorsInset,
-
     required this.updateHeightStep,
     required this.canUpdateHeightTo,
     required this.onUpdateHeightEnd,
-
     required this.canUpdateTopTo,
     required this.onUpdateTopEnd,
     required this.onNewUpdateTop,
     required this.onUpdateTopStart,
     required this.onUpdateTopCancel,
-
     required this.endTimeOfDayForPossibleNewHeight,
-
     required this.child,
     Key? key,
   }) : super(key: key);
@@ -52,7 +48,8 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
   @override
   void initState() {
     _updateMode = ValueNotifier(AppointmentUpdatingMode.none);
-    _possibleNewEndDate = ValueNotifier(widget.endTimeOfDayForPossibleNewHeight(widget.position.height));
+    _possibleNewEndDate = ValueNotifier(
+        widget.endTimeOfDayForPossibleNewHeight(widget.position.height));
     super.initState();
   }
 
@@ -73,16 +70,16 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
         clipBehavior: Clip.none,
         children: [
           ValueListenableBuilder(
-              valueListenable: _updateMode,
-              builder: (context, value, child){
-                return Visibility(
-                  visible: value == AppointmentUpdatingMode.changeHeight,
-                  child: child!,
-                );
-              },
+            valueListenable: _updateMode,
+            builder: (context, value, child) {
+              return Visibility(
+                visible: value == AppointmentUpdatingMode.changeHeight,
+                child: child!,
+              );
+            },
             child: ValueListenableBuilder<TimeOfDay>(
               valueListenable: _possibleNewEndDate,
-              builder: (context, endDate, child){
+              builder: (context, endDate, child) {
                 return AppointmentTimeOfDayIndicatorWidget.end(
                   time: endDate,
                   timeIndicatorsInset: widget.timeIndicatorsInset,
@@ -211,7 +208,8 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
   }
 
   void _onUpdateHeightStart() {
-    _possibleNewEndDate.value = widget.endTimeOfDayForPossibleNewHeight(widget.position.height);
+    _possibleNewEndDate.value =
+        widget.endTimeOfDayForPossibleNewHeight(widget.position.height);
     _updateModeToChangingHeight();
   }
 
@@ -221,7 +219,8 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
   }
 
   void _onNewUpdateHeight(double newHeight) {
-    _possibleNewEndDate.value = widget.endTimeOfDayForPossibleNewHeight(newHeight);
+    _possibleNewEndDate.value =
+        widget.endTimeOfDayForPossibleNewHeight(newHeight);
   }
 
   void _onUpdateHeightCancel() {

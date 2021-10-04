@@ -1,4 +1,5 @@
 enum MinuteInterval { one, five, ten, fifteen, twenty, thirty }
+
 extension NumberValue on MinuteInterval {
   int get numberValue {
     switch (this) {
