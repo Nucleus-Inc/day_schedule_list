@@ -2,7 +2,6 @@ import 'package:day_schedule_list/src/ui/valid_time_of_day_list_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../models/interval_range.dart';
-import '../models/minute_interval.dart';
 import 'day_schedule_list_widget_extensions.dart';
 import 'interval_containers/appointment_container/appointment_container.dart';
 import 'interval_containers/unavailable_interval_container.dart';
@@ -71,20 +70,18 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
 }
 
 class _DayScheduleListWidgetState<S extends IntervalRange>
-    extends State<DayScheduleListWidget<S>> with DayScheduleListMethods {
-  final MinuteInterval minimumMinuteInterval = MinuteInterval.one;
-  final MinuteInterval appointmentMinimumDuration = MinuteInterval.thirty;
-  double get minimumMinuteIntervalHeight =>
-      (widget.hourHeight * minimumMinuteInterval.numberValue.toDouble()) / 60.0;
-  late double timeOfDayWidgetHeight;
-  List<ScheduleTimeOfDay> validTimesList = [];
+    extends State<DayScheduleListWidget<S>> with DayScheduleListWidgetMethods {
+  @override
+  double get hourHeight => widget.hourHeight;
 
+  List<ScheduleTimeOfDay> validTimesList = [];
   final GlobalKey _validTimesListColumnKey = GlobalKey();
 
   @override
   void initState() {
-    timeOfDayWidgetHeight = 10 * minimumMinuteIntervalHeight;
-    _populateValidTimesList();
+    validTimesList = populateValidTimesList(
+      unavailableIntervals: widget.unavailableIntervals,
+    );
     super.initState();
   }
 
@@ -93,7 +90,9 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     super.didUpdateWidget(oldWidget);
     widget.appointments.sort((a, b) => a.start <= b.start ? -1 : 1);
     //if(oldWidget.unavailableIntervals != widget.unavailableIntervals) {
-    _populateValidTimesList();
+    validTimesList = populateValidTimesList(
+      unavailableIntervals: widget.unavailableIntervals,
+    );
     //}
   }
 
@@ -139,73 +138,6 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     );
   }
 
-  void _populateValidTimesList() {
-    validTimesList = [];
-    final verifyUnavailableIntervals = widget.unavailableIntervals.isNotEmpty;
-    for (var item = 0; item < 25; item++) {
-      final hasTimeBefore = item > 0;
-      final TimeOfDay time =
-          TimeOfDay(hour: item == 24 ? 23 : item, minute: item == 24 ? 59 : 0);
-      if (verifyUnavailableIntervals) {
-        final IntervalRange first = widget.unavailableIntervals.first;
-        final IntervalRange last = widget.unavailableIntervals.last;
-
-        final belongsToFirst = first.belongsToRange(time);
-        final belongsToLast = last.belongsToRange(time);
-
-        if (hasTimeBefore) {
-          final beforeDateTime =
-              DateTime(DateTime.now().year, 1, 1, time.hour, time.minute)
-                  .subtract(const Duration(hours: 1));
-          final timeBefore = TimeOfDay.fromDateTime(beforeDateTime);
-          final timeBeforeBelongsToFirst = first.belongsToRange(timeBefore);
-          final timeBeforeBelongsToLast = last.belongsToRange(timeBefore);
-          if (timeBeforeBelongsToFirst && !belongsToFirst) {
-            final dateTimeToAdd = DateTime(
-                    DateTime.now().year, 1, 1, first.end.hour, first.end.minute)
-                .add(Duration(minutes: minimumMinuteInterval.numberValue));
-            final timeOfDayToAdd = TimeOfDay.fromDateTime(dateTimeToAdd);
-            if (time.toMinutes - timeOfDayToAdd.toMinutes >
-                minimumMinuteInterval.numberValue) {
-              validTimesList.add(
-                _belongsToInternalUnavailableRange(timeOfDayToAdd)
-                    ? ScheduleTimeOfDay.unavailable(time: timeOfDayToAdd)
-                    : ScheduleTimeOfDay.available(time: timeOfDayToAdd),
-              );
-            }
-          } else if (!timeBeforeBelongsToLast && belongsToLast) {
-            final dateTimeToAdd = DateTime(DateTime.now().year, 1, 1,
-                    last.start.hour, last.start.minute)
-                .subtract(Duration(minutes: minimumMinuteInterval.numberValue));
-            final timeOfDayToAdd = TimeOfDay.fromDateTime(dateTimeToAdd);
-            if (time.toMinutes - timeOfDayToAdd.toMinutes >
-                minimumMinuteInterval.numberValue) {
-              validTimesList.add(
-                _belongsToInternalUnavailableRange(timeOfDayToAdd)
-                    ? ScheduleTimeOfDay.unavailable(time: timeOfDayToAdd)
-                    : ScheduleTimeOfDay.available(time: timeOfDayToAdd),
-              );
-            }
-          }
-        }
-
-        if (!belongsToFirst && !belongsToLast) {
-          validTimesList.add(
-            _belongsToInternalUnavailableRange(time)
-                ? ScheduleTimeOfDay.unavailable(time: time)
-                : ScheduleTimeOfDay.available(time: time),
-          );
-        }
-      } else {
-        validTimesList.add(
-          _belongsToInternalUnavailableRange(time)
-              ? ScheduleTimeOfDay.unavailable(time: time)
-              : ScheduleTimeOfDay.available(time: time),
-        );
-      }
-    }
-  }
-
   List<UnavailableIntervalContainer> _buildUnavailableIntervalsWidgetList(
       {required double insetVertical}) {
     final List<IntervalRange> unavailableSublist =
@@ -218,8 +150,6 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         interval: interval,
         position: calculateItemRangePosition(
           itemRange: interval,
-          minimumMinuteInterval: minimumMinuteInterval,
-          minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
           insetVertical: insetVertical,
           firstValidTime: validTimesList.first,
         ),
@@ -259,8 +189,6 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
       timeIndicatorsInset: timeOfDayWidgetHeight / 2.0,
       position: calculateItemRangePosition(
         itemRange: interval,
-        minimumMinuteInterval: minimumMinuteInterval,
-        minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
         insetVertical: insetVertical,
         firstValidTime: validTimesList.first,
       ),
@@ -275,9 +203,6 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         newHeight: newHeight,
         unavailableIntervals: unavailableIntervals,
         validTimesList: validTimesList,
-        minimumMinuteInterval: minimumMinuteInterval,
-        appointmentMinimumDuration: appointmentMinimumDuration,
-        minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
       ),
       onUpdateHeightEnd: (double newHeight) =>
           _updateAppointIntervalForNewHeight(
@@ -292,8 +217,6 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         validTimesList: validTimesList,
         contentHeight:
             _validTimesListColumnKey.currentContext?.size?.height ?? 0,
-        minimumMinuteInterval: minimumMinuteInterval,
-        minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
       ),
       onUpdateTopEnd: (double newTop) => _updateAppointIntervalForNewTop(
         index: index,
@@ -306,8 +229,6 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         interval: interval,
         insetVertical: insetVertical,
         timeOfDayWidgetHeight: timeOfDayWidgetHeight,
-        minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
-        minimumMinuteInterval: minimumMinuteInterval,
         validTimesList: validTimesList,
         appointmentBuilder: widget.appointmentBuilder,
       ),
@@ -324,8 +245,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     final newInterval = calculateItervalRangeFor(
         start: appointment.start,
         newDurationHeight: newHeight,
-        minimumMinuteInterval: minimumMinuteInterval,
-        minimumMinuteIntervalHeight: minimumMinuteIntervalHeight);
+    );
     return await widget.updateAppointDuration(appointment, newInterval);
   }
 
@@ -341,20 +261,21 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
       newTop: newTop,
       firstValidTime: validTimesList.first.time,
       insetVertical: insetVertical,
-      minimumMinuteInterval: minimumMinuteInterval,
-      minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
     );
 
-    final intersectsOtherAppointment = widget.appointments.any((element) {
-      return element != appointment && newInterval.intersects(element);
-    });
+    final intersectsOtherAppt = intersectsOtherInterval<S>(
+      newInterval: newInterval,
+      excludingInterval: appointment,
+      intervals: appointments,
+    );
 
-    final intersectsSomeUnavailableRange =
-        widget.unavailableIntervals.any((element) {
-      return newInterval.intersects(element);
-    });
+    final intersectsSomeUnavailRange = intersectsOtherInterval(
+      newInterval: newInterval,
+      intervals: widget.unavailableIntervals,
+    );
+
     hideAppoinmentOverlay();
-    if (intersectsOtherAppointment || intersectsSomeUnavailableRange) {
+    if (intersectsOtherAppt || intersectsSomeUnavailRange) {
       setState(() {});
       return false;
     }
@@ -372,18 +293,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     final newInterval = calculateItervalRangeFor(
         start: appointment.start,
         newDurationHeight: newHeight,
-        minimumMinuteInterval: minimumMinuteInterval,
-        minimumMinuteIntervalHeight: minimumMinuteIntervalHeight);
+    );
     return newInterval.end;
-  }
-
-  bool _belongsToInternalUnavailableRange(TimeOfDay time) {
-    final List<IntervalRange> internalUnavailableIntervals =
-        widget.unavailableIntervals.length >= 3
-            ? widget.unavailableIntervals
-                .sublist(1, widget.unavailableIntervals.length - 1)
-            : [];
-    return internalUnavailableIntervals
-        .any((element) => element.belongsToRange(time));
   }
 }

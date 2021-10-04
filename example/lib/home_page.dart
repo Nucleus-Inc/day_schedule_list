@@ -82,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 start: const TimeOfDay(hour: 12, minute: 0),
                 end: const TimeOfDay(hour: 13, minute: 15)),
             IntervalRange(
-                start: const TimeOfDay(hour: 18, minute: 43),
+                start: const TimeOfDay(hour: 18, minute: 0),
                 end: const TimeOfDay(hour: 23, minute: 59))
           ],
         ));

@@ -11,3 +11,8 @@
 # 0.0.3
 * Fix some warnings
 * Improve imports
+
+# 0.0.4
+* Update README.md
+* Package documentation
+* Unit tests

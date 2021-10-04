@@ -24,13 +24,14 @@ class IntervalRange {
   TimeOfDay end;
 
   ///Verify if [time] belongs to this time interval.
-  bool belongsToRange(TimeOfDay time) {
+  bool containsTimeOfDay(TimeOfDay time) {
     return start <= time && end >= time;
   }
 
   ///Verify if some time interval [range] intersects this one.
   bool intersects(IntervalRange range) {
-    return belongsToRange(range.start) || belongsToRange(range.end);
+    return containsTimeOfDay(range.start) || containsTimeOfDay(range.end) ||
+        range.containsTimeOfDay(start) || range.containsTimeOfDay(end);
   }
 
   ///Returns the time interval between [start] and [end] in minutes.
