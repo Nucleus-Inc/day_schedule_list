@@ -156,8 +156,7 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
     double? updateStep = widget.updateStep;
     final offsetY = details.offsetFromOrigin.dy - _oldOffsetFromOrigin.dy;
     if (updateStep != null) {
-      final double nextPendingIncrement =
-          _pendingDeltaYForUpdateStep + offsetY;
+      final double nextPendingIncrement = _pendingDeltaYForUpdateStep + offsetY;
       if (nextPendingIncrement.abs() >= updateStep) {
         _performIncrementBy(
           updateStep * (nextPendingIncrement / nextPendingIncrement.abs()),
@@ -173,11 +172,10 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
   }
 
   void onLongPressEnd(LongPressEndDetails details) {
-    if(_didMove) {
+    if (_didMove) {
       debugPrint('end');
       _informUpdateEnd();
-    }
-    else {
+    } else {
       onLongPressCancel();
     }
   }

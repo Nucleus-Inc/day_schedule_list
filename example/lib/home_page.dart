@@ -99,18 +99,20 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Text(
           appointment.title,
           style: Theme.of(context).textTheme.caption?.copyWith(
-            color: Colors.white,
-          ),
+                color: Colors.white,
+              ),
         ),
       ),
     );
   }
 
-  Future<bool> _updateAppointmentDuration(MyAppointment appointment, IntervalRange newInterval){
+  Future<bool> _updateAppointmentDuration(
+      MyAppointment appointment, IntervalRange newInterval) {
     setState(() {
       appointment.start = newInterval.start;
       appointment.end = newInterval.end;
     });
+
     ///Save on server or locally the change and inform the success or not
     return Future.value(true);
   }
