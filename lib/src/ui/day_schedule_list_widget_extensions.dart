@@ -117,6 +117,37 @@ mixin DayScheduleListWidgetMethods {
     return IntervalRange(start: newStart, end: newEnd);
   }
 
+  IntervalRange calculateItervalRangeForNewPosition({
+    required IntervalRange range,
+    required ScheduleItemPosition newPosition,
+    required TimeOfDay firstValidTime,
+    required double insetVertical,
+  }) {
+    final start = range.start;
+    final end = range.end;
+    final int newStartIncrement =
+    firstValidTime.hour > 0 || firstValidTime.minute > 0
+        ? firstValidTime.toMinutes
+        : 0;
+    final int newStartInMinutes = convertDeltaYToMinutes(
+      deltaY: newPosition.top - insetVertical,
+    ) +
+        newStartIncrement;
+    final deltaInMinutes = newStartInMinutes - start.toMinutes;
+
+    final DateTime startDateTime =
+    DateTime(DateTime.now().year, 1, 1, start.hour, start.minute)
+        .add(Duration(minutes: deltaInMinutes));
+    final TimeOfDay newStart = TimeOfDay.fromDateTime(startDateTime);
+
+    final DateTime endDateTime =
+    DateTime(DateTime.now().year, 1, 1, end.hour, end.minute)
+        .add(Duration(minutes: deltaInMinutes));
+    final TimeOfDay newEnd = TimeOfDay.fromDateTime(endDateTime);
+
+    return IntervalRange(start: newStart, end: newEnd);
+  }
+
   int convertDeltaYToMinutes({
     required double deltaY,
   }) {
@@ -238,6 +269,24 @@ mixin DayScheduleListWidgetMethods {
     return canUpdate;
   }
 
+  bool canUpdatePositionOfInterval<S extends IntervalRange>({
+    required int index,
+    required List<S> appointments,
+    required ScheduleItemPosition newPosition,
+    required double insetVertical,
+    required double contentHeight,
+  }) {
+    final interval = appointments[index];
+    // final currentPosition = calculateItemRangePosition<S>(
+    //   itemRange: interval,
+    //   insetVertical: insetVertical,
+    //   firstValidTime: validTimesList.first,
+    // );
+    final minTop = insetVertical;
+    final maxEnd = contentHeight - insetVertical;
+    return newPosition.top >= minTop && newPosition.top + newPosition.height <= maxEnd;
+  }
+
   bool canUpdateTopOfInterval<S extends IntervalRange>({
     required int index,
     required List<S> appointments,
@@ -292,8 +341,8 @@ mixin DayScheduleListWidgetMethods {
     Overlay.of(context)?.insert(appointmentOverlayEntry);
   }
 
-  void updateAppointmentOverlay(double newTop) {
-    appointmentOverlayPosition = appointmentOverlayPosition.withNewTop(newTop);
+  void updateAppointmentOverlay(ScheduleItemPosition newPosition) {
+    appointmentOverlayPosition = newPosition;
     appointmentOverlayEntry.markNeedsBuild();
   }
 

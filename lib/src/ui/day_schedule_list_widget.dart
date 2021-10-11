@@ -1,3 +1,4 @@
+import 'package:day_schedule_list/src/models/schedule_item_position.dart';
 import 'package:day_schedule_list/src/ui/valid_time_of_day_list_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -230,22 +231,21 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         appointment: interval,
         newHeight: newHeight,
       ),
-      canUpdateTopTo: (double newTop) => canUpdateTopOfInterval(
+      canUpdatePositionTo: (ScheduleItemPosition newPosition) => canUpdatePositionOfInterval(
         index: index,
-        newTop: newTop,
+        newPosition: newPosition,
         insetVertical: insetVertical,
         appointments: appointments,
-        validTimesList: validTimesList,
         contentHeight:
             _validTimesListColumnKey.currentContext?.size?.height ?? 0,
       ),
-      onUpdateTopEnd: (double newTop) => _updateAppointIntervalForNewTop(
+      onUpdatePositionEnd: (ScheduleItemPosition newPosition) => _updateAppointIntervalForNewPosition(
         index: index,
         appointments: appointments,
-        newTop: newTop,
+        newPosition: newPosition,
         insetVertical: insetVertical,
       ),
-      onUpdateTopStart: () => showUpdateTopOverlay<S>(
+      onUpdatePositionStart: () => showUpdateTopOverlay<S>(
         context: context,
         interval: interval,
         insetVertical: insetVertical,
@@ -253,8 +253,8 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         validTimesList: validTimesList,
         appointmentBuilder: widget.appointmentBuilder,
       ),
-      onNewUpdateTop: (newTop) => updateAppointmentOverlay(newTop),
-      onUpdateTopCancel: () => hideAppoinmentOverlay(),
+      onNewUpdatePosition: (newPosition) => updateAppointmentOverlay(newPosition),
+      onUpdatePositionCancel: () => hideAppoinmentOverlay(),
       child: widget.appointmentBuilder(context, interval),
     );
   }
@@ -303,6 +303,43 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
 
     final success =
         await widget.updateAppointDuration(appointment, newInterval);
+
+    return success;
+  }
+
+  Future<bool> _updateAppointIntervalForNewPosition({
+    required int index,
+    required List<S> appointments,
+    required ScheduleItemPosition newPosition,
+    required double insetVertical,
+  }) async {
+    final appointment = appointments[index];
+    final newInterval = calculateItervalRangeForNewPosition(
+      range: appointment,
+      newPosition: newPosition,
+      firstValidTime: validTimesList.first.time,
+      insetVertical: insetVertical,
+    );
+
+    final intersectsOtherAppt = intersectsOtherInterval<S>(
+      newInterval: newInterval,
+      excludingInterval: appointment,
+      intervals: appointments,
+    );
+
+    final intersectsSomeUnavailRange = intersectsOtherInterval(
+      newInterval: newInterval,
+      intervals: widget.unavailableIntervals,
+    );
+
+    hideAppoinmentOverlay();
+    if (intersectsOtherAppt || intersectsSomeUnavailRange) {
+      setState(() {});
+      return false;
+    }
+
+    final success =
+    await widget.updateAppointDuration(appointment, newInterval);
 
     return success;
   }

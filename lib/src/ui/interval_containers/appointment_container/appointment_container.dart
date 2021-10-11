@@ -13,11 +13,11 @@ class AppointmentContainer extends StatefulWidget {
     required this.updateHeightStep,
     required this.canUpdateHeightTo,
     required this.onUpdateHeightEnd,
-    required this.canUpdateTopTo,
-    required this.onUpdateTopEnd,
-    required this.onNewUpdateTop,
-    required this.onUpdateTopStart,
-    required this.onUpdateTopCancel,
+    required this.canUpdatePositionTo,
+    required this.onUpdatePositionEnd,
+    required this.onNewUpdatePosition,
+    required this.onUpdatePositionStart,
+    required this.onUpdatePositionCancel,
     required this.endTimeOfDayForPossibleNewHeight,
     required this.child,
     this.dragIndicatorBorderWidth,
@@ -35,11 +35,11 @@ class AppointmentContainer extends StatefulWidget {
   final UpdateHeightCallback onUpdateHeightEnd;
   final TimeOfDay Function(double newHeight) endTimeOfDayForPossibleNewHeight;
 
-  final CanUpdateToTopPosition canUpdateTopTo;
-  final UpdateTopPositionCallback onUpdateTopEnd;
-  final UpdateTopPositionCallback onNewUpdateTop;
-  final void Function() onUpdateTopStart;
-  final void Function() onUpdateTopCancel;
+  final CanUpdateToPosition canUpdatePositionTo;
+  final UpdatePositionCallback onUpdatePositionEnd;
+  final UpdatePositionCallback onNewUpdatePosition;
+  final void Function() onUpdatePositionStart;
+  final void Function() onUpdatePositionCancel;
 
   final Color? dragIndicatorColor;
   final Color? dragIndicatorBorderColor;
@@ -100,12 +100,12 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
               left: DayScheduleListWidget.intervalContainerLeftInset,
             ),
             child: DynamicTopPositionContainer(
-              top: widget.position.top,
-              canUpdateTopTo: widget.canUpdateTopTo,
-              onNewUpdate: _onNewTopUpdate,
-              onUpdateEnd: _onTopUpdateEnd,
-              onUpdateCancel: _onUpdateTopCancel,
-              onUpdateStart: _onUpdateTopStart,
+              position: widget.position,
+              canUpdatePositionTo: widget.canUpdatePositionTo,
+              onNewPositionUpdate: _onNewPositionUpdate,
+              onUpdatePositionEnd: _onPositionUpdateEnd,
+              onUpdatePositionCancel: _onUpdateTopCancel,
+              onUpdatePositionStart: _onUpdateTopStart,
               child: DynamicHeightContainer(
                 currentHeight: widget.position.height,
                 updateStep: widget.updateHeightStep,
@@ -200,22 +200,21 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
 
   void _onUpdateTopStart() {
     _updateModeToChangingTop();
-    widget.onUpdateTopStart();
+    widget.onUpdatePositionStart();
   }
 
-  void _onNewTopUpdate(double newTop) {
-    widget.onNewUpdateTop(newTop);
-    //_currentPosition.value = _currentPosition.value.withNewTop(newTop);
+  void _onNewPositionUpdate(ScheduleItemPosition newPosition) {
+    widget.onNewUpdatePosition(newPosition);
   }
 
-  void _onTopUpdateEnd(double newTop) {
+  void _onPositionUpdateEnd(ScheduleItemPosition newPosition) {
     _updateModeTofinishChangeTop();
-    widget.onUpdateTopEnd(newTop);
+    widget.onUpdatePositionEnd(newPosition);
   }
 
   void _onUpdateTopCancel() {
     _updateModeTofinishChangeTop();
-    widget.onUpdateTopCancel();
+    widget.onUpdatePositionCancel();
   }
 
   void _onUpdateHeightStart() {

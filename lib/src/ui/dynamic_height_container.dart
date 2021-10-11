@@ -1,9 +1,8 @@
+import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/drag_indicator_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 typedef CanUpdateToHeight = bool Function(double);
-typedef OnScaleUpdate = bool Function(bool);
-
 typedef UpdateCallback = void Function();
 typedef UpdateHeightCallback = void Function(double height);
 
@@ -98,56 +97,24 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        ValueListenableBuilder<double>(
-          valueListenable: _currentHeight,
-          builder: (context, value, child) {
-            return SizedBox(
-              height: value,
-              child: child,
-            );
-          },
-          child: widget.child,
-        ),
-        Positioned(
-          right: 0,
-          left: 0,
-          bottom: -2,
-          child: GestureDetector(
-            onLongPress: onLongPressDown,
-            onLongPressStart: onLongPressStart,
-            onLongPressEnd: onLongPressEnd,
-            onLongPressMoveUpdate: onLongPressMoveUpdate,
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Container(
-                clipBehavior: Clip.hardEdge,
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: widget.dragIndicatorColor ?? Colors.white,
-                    border: Border.all(
-                      color: widget.dragIndicatorBorderColor ??
-                          Theme.of(context).primaryColor,
-                      width: widget.dragIndicatorBorderWidth ?? 3,
-                    ),
-                    boxShadow: const [
-                      BoxShadow(
-                        offset: Offset(1, 1),
-                        blurRadius: 1,
-                        color: Colors.black45,
-                      )
-                    ]),
-              ),
-            ),
-          ),
-        ),
-      ],
+    return DragIndicatorWidget.bottom(
+      onLongPressDown: onLongPressDown,
+      onLongPressStart: onLongPressStart,
+      onLongPressEnd: onLongPressEnd,
+      onLongPressMoveUpdate: onLongPressMoveUpdate,
+      dragIndicatorColor: widget.dragIndicatorColor,
+      dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
+      dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
+      child: ValueListenableBuilder<double>(
+        valueListenable: _currentHeight,
+        builder: (context, value, child) {
+          return SizedBox(
+            height: value,
+            child: child,
+          );
+        },
+        child: widget.child,
+      ),
     );
   }
 
