@@ -27,6 +27,7 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     required this.updateAppointDuration,
     required this.appointmentBuilder,
     this.hourHeight = 100.0,
+    this.scrollController,
     Key? key,
   })  : assert(hourHeight > 0, 'hourHeight must be != null and > 0'),
         super(key: key);
@@ -63,6 +64,10 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
   ///
   /// Default value = 100.0
   final double hourHeight;
+
+  /// An object that can be used to control the position to which the scroll
+  /// view is scrolled.
+  final ScrollController? scrollController;
 
   @override
   _DayScheduleListWidgetState<T> createState() =>
@@ -102,6 +107,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     final insetVertical = baseInsetVertical +
         calculateTimeOfDayIndicatorsInset(timeOfDayWidgetHeight);
     return SingleChildScrollView(
+      controller: widget.scrollController,
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 2,
