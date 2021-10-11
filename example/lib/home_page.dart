@@ -50,28 +50,19 @@ class _MyHomePageState extends State<MyHomePage> {
       start: const TimeOfDay(hour: 16, minute: 10),
       end: const TimeOfDay(hour: 17, minute: 20),
     ),
-    // MyAppointment(
-    //   title: 'Appointment 1',
-    //   start: const TimeOfDay(hour: 8, minute: 40),
-    //   end: const TimeOfDay(hour: 9, minute: 40),
-    // ),
-    // MyAppointment(
-    //   title: 'Appointment 1',
-    //   start: const TimeOfDay(hour: 8, minute: 40),
-    //   end: const TimeOfDay(hour: 9, minute: 40),
-    // )
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Teste'),
+          title: const Text('My Schedule'),
         ),
         body: DayScheduleListWidget<MyAppointment>(
           hourHeight: 100,
           referenceDate: DateTime.now(),
           appointments: myAppointments,
+          dragIndicatorColor: Colors.red,
           updateAppointDuration: _updateAppointmentDuration,
           appointmentBuilder: _buildItem,
           unavailableIntervals: [

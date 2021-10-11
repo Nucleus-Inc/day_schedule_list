@@ -20,6 +20,9 @@ class AppointmentContainer extends StatefulWidget {
     required this.onUpdateTopCancel,
     required this.endTimeOfDayForPossibleNewHeight,
     required this.child,
+    this.dragIndicatorBorderWidth,
+    this.dragIndicatorColor,
+    this.dragIndicatorBorderColor,
     Key? key,
   }) : super(key: key);
 
@@ -37,6 +40,11 @@ class AppointmentContainer extends StatefulWidget {
   final UpdateTopPositionCallback onNewUpdateTop;
   final void Function() onUpdateTopStart;
   final void Function() onUpdateTopCancel;
+
+  final Color? dragIndicatorColor;
+  final Color? dragIndicatorBorderColor;
+  final double? dragIndicatorBorderWidth;
+
   @override
   _AppointmentContainerState createState() => _AppointmentContainerState();
 }
@@ -102,6 +110,9 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
                 currentHeight: widget.position.height,
                 updateStep: widget.updateHeightStep,
                 canUpdateHeightTo: widget.canUpdateHeightTo,
+                dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
+                dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
+                dragIndicatorColor: widget.dragIndicatorColor,
                 onUpdateEnd: _onUpdateHeightEnd,
                 onUpdateStart: _onUpdateHeightStart,
                 onUpdateCancel: _onUpdateHeightCancel,

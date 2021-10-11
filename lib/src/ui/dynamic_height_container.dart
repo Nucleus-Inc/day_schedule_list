@@ -12,28 +12,36 @@ class DynamicHeightContainer extends StatefulWidget {
       {required this.canUpdateHeightTo,
       required this.currentHeight,
       required this.child,
-      this.dragIconColor,
-      this.dragIndicatorWidget,
+      this.dragIndicatorColor,
+      this.dragIndicatorBorderColor,
+      this.dragIndicatorBorderWidth,
       this.updateStep,
       this.onUpdateStart,
       this.onNewUpdate,
       this.onUpdateEnd,
       this.onUpdateCancel,
       Key? key})
-      : assert(dragIndicatorWidget == null || dragIconColor == null,
-            'dragIndicatorIcon == null or dragIconColor == null, never give value for both parameters'),
-        assert(updateStep == null || updateStep > 0, 'updateStep must be > 0'),
+      : assert(
+          dragIndicatorBorderWidth == null || dragIndicatorBorderWidth > 0,
+          'dragIndicatorBorderWidth must be null or > 0',
+        ),
+        assert(
+          updateStep == null || updateStep > 0,
+          'updateStep must be > 0',
+        ),
         super(key: key);
-
-  ///Custom widget to indicate the place to press for performing vertical drag gesture and
-  ///Widget height change.
-  final Widget? dragIndicatorWidget;
 
   ///The widget that will have it's height changed.
   final Widget child;
 
   ///The color to be applied to the default drag indicator widget.
-  final Color? dragIconColor;
+  final Color? dragIndicatorColor;
+
+  ///The color to be applied to the default drag indicator widget border.
+  final Color? dragIndicatorBorderColor;
+
+  ///The width to be applied to the default drag indicator widget border.
+  final double? dragIndicatorBorderWidth;
 
   ///How much [child] height should change by each update during vertical drag gesture.
   final double? updateStep;
@@ -116,23 +124,26 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
             child: Container(
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: widget.dragIndicatorWidget ??
-                  Container(
-                    clipBehavior: Clip.hardEdge,
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        border: Border.all(color: Colors.blue, width: 3),
-                        boxShadow: const [
-                          BoxShadow(
-                            offset: Offset(1, 1),
-                            blurRadius: 1,
-                            color: Colors.black45,
-                          )
-                        ]),
-                  ),
+              child: Container(
+                clipBehavior: Clip.hardEdge,
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: widget.dragIndicatorColor ?? Colors.white,
+                    border: Border.all(
+                      color: widget.dragIndicatorBorderColor ??
+                          Theme.of(context).primaryColor,
+                      width: widget.dragIndicatorBorderWidth ?? 3,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        offset: Offset(1, 1),
+                        blurRadius: 1,
+                        color: Colors.black45,
+                      )
+                    ]),
+              ),
             ),
           ),
         ),

@@ -28,6 +28,9 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     required this.appointmentBuilder,
     this.hourHeight = 100.0,
     this.scrollController,
+    this.dragIndicatorBorderWidth,
+    this.dragIndicatorColor,
+    this.dragIndicatorBorderColor,
     Key? key,
   })  : assert(hourHeight > 0, 'hourHeight must be != null and > 0'),
         super(key: key);
@@ -68,6 +71,15 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
   /// An object that can be used to control the position to which the scroll
   /// view is scrolled.
   final ScrollController? scrollController;
+
+  ///The color to be applied to the default drag indicator widget.
+  final Color? dragIndicatorColor;
+
+  ///The color to be applied to the default drag indicator widget border.
+  final Color? dragIndicatorBorderColor;
+
+  ///The width to be applied to the default drag indicator widget border.
+  final double? dragIndicatorBorderWidth;
 
   @override
   _DayScheduleListWidgetState<T> createState() =>
@@ -193,6 +205,9 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     return AppointmentContainer(
       updateHeightStep: minimumMinuteIntervalHeight,
       timeIndicatorsInset: timeOfDayWidgetHeight / 2.0,
+      dragIndicatorColor: widget.dragIndicatorColor,
+      dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
+      dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
       position: calculateItemRangePosition(
         itemRange: interval,
         insetVertical: insetVertical,
