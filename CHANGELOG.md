@@ -12,7 +12,10 @@
 * Fix some warnings
 * Improve imports
 
-# 0.0.4
+# 0.1.0
 * Update README.md
 * Package documentation
 * Unit tests
+* Add parameters to customize drag indicator widget
+* Issue: Add ScrollController parameter
+* Issue: Add Feature to change start date of appointment without changing its end date

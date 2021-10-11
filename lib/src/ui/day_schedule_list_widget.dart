@@ -204,7 +204,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     required double insetVertical,
   }) {
     return AppointmentContainer(
-      updateHeightStep: minimumMinuteIntervalHeight,
+      updateStep: minimumMinuteIntervalHeight,
       timeIndicatorsInset: timeOfDayWidgetHeight / 2.0,
       dragIndicatorColor: widget.dragIndicatorColor,
       dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
@@ -214,24 +214,17 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         insetVertical: insetVertical,
         firstValidTime: validTimesList.first,
       ),
-      endTimeOfDayForPossibleNewHeight: (double newHeight) =>
-          _calulateEndTimeOfAppointmentForNewHeight(
-        appointment: interval,
-        newHeight: newHeight,
-      ),
-      canUpdateHeightTo: (newHeight) => canUpdateHeightOfInterval<S>(
+      canUpdateHeightTo: (newHeight, from) => canUpdateHeightOfInterval<S>(
+        insetVertical: insetVertical,
+        from: from,
         index: index,
         appointments: appointments,
         newHeight: newHeight,
         unavailableIntervals: unavailableIntervals,
         validTimesList: validTimesList,
       ),
-      onUpdateHeightEnd: (double newHeight) =>
-          _updateAppointIntervalForNewHeight(
-        appointment: interval,
-        newHeight: newHeight,
-      ),
-      canUpdatePositionTo: (ScheduleItemPosition newPosition) => canUpdatePositionOfInterval(
+      canUpdatePositionTo: (ScheduleItemPosition newPosition) =>
+          canUpdatePositionOfInterval(
         index: index,
         newPosition: newPosition,
         insetVertical: insetVertical,
@@ -239,72 +232,27 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         contentHeight:
             _validTimesListColumnKey.currentContext?.size?.height ?? 0,
       ),
-      onUpdatePositionEnd: (ScheduleItemPosition newPosition) => _updateAppointIntervalForNewPosition(
+      onUpdatePositionEnd: (ScheduleItemPosition newPosition) =>
+          _updateAppointIntervalForNewPosition(
         index: index,
         appointments: appointments,
         newPosition: newPosition,
         insetVertical: insetVertical,
       ),
-      onUpdatePositionStart: () => showUpdateTopOverlay<S>(
+      onUpdatePositionStart: (mode) => showUpdateOverlay<S>(
         context: context,
         interval: interval,
+        mode: mode,
         insetVertical: insetVertical,
         timeOfDayWidgetHeight: timeOfDayWidgetHeight,
         validTimesList: validTimesList,
         appointmentBuilder: widget.appointmentBuilder,
       ),
-      onNewUpdatePosition: (newPosition) => updateAppointmentOverlay(newPosition),
+      onNewUpdatePosition: (newPosition) =>
+          updateAppointmentOverlay(newPosition),
       onUpdatePositionCancel: () => hideAppoinmentOverlay(),
       child: widget.appointmentBuilder(context, interval),
     );
-  }
-
-  Future<bool> _updateAppointIntervalForNewHeight({
-    required S appointment,
-    required double newHeight,
-  }) async {
-    final newInterval = calculateItervalRangeFor(
-        start: appointment.start,
-        newDurationHeight: newHeight,
-    );
-    return await widget.updateAppointDuration(appointment, newInterval);
-  }
-
-  Future<bool> _updateAppointIntervalForNewTop({
-    required int index,
-    required List<S> appointments,
-    required double newTop,
-    required double insetVertical,
-  }) async {
-    final appointment = appointments[index];
-    final newInterval = calculateItervalRangeForNewTop(
-      range: appointment,
-      newTop: newTop,
-      firstValidTime: validTimesList.first.time,
-      insetVertical: insetVertical,
-    );
-
-    final intersectsOtherAppt = intersectsOtherInterval<S>(
-      newInterval: newInterval,
-      excludingInterval: appointment,
-      intervals: appointments,
-    );
-
-    final intersectsSomeUnavailRange = intersectsOtherInterval(
-      newInterval: newInterval,
-      intervals: widget.unavailableIntervals,
-    );
-
-    hideAppoinmentOverlay();
-    if (intersectsOtherAppt || intersectsSomeUnavailRange) {
-      setState(() {});
-      return false;
-    }
-
-    final success =
-        await widget.updateAppointDuration(appointment, newInterval);
-
-    return success;
   }
 
   Future<bool> _updateAppointIntervalForNewPosition({
@@ -339,19 +287,8 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     }
 
     final success =
-    await widget.updateAppointDuration(appointment, newInterval);
+        await widget.updateAppointDuration(appointment, newInterval);
 
     return success;
-  }
-
-  TimeOfDay _calulateEndTimeOfAppointmentForNewHeight({
-    required S appointment,
-    required double newHeight,
-  }) {
-    final newInterval = calculateItervalRangeFor(
-        start: appointment.start,
-        newDurationHeight: newHeight,
-    );
-    return newInterval.end;
   }
 }

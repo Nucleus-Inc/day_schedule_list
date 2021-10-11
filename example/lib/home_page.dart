@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
     MyAppointment(
       title: 'Appointment 2',
       start: const TimeOfDay(hour: 11, minute: 0),
-      end: const TimeOfDay(hour: 12, minute: 0),
+      end: const TimeOfDay(hour: 11, minute: 59),
     ),
     MyAppointment(
       title: 'Appointment 3',

@@ -1,10 +1,13 @@
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
-import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/drag_indicator_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-typedef CanUpdateToPosition = bool Function(ScheduleItemPosition);
+import 'appointment_container/appointment_container.dart';
+
 typedef UpdatePositionCallback = void Function(ScheduleItemPosition position);
+typedef CanUpdateToPosition = bool Function(ScheduleItemPosition);
+typedef CanUpdateToTop = bool Function(double);
+typedef UpdateTopCallback = void Function(double top);
 
 class DynamicTopPositionContainer extends StatefulWidget {
   const DynamicTopPositionContainer({
@@ -13,8 +16,8 @@ class DynamicTopPositionContainer extends StatefulWidget {
     required this.canUpdatePositionTo,
     required this.onUpdatePositionEnd,
     required this.onNewPositionUpdate,
-    this.onUpdatePositionStart,
-    this.onUpdatePositionCancel,
+    required this.onUpdatePositionCancel,
+    required this.onUpdatePositionStart,
     this.updateStep,
     Key? key,
   }) : super(key: key);
@@ -29,13 +32,13 @@ class DynamicTopPositionContainer extends StatefulWidget {
   final CanUpdateToPosition canUpdatePositionTo;
 
   ///Callback called when top position update action starts
-  final void Function()? onUpdatePositionStart;
+  final void Function() onUpdatePositionStart;
 
   ///Callback called when top position update action ends
   final UpdatePositionCallback onUpdatePositionEnd;
 
   ///Callback called when top position update action ends
-  final void Function()? onUpdatePositionCancel;
+  final void Function() onUpdatePositionCancel;
 
   ///Callback called when top position update action changes
   final UpdatePositionCallback onNewPositionUpdate;
@@ -69,50 +72,21 @@ class _DynamicTopPositionContainerState
 
   @override
   Widget build(BuildContext context) {
-    return DragIndicatorWidget.top(
-      onLongPressDown: onLongPressDown,
-      onLongPressStart: onLongPressStart,
-      onLongPressEnd: onLongPressEnd,
-      onLongPressMoveUpdate: onLongPressMoveUpdate,
-      child: GestureDetector(
-        onLongPress: onRescheduleLongPressDown,
-        onLongPressStart: onRescheduleLongPressStart,
-        onLongPressEnd: onRescheduleLongPressEnd,
-        onLongPressMoveUpdate: onRescheduleLongPressMoveUpdate,
-        child: widget.child,
-      ),
+    return GestureDetector(
+      onLongPress: onRescheduleLongPressDown,
+      //onLongPressStart: onRescheduleLongPressStart,
+      onLongPressEnd: onRescheduleLongPressEnd,
+      onLongPressMoveUpdate: onRescheduleLongPressMoveUpdate,
+      child: widget.child,
     );
   }
 
-
-}
-
-extension TopChanges on _DynamicTopPositionContainerState {
-  void onLongPressDown() {
-    HapticFeedback.heavyImpact();
-  }
-
-  void onLongPressStart(LongPressStartDetails details) {}
-
-  void onLongPressMoveUpdate(LongPressMoveUpdateDetails details) {}
-
-  void onLongPressEnd(LongPressEndDetails details) {}
-
-  void onLongPressCancel() {}
-}
-
-extension RescheduleChanges on _DynamicTopPositionContainerState {
   void onRescheduleLongPressDown() {
     HapticFeedback.heavyImpact();
     _pendingDeltaYForUpdateStep = 0;
     _oldOffsetFromOrigin = Offset.zero;
     _didMove = false;
-  }
-
-  void onRescheduleLongPressStart(LongPressStartDetails details) {
-    if (widget.onUpdatePositionStart != null) {
-      widget.onUpdatePositionStart!();
-    }
+    widget.onUpdatePositionStart();
   }
 
   void onRescheduleLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
@@ -135,7 +109,7 @@ extension RescheduleChanges on _DynamicTopPositionContainerState {
   }
 
   void onRescheduleLongPressEnd(LongPressEndDetails details) {
-    if (_didMove) {
+    if (_didMove && widget.canUpdatePositionTo(_currentPosition)) {
       debugPrint('end');
       if (widget.canUpdatePositionTo(_currentPosition)) {
         widget.onUpdatePositionEnd(_currentPosition);
@@ -147,9 +121,7 @@ extension RescheduleChanges on _DynamicTopPositionContainerState {
 
   void onRescheduleLongPressCancel() {
     debugPrint('cancel');
-    if (widget.onUpdatePositionCancel != null) {
-      widget.onUpdatePositionCancel!();
-    }
+    widget.onUpdatePositionCancel();
   }
 
   void _performRescheduleIncrementBy(double value) {
@@ -161,8 +133,4 @@ extension RescheduleChanges on _DynamicTopPositionContainerState {
       widget.onNewPositionUpdate(_currentPosition);
     }
   }
-}
-
-mixin _DynamicPositionTopContainer {
-
 }

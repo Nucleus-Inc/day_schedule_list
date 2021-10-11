@@ -1,13 +1,16 @@
 import 'package:day_schedule_list/src/models/interval_range.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
+import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/appointment_container.dart';
 import 'package:flutter/material.dart';
 
 import '../day_schedule_list_widget.dart';
 import 'appointment_container/appointment_time_of_day_indicator_widget.dart';
+import 'appointment_container/drag_indicator_widget.dart';
 
 class AppointmentContainerOverlay extends StatefulWidget {
   const AppointmentContainerOverlay({
     required this.position,
+    required this.updateMode,
     required this.interval,
     required this.link,
     required this.child,
@@ -16,6 +19,7 @@ class AppointmentContainerOverlay extends StatefulWidget {
   }) : super(key: key);
 
   final ScheduleItemPosition position;
+  final AppointmentUpdatingMode updateMode;
   final LayerLink link;
   final Widget child;
   final double timeIndicatorsInset;
@@ -40,14 +44,16 @@ class _AppointmentContainerOverlayState
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            AppointmentTimeOfDayIndicatorWidget.start(
-              time: widget.interval.start,
-              timeIndicatorsInset: widget.timeIndicatorsInset,
-            ),
-            AppointmentTimeOfDayIndicatorWidget.end(
-              time: widget.interval.end,
-              timeIndicatorsInset: widget.timeIndicatorsInset,
-            ),
+            if([AppointmentUpdatingMode.changeTop, AppointmentUpdatingMode.changePosition].contains(widget.updateMode))
+              AppointmentTimeOfDayIndicatorWidget.start(
+                time: widget.interval.start,
+                timeIndicatorsInset: widget.timeIndicatorsInset,
+              ),
+            if([AppointmentUpdatingMode.changeHeight, AppointmentUpdatingMode.changePosition].contains(widget.updateMode))
+              AppointmentTimeOfDayIndicatorWidget.end(
+                time: widget.interval.end,
+                timeIndicatorsInset: widget.timeIndicatorsInset,
+              ),
             Padding(
               padding: const EdgeInsets.only(
                 left: DayScheduleListWidget.intervalContainerLeftInset,
