@@ -1,3 +1,5 @@
+import 'package:day_schedule_list/src/ui/dynamic_height_container.dart';
+import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/appointment_container.dart';
 import 'package:flutter/material.dart';
 import '../models/interval_range.dart';
 import '../models/minute_interval.dart';
@@ -19,8 +21,9 @@ mixin DayScheduleListWidgetMethods {
   late double timeOfDayWidgetHeight = 10 * minimumMinuteIntervalHeight;
 
   final LayerLink link = LayerLink();
-  late OverlayEntry appointmentOverlayEntry;
+  OverlayEntry? appointmentOverlayEntry;
   late ScheduleItemPosition appointmentOverlayPosition;
+  late AppointmentUpdatingMode appointmentUpdateMode;
 
   double calculateTimeOfDayIndicatorsInset(double timeOfDayWidgetHeight) {
     return timeOfDayWidgetHeight / 2.0;
@@ -67,7 +70,7 @@ mixin DayScheduleListWidgetMethods {
             (deltaIntervalInMinutes / minimumMinuteInterval.numberValue));
   }
 
-  IntervalRange calculateItervalRangeFor({
+  IntervalRange calculateItervalRangeForNewHeight({
     required TimeOfDay start,
     required double newDurationHeight,
   }) {
@@ -86,32 +89,59 @@ mixin DayScheduleListWidgetMethods {
     return IntervalRange(start: start, end: end);
   }
 
-  IntervalRange calculateItervalRangeForNewTop({
+  IntervalRange calculateItervalRangeForNewHeightFromTop({
+    required TimeOfDay end,
+    required double newDurationHeight,
+  }) {
+    final int durationInMinutes = convertDeltaYToMinutes(
+      deltaY: newDurationHeight,
+    );
+    final DateTime startDateTime =
+        DateTime(DateTime.now().year, 1, 1, end.hour, end.minute).subtract(
+      Duration(minutes: durationInMinutes),
+    );
+    TimeOfDay newStart;
+    if (startDateTime.day != 1) {
+      newStart = const TimeOfDay(hour: 0, minute: 0);
+    } else {
+      newStart = TimeOfDay.fromDateTime(startDateTime);
+    }
+    return IntervalRange(start: newStart, end: end);
+  }
+
+  IntervalRange calculateItervalRangeForNewPosition({
     required IntervalRange range,
-    required double newTop,
-    required TimeOfDay firstValidTime,
+    required ScheduleItemPosition newPosition,
+    required ScheduleTimeOfDay firstValidTime,
     required double insetVertical,
   }) {
     final start = range.start;
     final end = range.end;
     final int newStartIncrement =
-        firstValidTime.hour > 0 || firstValidTime.minute > 0
-            ? firstValidTime.toMinutes
+        firstValidTime.time.hour > 0 || firstValidTime.time.minute > 0
+            ? firstValidTime.time.toMinutes
             : 0;
     final int newStartInMinutes = convertDeltaYToMinutes(
-          deltaY: newTop - insetVertical,
+          deltaY: newPosition.top - insetVertical,
         ) +
         newStartIncrement;
-    final deltaInMinutes = newStartInMinutes - start.toMinutes;
+
+    final int newEndInMinutes = convertDeltaYToMinutes(
+          deltaY: newPosition.top + newPosition.height - insetVertical,
+        ) +
+        newStartIncrement;
+
+    final startDeltaInMinutes = newStartInMinutes - start.toMinutes;
+    final endDeltaInMinutes = newEndInMinutes - end.toMinutes;
 
     final DateTime startDateTime =
         DateTime(DateTime.now().year, 1, 1, start.hour, start.minute)
-            .add(Duration(minutes: deltaInMinutes));
+            .add(Duration(minutes: startDeltaInMinutes));
     final TimeOfDay newStart = TimeOfDay.fromDateTime(startDateTime);
 
     final DateTime endDateTime =
         DateTime(DateTime.now().year, 1, 1, end.hour, end.minute)
-            .add(Duration(minutes: deltaInMinutes));
+            .add(Duration(minutes: endDeltaInMinutes));
     final TimeOfDay newEnd = TimeOfDay.fromDateTime(endDateTime);
 
     return IntervalRange(start: newStart, end: newEnd);
@@ -208,58 +238,77 @@ mixin DayScheduleListWidgetMethods {
   }
 
   bool canUpdateHeightOfInterval<S extends IntervalRange>({
+    required HeightUpdateFrom from,
     required int index,
     required List<S> appointments,
     required List<IntervalRange> unavailableIntervals,
     required double newHeight,
     required List<ScheduleTimeOfDay> validTimesList,
+    required double insetVertical,
   }) {
     bool canUpdate = true;
     final interval = appointments[index];
-    final possibleNewInterval = calculateItervalRangeFor(
-      start: interval.start,
-      newDurationHeight: newHeight,
-    );
-    final hasNextInterval = index < appointments.length - 1;
-    if (hasNextInterval) {
-      final nextInterval = appointments[index + 1];
-      canUpdate &= !nextInterval.intersects(possibleNewInterval);
+
+    final possibleNewInterval = from == HeightUpdateFrom.bottom
+        ? calculateItervalRangeForNewHeight(
+            start: interval.start,
+            newDurationHeight: newHeight,
+          )
+        : calculateItervalRangeForNewHeightFromTop(
+            newDurationHeight: newHeight,
+            end: interval.end,
+          );
+
+    switch (from) {
+      case HeightUpdateFrom.top:
+        final hasBeforeInterval = index > 0;
+        if (hasBeforeInterval) {
+          final beforeInterval = appointments[index - 1];
+          canUpdate &= !beforeInterval.intersects(possibleNewInterval);
+        }
+        final exceedsMinValidTime =
+            possibleNewInterval.start < validTimesList.first.time;
+        canUpdate &= !exceedsMinValidTime;
+        break;
+      case HeightUpdateFrom.bottom:
+        final hasNextInterval = index < appointments.length - 1;
+        if (hasNextInterval) {
+          final nextInterval = appointments[index + 1];
+          canUpdate &= !nextInterval.intersects(possibleNewInterval);
+        }
+        final exceedsMaxValidTime =
+            possibleNewInterval.end > validTimesList.last.time;
+        canUpdate &= !exceedsMaxValidTime;
+        break;
     }
-    final exceedsMaxValidTime =
-        possibleNewInterval.end > validTimesList.last.time;
+
     final intersectsUnavailableInterval = unavailableIntervals
         .any((element) => element.intersects(possibleNewInterval));
     final isBiggerThanMinimumDuration =
         possibleNewInterval.deltaIntervalIMinutes >=
             appointmentMinimumDuration.numberValue;
-    canUpdate &= !exceedsMaxValidTime;
-    canUpdate &= !intersectsUnavailableInterval;
     canUpdate &= isBiggerThanMinimumDuration;
+    canUpdate &= !intersectsUnavailableInterval;
     return canUpdate;
   }
 
-  bool canUpdateTopOfInterval<S extends IntervalRange>({
+  bool canUpdatePositionOfInterval<S extends IntervalRange>({
     required int index,
     required List<S> appointments,
-    required double newTop,
+    required ScheduleItemPosition newPosition,
     required double insetVertical,
     required double contentHeight,
-    required List<ScheduleTimeOfDay> validTimesList,
   }) {
-    final interval = appointments[index];
-    final currentPosition = calculateItemRangePosition<S>(
-      itemRange: interval,
-      insetVertical: insetVertical,
-      firstValidTime: validTimesList.first,
-    );
     final minTop = insetVertical;
     final maxEnd = contentHeight - insetVertical;
-    return newTop >= minTop && newTop + currentPosition.height <= maxEnd;
+    return newPosition.top >= minTop &&
+        newPosition.top + newPosition.height <= maxEnd;
   }
 
-  void showUpdateTopOverlay<S extends IntervalRange>({
+  void showUpdateOverlay<S extends IntervalRange>({
     required BuildContext context,
     required S interval,
+    required AppointmentUpdatingMode mode,
     required double insetVertical,
     required List<ScheduleTimeOfDay> validTimesList,
     required double timeOfDayWidgetHeight,
@@ -270,17 +319,21 @@ mixin DayScheduleListWidgetMethods {
       insetVertical: insetVertical,
       firstValidTime: validTimesList.first,
     );
+    appointmentUpdateMode = mode;
 
+    debugPrint('$mode');
+    hideAppoinmentOverlay();
     appointmentOverlayEntry = OverlayEntry(
       builder: (BuildContext context) {
-        final updatedInterval = calculateItervalRangeForNewTop(
+        final updatedInterval = calculateItervalRangeForNewPosition(
           range: interval,
-          newTop: appointmentOverlayPosition.top,
-          firstValidTime: validTimesList.first.time,
+          newPosition: appointmentOverlayPosition,
+          firstValidTime: validTimesList.first,
           insetVertical: insetVertical,
         );
         return AppointmentContainerOverlay(
           position: appointmentOverlayPosition,
+          updateMode: mode,
           interval: updatedInterval,
           link: link,
           timeIndicatorsInset:
@@ -289,15 +342,23 @@ mixin DayScheduleListWidgetMethods {
         );
       },
     );
-    Overlay.of(context)?.insert(appointmentOverlayEntry);
+    Overlay.of(context)?.insert(appointmentOverlayEntry!);
   }
 
-  void updateAppointmentOverlay(double newTop) {
-    appointmentOverlayPosition = appointmentOverlayPosition.withNewTop(newTop);
-    appointmentOverlayEntry.markNeedsBuild();
+  void updateAppointmentOverlay(ScheduleItemPosition newPosition) {
+    appointmentOverlayPosition = newPosition;
+    appointmentOverlayEntry?.markNeedsBuild();
   }
 
   void hideAppoinmentOverlay() {
-    appointmentOverlayEntry.remove();
+    try {
+      final overlay = appointmentOverlayEntry;
+      if(overlay != null) {
+        overlay.remove();
+      }
+    }
+    catch(error){
+      debugPrint('$error');
+    }
   }
 }
