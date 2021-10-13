@@ -2,8 +2,9 @@ name: Flutter_Tests
 
 on:
   push:
+    branches: [main, develop]
   pull_request:
-    branches: [main,develop]
+    branches: [main, develop]
 
 jobs:
   tests:
@@ -25,4 +26,10 @@ jobs:
 
       - name: Run tests
         run: flutter test --coverage
+
+      - name: Upload coverage to codecov
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+
 
