@@ -1,3 +1,4 @@
+[![codecov](https://codecov.io/gh/Nucleus-Inc/day_schedule_list/branch/main/graph/badge.svg?token=JA1PRA7Z3V)](https://codecov.io/gh/Nucleus-Inc/day_schedule_list)
 # Day Schedule List
 
 Present your daily appointments on a widget similar to Google Calendar app day view.
