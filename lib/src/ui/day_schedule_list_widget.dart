@@ -265,7 +265,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     final newInterval = calculateItervalRangeForNewPosition(
       range: appointment,
       newPosition: newPosition,
-      firstValidTime: validTimesList.first.time,
+      firstValidTime: validTimesList.first,
       insetVertical: insetVertical,
     );
 

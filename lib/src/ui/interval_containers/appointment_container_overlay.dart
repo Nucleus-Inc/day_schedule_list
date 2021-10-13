@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../day_schedule_list_widget.dart';
 import 'appointment_container/appointment_time_of_day_indicator_widget.dart';
-import 'appointment_container/drag_indicator_widget.dart';
 
 class AppointmentContainerOverlay extends StatefulWidget {
   const AppointmentContainerOverlay({

@@ -109,53 +109,17 @@ mixin DayScheduleListWidgetMethods {
     return IntervalRange(start: newStart, end: end);
   }
 
-  IntervalRange calculateItervalRangeForNewTop({
-    required IntervalRange range,
-    required double newTop,
-    required ScheduleTimeOfDay firstValidTime,
-    required double insetVertical,
-  }) {
-    final position = calculateItemRangePosition(
-        itemRange: range,
-        insetVertical: insetVertical,
-        firstValidTime: firstValidTime);
-    return calculateItervalRangeForNewPosition(
-      range: range,
-      newPosition: position.withNewTop(newTop),
-      firstValidTime: firstValidTime.time,
-      insetVertical: insetVertical,
-    );
-    // final start = range.start;
-    // final end = range.end;
-    // final int newStartIncrement =
-    //     firstValidTime.time.hour > 0 || firstValidTime.time.minute > 0
-    //         ? firstValidTime.time.toMinutes
-    //         : 0;
-    // final int newStartInMinutes = convertDeltaYToMinutes(
-    //       deltaY: newTop - insetVertical,
-    //     ) +
-    //     newStartIncrement;
-    // final deltaInMinutes = newStartInMinutes - start.toMinutes;
-    //
-    // final DateTime startDateTime =
-    //     DateTime(DateTime.now().year, 1, 1, start.hour, start.minute)
-    //         .add(Duration(minutes: deltaInMinutes));
-    // final TimeOfDay newStart = TimeOfDay.fromDateTime(startDateTime);
-    //
-    // return IntervalRange(start: newStart, end: end);
-  }
-
   IntervalRange calculateItervalRangeForNewPosition({
     required IntervalRange range,
     required ScheduleItemPosition newPosition,
-    required TimeOfDay firstValidTime,
+    required ScheduleTimeOfDay firstValidTime,
     required double insetVertical,
   }) {
     final start = range.start;
     final end = range.end;
     final int newStartIncrement =
-        firstValidTime.hour > 0 || firstValidTime.minute > 0
-            ? firstValidTime.toMinutes
+        firstValidTime.time.hour > 0 || firstValidTime.time.minute > 0
+            ? firstValidTime.time.toMinutes
             : 0;
     final int newStartInMinutes = convertDeltaYToMinutes(
           deltaY: newPosition.top - insetVertical,
@@ -364,7 +328,7 @@ mixin DayScheduleListWidgetMethods {
         final updatedInterval = calculateItervalRangeForNewPosition(
           range: interval,
           newPosition: appointmentOverlayPosition,
-          firstValidTime: validTimesList.first.time,
+          firstValidTime: validTimesList.first,
           insetVertical: insetVertical,
         );
         return AppointmentContainerOverlay(

@@ -2,7 +2,6 @@ import 'package:day_schedule_list/src/models/schedule_item_position.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'appointment_container/appointment_container.dart';
 
 typedef UpdatePositionCallback = void Function(ScheduleItemPosition position);
 typedef CanUpdateToPosition = bool Function(ScheduleItemPosition);
