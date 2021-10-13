@@ -8,7 +8,7 @@ on:
       - completed
 
 jobs:
-  tests:
+  coverage_upload:
     runs-on: ubuntu-latest
 
     steps:
