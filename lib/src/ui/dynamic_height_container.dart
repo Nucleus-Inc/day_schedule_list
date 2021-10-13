@@ -1,39 +1,50 @@
+import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/drag_indicator_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-typedef CanUpdateToHeight = bool Function(double);
-typedef OnScaleUpdate = bool Function(bool);
+typedef CanUpdateToHeight = bool Function(double, HeightUpdateFrom);
+typedef UpdateCallback = void Function(HeightUpdateFrom from);
+typedef UpdateHeightCallback = void Function(double height, HeightUpdateFrom from);
 
-typedef UpdateCallback = void Function();
-typedef UpdateHeightCallback = void Function(double height);
+enum HeightUpdateFrom {
+  top, bottom
+}
 
 class DynamicHeightContainer extends StatefulWidget {
   const DynamicHeightContainer(
       {required this.canUpdateHeightTo,
+      required this.onUpdateStart,
+      required this.onNewUpdate,
+      required this.onUpdateEnd,
+      required this.onUpdateCancel,
       required this.currentHeight,
       required this.child,
-      this.dragIconColor,
-      this.dragIndicatorWidget,
+      this.dragIndicatorColor,
+      this.dragIndicatorBorderColor,
+      this.dragIndicatorBorderWidth,
       this.updateStep,
-      this.onUpdateStart,
-      this.onNewUpdate,
-      this.onUpdateEnd,
-      this.onUpdateCancel,
       Key? key})
-      : assert(dragIndicatorWidget == null || dragIconColor == null,
-            'dragIndicatorIcon == null or dragIconColor == null, never give value for both parameters'),
-        assert(updateStep == null || updateStep > 0, 'updateStep must be > 0'),
+      : assert(
+          dragIndicatorBorderWidth == null || dragIndicatorBorderWidth > 0,
+          'dragIndicatorBorderWidth must be null or > 0',
+        ),
+        assert(
+          updateStep == null || updateStep > 0,
+          'updateStep must be > 0',
+        ),
         super(key: key);
-
-  ///Custom widget to indicate the place to press for performing vertical drag gesture and
-  ///Widget height change.
-  final Widget? dragIndicatorWidget;
 
   ///The widget that will have it's height changed.
   final Widget child;
 
   ///The color to be applied to the default drag indicator widget.
-  final Color? dragIconColor;
+  final Color? dragIndicatorColor;
+
+  ///The color to be applied to the default drag indicator widget border.
+  final Color? dragIndicatorBorderColor;
+
+  ///The width to be applied to the default drag indicator widget border.
+  final double? dragIndicatorBorderWidth;
 
   ///How much [child] height should change by each update during vertical drag gesture.
   final double? updateStep;
@@ -42,16 +53,16 @@ class DynamicHeightContainer extends StatefulWidget {
   final double currentHeight;
 
   ///Callback called when height update action starts.
-  final UpdateCallback? onUpdateStart;
+  final UpdateCallback onUpdateStart;
 
   ///Callback called everytime height value changes.
-  final UpdateHeightCallback? onNewUpdate;
+  final UpdateHeightCallback onNewUpdate;
 
   ///Callback called when height update action ends
-  final UpdateHeightCallback? onUpdateEnd;
+  final UpdateHeightCallback onUpdateEnd;
 
   ///Callback called when height update action ends
-  final UpdateCallback? onUpdateCancel;
+  final UpdateCallback onUpdateCancel;
 
   ///Function to determine if [child] height should or not change to a new one.
   final CanUpdateToHeight canUpdateHeightTo;
@@ -62,30 +73,25 @@ class DynamicHeightContainer extends StatefulWidget {
 
 class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
   ///Current widget height
-  late ValueNotifier<double> _currentHeight;
+  late double _currentHeight;
 
   ///The sum of last vertical drag gesture [DragUpdateDetails.delta.dy]  that does not
   ///caused View height to change because it is less than [widget.updateStep]
   double _pendingDeltaYForUpdateStep = 0;
   Offset _oldOffsetFromOrigin = Offset.zero;
   bool _didMove = false;
-
+  HeightUpdateFrom?  _updateFrom;
   @override
   void initState() {
-    _currentHeight = ValueNotifier(widget.currentHeight);
+    _currentHeight = widget.currentHeight;
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _currentHeight.dispose();
-    super.dispose();
   }
 
   @override
   void didUpdateWidget(covariant DynamicHeightContainer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _currentHeight.value = widget.currentHeight;
+    _currentHeight = widget.currentHeight;
+    _updateFrom = null;
   }
 
   @override
@@ -93,72 +99,48 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        ValueListenableBuilder<double>(
-          valueListenable: _currentHeight,
-          builder: (context, value, child) {
-            return SizedBox(
-              height: value,
-              child: child,
-            );
-          },
+        SizedBox(
+          height: _currentHeight,
           child: widget.child,
         ),
-        Positioned(
-          right: 0,
-          left: 0,
-          bottom: -2,
-          child: GestureDetector(
-            onLongPress: onLongPressDown,
-            onLongPressStart: onLongPressStart,
-            onLongPressEnd: onLongPressEnd,
-            onLongPressMoveUpdate: onLongPressMoveUpdate,
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: widget.dragIndicatorWidget ??
-                  Container(
-                    clipBehavior: Clip.hardEdge,
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        border: Border.all(color: Colors.blue, width: 3),
-                        boxShadow: const [
-                          BoxShadow(
-                            offset: Offset(1, 1),
-                            blurRadius: 1,
-                            color: Colors.black45,
-                          )
-                        ]),
-                  ),
-            ),
-          ),
+        DragIndicatorWidget.top(
+          onLongPressDown: () => onLongPressDown(HeightUpdateFrom.top),
+          onLongPressStart: (_){},//onLongPressStart,
+          onLongPressEnd: onLongPressEnd,
+          onLongPressMoveUpdate: onLongPressMoveUpdate,
+          dragIndicatorColor: widget.dragIndicatorColor,
+          dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
+          dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
         ),
+        DragIndicatorWidget.bottom(
+          onLongPressDown: () => onLongPressDown(HeightUpdateFrom.bottom),
+          onLongPressStart: (_){},//onLongPressStart,
+          onLongPressEnd: onLongPressEnd,
+          onLongPressMoveUpdate: onLongPressMoveUpdate,
+          dragIndicatorColor: widget.dragIndicatorColor,
+          dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
+          dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
+        )
       ],
     );
   }
 
-  void onLongPressDown() {
+  void onLongPressDown(HeightUpdateFrom from) {
     HapticFeedback.heavyImpact();
     _pendingDeltaYForUpdateStep = 0;
     _oldOffsetFromOrigin = Offset.zero;
     _didMove = false;
-  }
-
-  void onLongPressStart(LongPressStartDetails details) {
+    _updateFrom = from;
     _informUpdateStart();
   }
 
   void onLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
-    _didMove = true;
     double? updateStep = widget.updateStep;
     final offsetY = details.offsetFromOrigin.dy - _oldOffsetFromOrigin.dy;
     if (updateStep != null) {
-      final double nextPendingIncrement =
-          _pendingDeltaYForUpdateStep + offsetY;
+      final double nextPendingIncrement = _pendingDeltaYForUpdateStep + offsetY;
       if (nextPendingIncrement.abs() >= updateStep) {
+        _didMove = true;
         _performIncrementBy(
           updateStep * (nextPendingIncrement / nextPendingIncrement.abs()),
         );
@@ -167,17 +149,17 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
         _pendingDeltaYForUpdateStep = nextPendingIncrement;
       }
     } else {
+      _didMove = true;
       _performIncrementBy(offsetY);
     }
     _oldOffsetFromOrigin = details.offsetFromOrigin;
   }
 
   void onLongPressEnd(LongPressEndDetails details) {
-    if(_didMove) {
+    if (_didMove) {
       debugPrint('end');
       _informUpdateEnd();
-    }
-    else {
+    } else {
       onLongPressCancel();
     }
   }
@@ -188,35 +170,42 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
   }
 
   void _informUpdateStart() {
-    if (widget.onUpdateStart != null) {
-      widget.onUpdateStart!();
+    final from = _updateFrom;
+    if (from != null) {
+      widget.onUpdateStart(from);
     }
   }
 
   void _informUpdateEnd() {
-    if (widget.onUpdateEnd != null) {
-      widget.onUpdateEnd!(_currentHeight.value);
+    final from = _updateFrom;
+    if (from != null) {
+      widget.onUpdateEnd(_currentHeight, from);
     }
   }
 
   void _informNewUpdate() {
-    if (widget.onNewUpdate != null) {
-      widget.onNewUpdate!(_currentHeight.value);
+    final from = _updateFrom;
+    if (from != null) {
+      widget.onNewUpdate(_currentHeight, from);
     }
   }
 
   void _informUpdateCancel() {
-    if (widget.onUpdateCancel != null) {
-      widget.onUpdateCancel!();
+    final from = _updateFrom;
+    if (from != null) {
+      widget.onUpdateCancel(from);
     }
   }
 
   void _performIncrementBy(double value) {
-    final localCurrentHeight = _currentHeight.value;
-    final finalHeight = localCurrentHeight + value;
-    if (widget.canUpdateHeightTo(finalHeight)) {
-      _currentHeight.value = finalHeight;
-      _informNewUpdate();
+    final from = _updateFrom;
+    if(from != null) {
+      final localCurrentHeight = _currentHeight;
+      final finalHeight = localCurrentHeight + value*(from == HeightUpdateFrom.bottom ? 1 : -1);
+      if (widget.canUpdateHeightTo(finalHeight, from)) {
+        _currentHeight = finalHeight;
+        _informNewUpdate();
+      }
     }
   }
 }

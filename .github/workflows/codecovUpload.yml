@@ -1,0 +1,16 @@
+name: Codecov_upload
+
+on:
+  workflow_run:
+    workflows: [ "Flutter_Tests" ]
+    branches: [main]
+    types:
+      - completed
+
+jobs:
+  coverage_upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Upload coverage to codecov
+        uses: codecov/codecov-action@v2

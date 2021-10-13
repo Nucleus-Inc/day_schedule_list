@@ -1,6 +1,6 @@
 name: day_schedule_list
 description: Day schedule list package based on design of Google Calendar app
-version: 0.0.3
+version: 0.1.0
 repository: https://github.com/Nucleus-Inc/day_schedule_list/branches
 homepage:
 
@@ -16,7 +16,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^1.0.4
 
 
