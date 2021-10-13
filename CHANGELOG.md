@@ -19,3 +19,4 @@
 * Add parameters to customize drag indicator widget
 * Issue: Add ScrollController parameter
 * Issue: Add Feature to change start date of appointment without changing its end date
+* Add github action for test and upload code coverage to CodeCov service
