@@ -11,7 +11,7 @@ import '../helpers/time_of_day_extensions.dart';
 
 mixin DayScheduleListWidgetMethods {
   final MinuteInterval minimumMinuteInterval = MinuteInterval.one;
-  final MinuteInterval appointmentMinimumDuration = MinuteInterval.thirty;
+  final MinuteInterval appointmentMinimumDuration = MinuteInterval.fifteen;
 
   double get hourHeight => 0;
 

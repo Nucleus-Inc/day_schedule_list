@@ -20,3 +20,6 @@
 * Issue: Add ScrollController parameter
 * Issue: Add Feature to change start date of appointment without changing its end date
 * Add github action for test and upload code coverage to CodeCov service
+
+# 0.2.0
+* Issue: Change minimum time interval of appointment from 30 minutes to 15 minutes
