@@ -70,7 +70,7 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
         padding: const EdgeInsets.only(
           left: DayScheduleListWidget.intervalContainerLeftInset,
         ),
-        child: DynamicTopPositionContainer(
+        child: DynamicPositionContainer(
           position: widget.position,
           canUpdatePositionTo: widget.canUpdatePositionTo,
           onNewPositionUpdate: _onNewPositionUpdate,

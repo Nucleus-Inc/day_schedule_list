@@ -8,8 +8,8 @@ typedef CanUpdateToPosition = bool Function(ScheduleItemPosition);
 typedef CanUpdateToTop = bool Function(double);
 typedef UpdateTopCallback = void Function(double top);
 
-class DynamicTopPositionContainer extends StatefulWidget {
-  const DynamicTopPositionContainer({
+class DynamicPositionContainer extends StatefulWidget {
+  const DynamicPositionContainer({
     required this.position,
     required this.child,
     required this.canUpdatePositionTo,
@@ -43,12 +43,12 @@ class DynamicTopPositionContainer extends StatefulWidget {
   final UpdatePositionCallback onNewPositionUpdate;
 
   @override
-  _DynamicTopPositionContainerState createState() =>
-      _DynamicTopPositionContainerState();
+  _DynamicPositionContainerState createState() =>
+      _DynamicPositionContainerState();
 }
 
-class _DynamicTopPositionContainerState
-    extends State<DynamicTopPositionContainer> {
+class _DynamicPositionContainerState
+    extends State<DynamicPositionContainer> {
   late ScheduleItemPosition _currentPosition;
 
   ///The sum of last vertical drag gesture [DragUpdateDetails.delta.dy]  that does not
@@ -64,7 +64,7 @@ class _DynamicTopPositionContainerState
   }
 
   @override
-  void didUpdateWidget(covariant DynamicTopPositionContainer oldWidget) {
+  void didUpdateWidget(covariant DynamicPositionContainer oldWidget) {
     super.didUpdateWidget(oldWidget);
     _currentPosition = widget.position;
   }
