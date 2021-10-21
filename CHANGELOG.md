@@ -23,3 +23,4 @@
 
 # 0.2.0
 * Issue: Change minimum time interval of appointment from 30 minutes to 15 minutes
+* Issue: Add tap gesture to enable and disable edition mode

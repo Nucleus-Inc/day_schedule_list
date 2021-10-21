@@ -4,15 +4,15 @@ import 'package:flutter/services.dart';
 
 typedef CanUpdateToHeight = bool Function(double, HeightUpdateFrom);
 typedef UpdateCallback = void Function(HeightUpdateFrom from);
-typedef UpdateHeightCallback = void Function(double height, HeightUpdateFrom from);
+typedef UpdateHeightCallback = void Function(
+    double height, HeightUpdateFrom from);
 
-enum HeightUpdateFrom {
-  top, bottom
-}
+enum HeightUpdateFrom { top, bottom }
 
 class DynamicHeightContainer extends StatefulWidget {
   const DynamicHeightContainer(
-      {required this.canUpdateHeightTo,
+      {required this.editionEnabled,
+      required this.canUpdateHeightTo,
       required this.onUpdateStart,
       required this.onNewUpdate,
       required this.onUpdateEnd,
@@ -67,6 +67,7 @@ class DynamicHeightContainer extends StatefulWidget {
   ///Function to determine if [child] height should or not change to a new one.
   final CanUpdateToHeight canUpdateHeightTo;
 
+  final bool editionEnabled;
   @override
   _DynamicHeightContainerState createState() => _DynamicHeightContainerState();
 }
@@ -80,7 +81,7 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
   double _pendingDeltaYForUpdateStep = 0;
   Offset _oldOffsetFromOrigin = Offset.zero;
   bool _didMove = false;
-  HeightUpdateFrom?  _updateFrom;
+  HeightUpdateFrom? _updateFrom;
   @override
   void initState() {
     _currentHeight = widget.currentHeight;
@@ -104,8 +105,9 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
           child: widget.child,
         ),
         DragIndicatorWidget.top(
+          enabled: widget.editionEnabled,
           onLongPressDown: () => onLongPressDown(HeightUpdateFrom.top),
-          onLongPressStart: (_){},//onLongPressStart,
+          onLongPressStart: (_) {}, //onLongPressStart,
           onLongPressEnd: onLongPressEnd,
           onLongPressMoveUpdate: onLongPressMoveUpdate,
           dragIndicatorColor: widget.dragIndicatorColor,
@@ -113,14 +115,15 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
           dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
         ),
         DragIndicatorWidget.bottom(
+          enabled: widget.editionEnabled,
           onLongPressDown: () => onLongPressDown(HeightUpdateFrom.bottom),
-          onLongPressStart: (_){},//onLongPressStart,
+          onLongPressStart: (_) {}, //onLongPressStart,
           onLongPressEnd: onLongPressEnd,
           onLongPressMoveUpdate: onLongPressMoveUpdate,
           dragIndicatorColor: widget.dragIndicatorColor,
           dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
           dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
-        )
+        ),
       ],
     );
   }
@@ -199,9 +202,10 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
 
   void _performIncrementBy(double value) {
     final from = _updateFrom;
-    if(from != null) {
+    if (from != null) {
       final localCurrentHeight = _currentHeight;
-      final finalHeight = localCurrentHeight + value*(from == HeightUpdateFrom.bottom ? 1 : -1);
+      final finalHeight = localCurrentHeight +
+          value * (from == HeightUpdateFrom.bottom ? 1 : -1);
       if (widget.canUpdateHeightTo(finalHeight, from)) {
         _currentHeight = finalHeight;
         _informNewUpdate();

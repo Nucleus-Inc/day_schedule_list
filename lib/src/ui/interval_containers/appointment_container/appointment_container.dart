@@ -48,14 +48,17 @@ class AppointmentContainer extends StatefulWidget {
 
 class _AppointmentContainerState extends State<AppointmentContainer> {
   late ValueNotifier<AppointmentUpdatingMode> _updateMode;
+  late ValueNotifier<bool> _editingMode;
   @override
   void initState() {
+    _editingMode = ValueNotifier(false);
     _updateMode = ValueNotifier(AppointmentUpdatingMode.none);
     super.initState();
   }
 
   @override
   void dispose() {
+    _editingMode.dispose();
     _updateMode.dispose();
     super.dispose();
   }
@@ -77,17 +80,25 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
           onUpdatePositionEnd: _onPositionUpdateEnd,
           onUpdatePositionCancel: _onUpdatePositionCancel,
           onUpdatePositionStart: _onUpdatePositionStart,
-          child: DynamicHeightContainer(
-            currentHeight: widget.position.height,
-            updateStep: widget.updateStep,
-            canUpdateHeightTo: widget.canUpdateHeightTo,
-            dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
-            dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
-            dragIndicatorColor: widget.dragIndicatorColor,
-            onUpdateEnd: _onUpdateHeightEnd,
-            onUpdateStart: _onUpdateHeightStart,
-            onUpdateCancel: _onUpdateHeightCancel,
-            onNewUpdate: _onNewUpdateHeight,
+          onUpdateEditingModeTap: (editing) => _editingMode.value = editing,
+          child: ValueListenableBuilder<bool>(
+            valueListenable: _editingMode,
+            builder: (context, editingMode, child){
+              return DynamicHeightContainer(
+                editionEnabled: editingMode,
+                currentHeight: widget.position.height,
+                updateStep: widget.updateStep,
+                canUpdateHeightTo: widget.canUpdateHeightTo,
+                dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
+                dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
+                dragIndicatorColor: widget.dragIndicatorColor,
+                onUpdateEnd: _onUpdateHeightEnd,
+                onUpdateStart: _onUpdateHeightStart,
+                onUpdateCancel: _onUpdateHeightCancel,
+                onNewUpdate: _onNewUpdateHeight,
+                child: child!,
+              );
+            },
             child: ValueListenableBuilder<AppointmentUpdatingMode>(
               valueListenable: _updateMode,
               builder: (context, value, child) {
