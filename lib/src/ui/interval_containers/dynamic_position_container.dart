@@ -2,14 +2,13 @@ import 'package:day_schedule_list/src/models/schedule_item_position.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-
 typedef UpdatePositionCallback = void Function(ScheduleItemPosition position);
 typedef CanUpdateToPosition = bool Function(ScheduleItemPosition);
 typedef CanUpdateToTop = bool Function(double);
 typedef UpdateTopCallback = void Function(double top);
 
-class DynamicTopPositionContainer extends StatefulWidget {
-  const DynamicTopPositionContainer({
+class DynamicPositionContainer extends StatefulWidget {
+  const DynamicPositionContainer({
     required this.position,
     required this.child,
     required this.canUpdatePositionTo,
@@ -18,6 +17,7 @@ class DynamicTopPositionContainer extends StatefulWidget {
     required this.onUpdatePositionCancel,
     required this.onUpdatePositionStart,
     this.updateStep,
+    this.onUpdateEditingModeTap,
     Key? key,
   }) : super(key: key);
 
@@ -30,25 +30,27 @@ class DynamicTopPositionContainer extends StatefulWidget {
 
   final CanUpdateToPosition canUpdatePositionTo;
 
-  ///Callback called when top position update action starts
+  ///Callback called when position update action starts
   final void Function() onUpdatePositionStart;
 
-  ///Callback called when top position update action ends
+  ///Callback called when position update action ends
   final UpdatePositionCallback onUpdatePositionEnd;
 
-  ///Callback called when top position update action ends
+  ///Callback called when position update action ends
   final void Function() onUpdatePositionCancel;
 
-  ///Callback called when top position update action changes
+  ///Callback called when position update action changes
   final UpdatePositionCallback onNewPositionUpdate;
 
+  ///Callback called when tap gesture is detected
+  final void Function(bool)? onUpdateEditingModeTap;
+
   @override
-  _DynamicTopPositionContainerState createState() =>
-      _DynamicTopPositionContainerState();
+  _DynamicPositionContainerState createState() =>
+      _DynamicPositionContainerState();
 }
 
-class _DynamicTopPositionContainerState
-    extends State<DynamicTopPositionContainer> {
+class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
   late ScheduleItemPosition _currentPosition;
 
   ///The sum of last vertical drag gesture [DragUpdateDetails.delta.dy]  that does not
@@ -56,28 +58,40 @@ class _DynamicTopPositionContainerState
   double _pendingDeltaYForUpdateStep = 0;
   Offset _oldOffsetFromOrigin = Offset.zero;
   bool _didMove = false;
-
+  late ValueNotifier<bool> editingMode;
   @override
   void initState() {
+    editingMode = ValueNotifier(false);
     _currentPosition = widget.position;
     super.initState();
   }
 
   @override
-  void didUpdateWidget(covariant DynamicTopPositionContainer oldWidget) {
+  void didUpdateWidget(covariant DynamicPositionContainer oldWidget) {
     super.didUpdateWidget(oldWidget);
     _currentPosition = widget.position;
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: onRescheduleLongPressDown,
-      //onLongPressStart: onRescheduleLongPressStart,
-      onLongPressEnd: onRescheduleLongPressEnd,
-      onLongPressMoveUpdate: onRescheduleLongPressMoveUpdate,
-      child: widget.child,
-    );
+    return ValueListenableBuilder<bool>(
+        valueListenable: editingMode,
+        builder: (context, editing, child) {
+          return GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              if (widget.onUpdateEditingModeTap != null) {
+                editingMode.value = !editingMode.value;
+                widget.onUpdateEditingModeTap!(editingMode.value);
+              }
+            },
+            onLongPress: editing ? onRescheduleLongPressDown : null,
+            //onLongPressStart: onRescheduleLongPressStart,
+            onLongPressEnd: editing ? onRescheduleLongPressEnd : null,
+            onLongPressMoveUpdate: editing ? onRescheduleLongPressMoveUpdate : null,
+            child: widget.child,
+          );
+        });
   }
 
   void onRescheduleLongPressDown() {
