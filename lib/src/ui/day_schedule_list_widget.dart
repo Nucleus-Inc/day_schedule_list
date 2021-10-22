@@ -10,8 +10,10 @@ import 'time_of_day_widget.dart';
 import '../helpers/time_of_day_extensions.dart';
 
 ///Signature of function to build your widget that represents an appointment.
+///Never forget to consider the parameter height, it is the available space you
+///have to alocate it.
 typedef AppointmentWidgetBuilder<K extends IntervalRange> = Widget Function(
-    BuildContext context, K appointment);
+    BuildContext context, K appointment, double height);
 
 ///Signature of function to update some updated appointment.
 typedef UpdateAppointDuration<K extends IntervalRange> = Future<bool> Function(
@@ -203,17 +205,18 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     required S interval,
     required double insetVertical,
   }) {
+    final position = calculateItemRangePosition(
+      itemRange: interval,
+      insetVertical: insetVertical,
+      firstValidTime: validTimesList.first,
+    );
     return AppointmentContainer(
       updateStep: minimumMinuteIntervalHeight,
       timeIndicatorsInset: timeOfDayWidgetHeight / 2.0,
       dragIndicatorColor: widget.dragIndicatorColor,
       dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
       dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
-      position: calculateItemRangePosition(
-        itemRange: interval,
-        insetVertical: insetVertical,
-        firstValidTime: validTimesList.first,
-      ),
+      position: position,
       canUpdateHeightTo: (newHeight, from) => canUpdateHeightOfInterval<S>(
         insetVertical: insetVertical,
         from: from,
@@ -232,13 +235,15 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         contentHeight:
             _validTimesListColumnKey.currentContext?.size?.height ?? 0,
       ),
-      onUpdatePositionEnd: (ScheduleItemPosition newPosition) =>
-          _updateAppointIntervalForNewPosition(
-        index: index,
-        appointments: appointments,
-        newPosition: newPosition,
-        insetVertical: insetVertical,
-      ),
+      onUpdatePositionEnd: (ScheduleItemPosition newPosition){
+        hideAppoinmentOverlay();
+        _updateAppointIntervalForNewPosition(
+          index: index,
+          appointments: appointments,
+          newPosition: newPosition,
+          insetVertical: insetVertical,
+        );
+      },
       onUpdatePositionStart: (mode) => showUpdateOverlay<S>(
         context: context,
         interval: interval,
@@ -251,7 +256,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
       onNewUpdatePosition: (newPosition) =>
           updateAppointmentOverlay(newPosition),
       onUpdatePositionCancel: () => hideAppoinmentOverlay(),
-      child: widget.appointmentBuilder(context, interval),
+      child: widget.appointmentBuilder(context, interval, position.height),
     );
   }
 
@@ -280,7 +285,6 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
       intervals: widget.unavailableIntervals,
     );
 
-    hideAppoinmentOverlay();
     if (intersectsOtherAppt || intersectsSomeUnavailRange) {
       setState(() {});
       return false;

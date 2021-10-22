@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../day_schedule_list_widget.dart';
-import '../../dynamic_height_container.dart';
+import 'dynamic_height_container.dart';
 import '../../../models/schedule_item_position.dart';
-import '../dynamic_position_container.dart';
+import 'dynamic_position_container.dart';
 
 typedef AppointmentUpdatePositionStartCallback = void Function(AppointmentUpdatingMode mode);
 

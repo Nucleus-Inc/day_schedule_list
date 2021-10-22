@@ -1,4 +1,4 @@
-import 'package:day_schedule_list/src/ui/dynamic_height_container.dart';
+import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/dynamic_height_container.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/appointment_container.dart';
 import 'package:flutter/material.dart';
 import '../models/interval_range.dart';
@@ -331,6 +331,7 @@ mixin DayScheduleListWidgetMethods {
           firstValidTime: validTimesList.first,
           insetVertical: insetVertical,
         );
+
         return AppointmentContainerOverlay(
           position: appointmentOverlayPosition,
           updateMode: mode,
@@ -338,7 +339,7 @@ mixin DayScheduleListWidgetMethods {
           link: link,
           timeIndicatorsInset:
               calculateTimeOfDayIndicatorsInset(timeOfDayWidgetHeight),
-          child: appointmentBuilder(context, interval),
+          child: appointmentBuilder(context, interval,appointmentOverlayPosition.height,),
         );
       },
     );
@@ -354,6 +355,7 @@ mixin DayScheduleListWidgetMethods {
     try {
       final overlay = appointmentOverlayEntry;
       if(overlay != null) {
+        appointmentOverlayEntry = null;
         overlay.remove();
       }
     }

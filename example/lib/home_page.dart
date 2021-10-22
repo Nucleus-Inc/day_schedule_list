@@ -79,7 +79,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ));
   }
 
-  Widget _buildItem(BuildContext context, MyAppointment appointment) {
+  Widget _buildItem(BuildContext context, MyAppointment appointment, double height) {
+    Color color = height > 30 ? Colors.white : Colors.grey;
     return Card(
       margin: const EdgeInsets.symmetric(
         vertical: 1,
@@ -90,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Text(
           appointment.title,
           style: Theme.of(context).textTheme.caption?.copyWith(
-                color: Colors.white,
+                color: color,
               ),
         ),
       ),
