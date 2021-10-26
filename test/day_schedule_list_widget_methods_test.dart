@@ -20,6 +20,8 @@ void main() {
   _canUpdatePositionOfIntervalTest();
   _populateValidTimesListTest();
   _calculateItervalRangeForNewPositionTest();
+  _buildInternalUnavailableIntervalsTest();
+  _newAppointmentForTappedPositionTest();
 }
 
 void _calculateTimeOfDayIndicatorsInsetTest() {
@@ -138,7 +140,7 @@ void _belongsToInternalUnavailableRangeTest() {
           time: time,
           unavailableIntervals: unavailableItems,
         ),
-        false,
+        true,
       );
     });
   });
@@ -363,7 +365,7 @@ void _canUpdateHeightOfIntervalFromTopTest() {
   ];
 
   final validTimes =
-  methods.populateValidTimesList(unavailableIntervals: unavailableItems);
+      methods.populateValidTimesList(unavailableIntervals: unavailableItems);
   group('.canUpdateHeightOfInterval()', () {
     test('try to update without intersections', () {
       expect(
@@ -428,7 +430,7 @@ void _canUpdatePositionOfIntervalTest() {
   ];
 
   const oneHourHeight = 100.0;
-  const availableTimeIntervalInMinutes = 12 + 59/60.0;
+  const availableTimeIntervalInMinutes = 12 + 59 / 60.0;
   const contentHeight = availableTimeIntervalInMinutes * oneHourHeight;
 
   final validTimes =
@@ -631,6 +633,280 @@ void _calculateItervalRangeForNewPositionTest() {
             updatedRange.end == result.end),
       );
     });
+  });
+}
+
+void _buildInternalUnavailableIntervalsTest() {
+  group('.buildInternalUnavailableIntervals()', () {
+    final methods = _DayScheduleListWidgetMethodsTest();
+    test(
+        'A list with more than 2 elements one with start at 00:00 and other with end at 23:59',
+        () {
+      final unavailableIntervals = [
+        IntervalRange(
+            start: const TimeOfDay(hour: 0, minute: 0),
+            end: const TimeOfDay(hour: 8, minute: 0)),
+        IntervalRange(
+            start: const TimeOfDay(hour: 12, minute: 0),
+            end: const TimeOfDay(hour: 13, minute: 0)),
+        IntervalRange(
+            start: const TimeOfDay(hour: 16, minute: 0),
+            end: const TimeOfDay(hour: 16, minute: 30)),
+        IntervalRange(
+            start: const TimeOfDay(hour: 18, minute: 0),
+            end: const TimeOfDay(hour: 23, minute: 59)),
+      ];
+      final expectedIntervals = unavailableIntervals.sublist(1, 3);
+      expect(
+        methods.buildInternalUnavailableIntervals(
+            unavailableIntervals: unavailableIntervals),
+        expectedIntervals,
+      );
+    });
+    test(
+        'A list with 2 elements one with start at 00:00 and other with end at 23:59',
+        () {
+      final unavailableIntervals = [
+        IntervalRange(
+            start: const TimeOfDay(hour: 0, minute: 0),
+            end: const TimeOfDay(hour: 8, minute: 0)),
+        IntervalRange(
+            start: const TimeOfDay(hour: 18, minute: 0),
+            end: const TimeOfDay(hour: 23, minute: 59)),
+      ];
+      final expectedIntervals = [];
+      expect(
+        methods.buildInternalUnavailableIntervals(
+            unavailableIntervals: unavailableIntervals),
+        expectedIntervals,
+      );
+    });
+    test(
+        'A list with more than 2 elements one with start at 00:00 and no one at 23:59',
+        () {
+      final unavailableIntervals = [
+        IntervalRange(
+            start: const TimeOfDay(hour: 0, minute: 0),
+            end: const TimeOfDay(hour: 8, minute: 0)),
+        IntervalRange(
+            start: const TimeOfDay(hour: 12, minute: 0),
+            end: const TimeOfDay(hour: 13, minute: 0)),
+        IntervalRange(
+            start: const TimeOfDay(hour: 16, minute: 0),
+            end: const TimeOfDay(hour: 16, minute: 30)),
+        IntervalRange(
+            start: const TimeOfDay(hour: 18, minute: 0),
+            end: const TimeOfDay(hour: 22, minute: 30)),
+      ];
+      final expectedIntervals = [
+        unavailableIntervals[1],
+        unavailableIntervals[2],
+        unavailableIntervals[3]
+      ];
+      expect(
+        methods.buildInternalUnavailableIntervals(
+            unavailableIntervals: unavailableIntervals),
+        expectedIntervals,
+      );
+    });
+    test('an empty list', () {
+      final List<IntervalRange> unavailableIntervals = [];
+      expect(
+        methods.buildInternalUnavailableIntervals(
+            unavailableIntervals: unavailableIntervals),
+        [],
+      );
+    });
+    test('A list with less than 2 elements one with start at 00:00', () {
+      final unavailableIntervals = [
+        IntervalRange(
+            start: const TimeOfDay(hour: 0, minute: 0),
+            end: const TimeOfDay(hour: 8, minute: 0)),
+      ];
+      final expectedIntervals = [];
+      expect(
+        methods.buildInternalUnavailableIntervals(
+            unavailableIntervals: unavailableIntervals),
+        expectedIntervals,
+      );
+    });
+    test('A list with less than 2 elements no one with start at 00:00 or 23:59',
+        () {
+      final unavailableIntervals = [
+        IntervalRange(
+          start: const TimeOfDay(hour: 8, minute: 0),
+          end: const TimeOfDay(hour: 11, minute: 25),
+        ),
+      ];
+      final expectedIntervals = [...unavailableIntervals];
+      expect(
+        methods.buildInternalUnavailableIntervals(
+            unavailableIntervals: unavailableIntervals),
+        expectedIntervals,
+      );
+    });
+  });
+}
+
+void _newAppointmentForTappedPositionTest() {
+  final methods = _DayScheduleListWidgetMethodsTest();
+
+  final List<IntervalRange> appointments = [
+    IntervalRange(
+      start: const TimeOfDay(hour: 8, minute: 0),
+      end: const TimeOfDay(hour: 10, minute: 0),
+    ),
+    IntervalRange(
+      start: const TimeOfDay(hour: 12, minute: 0),
+      end: const TimeOfDay(hour: 14, minute: 35),
+    ),
+    IntervalRange(
+      start: const TimeOfDay(hour: 16, minute: 0),
+      end: const TimeOfDay(hour: 16, minute: 32),
+    ),
+    IntervalRange(
+      start: const TimeOfDay(hour: 17, minute: 0),
+      end: const TimeOfDay(hour: 20, minute: 30),
+    )
+  ];
+
+  final List<IntervalRange> unavailableIntervals = [
+    IntervalRange(
+      start: const TimeOfDay(hour: 6, minute: 0),
+      end: const TimeOfDay(hour: 7, minute: 59),
+    ),
+    IntervalRange(
+      start: const TimeOfDay(hour: 21, minute: 0),
+      end: const TimeOfDay(hour: 22, minute: 59),
+    )
+  ];
+  const insetVertical = 10.0;
+
+  final validTimes = methods.populateValidTimesList(
+      unavailableIntervals: unavailableIntervals);
+
+  group('.newAppointmentForTappedPosition()', () {
+    final methods = _DayScheduleListWidgetMethodsTest();
+    test('Add appointment inside time interval without intersections', () {
+      final position = methods.calculateItemRangePosition(
+        itemRange: appointments[0],
+        insetVertical: insetVertical,
+        firstValidTime: validTimes.first,
+      );
+      expect(
+        methods.newAppointmentForTappedPosition(
+            appointments: appointments,
+            startPosition: Offset(
+                0,
+                position.top +
+                    position.height +
+                    methods.minimumMinuteIntervalHeight * 30),
+            firstValidTimeList: validTimes.first,
+            lastValidTimeList: validTimes.last,
+            unavailableIntervals: unavailableIntervals),
+        predicate<IntervalRange>((result) {
+          return result.start == const TimeOfDay(hour: 10, minute: 6) &&
+              result.end == const TimeOfDay(hour: 11, minute: 6);
+        }),
+      );
+    });
+
+    test('Add appointment inside time interval with intersections on start',
+        () {
+      final position = methods.calculateItemRangePosition(
+        itemRange: appointments[0],
+        insetVertical: insetVertical,
+        firstValidTime: validTimes.first,
+      );
+      expect(
+        methods.newAppointmentForTappedPosition(
+            appointments: appointments,
+            startPosition: Offset(
+                0,
+                position.top +
+                    position.height
+            ),
+            firstValidTimeList: validTimes.first,
+            lastValidTimeList: validTimes.last,
+            unavailableIntervals: unavailableIntervals),
+        predicate<IntervalRange>((result) {
+          return result.start == const TimeOfDay(hour: 10, minute: 1) &&
+              result.end == const TimeOfDay(hour: 10, minute: 36);
+        }),
+      );
+    });
+
+    test('Add appointment inside time interval with intersections on end',
+            () {
+          final position = methods.calculateItemRangePosition(
+            itemRange: appointments[1],
+            insetVertical: insetVertical,
+            firstValidTime: validTimes.first,
+          );
+          expect(
+            methods.newAppointmentForTappedPosition(
+                appointments: appointments,
+                startPosition: Offset(
+                    0,
+                    position.top - methods.minimumMinuteIntervalHeight,
+                ),
+                firstValidTimeList: validTimes.first,
+                lastValidTimeList: validTimes.last,
+                unavailableIntervals: unavailableIntervals),
+            predicate<IntervalRange>((result) {
+              return result.start == const TimeOfDay(hour: 11, minute: 35) &&
+                  result.end == const TimeOfDay(hour: 11, minute: 59);
+            }),
+          );
+        });
+
+    test('Add appointment inside time interval constrained by min valid time',
+            () {
+          final position = methods.calculateItemRangePosition(
+            itemRange: unavailableIntervals[0],
+            insetVertical: insetVertical,
+            firstValidTime: validTimes.first,
+          );
+          expect(
+            methods.newAppointmentForTappedPosition(
+                appointments: appointments,
+                startPosition: Offset(
+                  0,
+                  position.top - methods.minimumMinuteIntervalHeight*60*7,
+                ),
+                firstValidTimeList: validTimes.first,
+                lastValidTimeList: validTimes.last,
+                unavailableIntervals: unavailableIntervals),
+            predicate<IntervalRange>((result) {
+              return result.start == const TimeOfDay(hour: 0, minute: 0) &&
+                  result.end == const TimeOfDay(hour: 1, minute: 0);
+            }),
+          );
+        });
+
+    test('Add appointment inside time interval constrained by max valid time',
+            () {
+          final position = methods.calculateItemRangePosition(
+            itemRange: unavailableIntervals.last,
+            insetVertical: insetVertical,
+            firstValidTime: validTimes.first,
+          );
+          expect(
+            methods.newAppointmentForTappedPosition(
+                appointments: appointments,
+                startPosition: Offset(
+                  0,
+                  position.top + position.height + methods.minimumMinuteIntervalHeight*59,
+                ),
+                firstValidTimeList: validTimes.first,
+                lastValidTimeList: validTimes.last,
+                unavailableIntervals: unavailableIntervals),
+            predicate<IntervalRange>((result) {
+              return result.start == const TimeOfDay(hour: 23, minute: 34) &&
+                  result.end == const TimeOfDay(hour: 23, minute: 59);
+            }),
+          );
+        });
   });
 }
 
