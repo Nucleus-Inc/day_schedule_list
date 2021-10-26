@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class DragIndicatorWidget extends StatelessWidget {
   const DragIndicatorWidget.top({
+    required this.enabled,
     required this.onLongPressDown,
     required this.onLongPressStart,
     required this.onLongPressEnd,
@@ -14,6 +15,7 @@ class DragIndicatorWidget extends StatelessWidget {
         super(key: key);
 
   const DragIndicatorWidget.bottom({
+    required this.enabled,
     required this.onLongPressDown,
     required this.onLongPressStart,
     required this.onLongPressEnd,
@@ -30,7 +32,8 @@ class DragIndicatorWidget extends StatelessWidget {
     this.dragIndicatorBorderWidth,
     this.dragIndicatorColor,
     Key? key,
-  })  : mode = _Mode.overlayTop,
+  })  : enabled = true,
+        mode = _Mode.overlayTop,
         onLongPressDown = null,
         onLongPressStart = null,
         onLongPressMoveUpdate = null,
@@ -42,7 +45,8 @@ class DragIndicatorWidget extends StatelessWidget {
     this.dragIndicatorBorderWidth,
     this.dragIndicatorColor,
     Key? key,
-  })  : mode = _Mode.overlayBottom,
+  })  : enabled = true,
+        mode = _Mode.overlayBottom,
         onLongPressDown = null,
         onLongPressStart = null,
         onLongPressMoveUpdate = null,
@@ -50,6 +54,7 @@ class DragIndicatorWidget extends StatelessWidget {
         super(key: key);
 
   final _Mode mode;
+  final bool enabled;
   final GestureLongPressCallback? onLongPressDown;
   final GestureLongPressStartCallback? onLongPressStart;
   final GestureLongPressEndCallback? onLongPressEnd;
@@ -74,13 +79,17 @@ class DragIndicatorWidget extends StatelessWidget {
       bottom: [_Mode.bottom, _Mode.overlayBottom].contains(mode) ? -2 : null,
       child: [_Mode.overlayBottom, _Mode.overlayTop].contains(mode)
           ? indicatorWidget
-          : GestureDetector(
-              onLongPress: onLongPressDown,
-              onLongPressStart: onLongPressStart,
-              onLongPressEnd: onLongPressEnd,
-              onLongPressMoveUpdate: onLongPressMoveUpdate,
-              behavior: HitTestBehavior.opaque,
-              child: indicatorWidget,
+          : AnimatedOpacity(
+              opacity: enabled ? 1 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: GestureDetector(
+                onLongPress: enabled ? onLongPressDown : null,
+                onLongPressStart: enabled ? onLongPressStart : null,
+                onLongPressEnd: enabled ? onLongPressEnd : null,
+                onLongPressMoveUpdate: enabled ? onLongPressMoveUpdate : null,
+                behavior: HitTestBehavior.opaque,
+                child: indicatorWidget,
+              ),
             ),
     );
   }
@@ -88,8 +97,8 @@ class DragIndicatorWidget extends StatelessWidget {
   Widget _buildContainer(BuildContext context) {
     return Container(
       alignment: [_Mode.bottom, _Mode.overlayBottom].contains(mode)
-          ? Alignment.centerRight
-          : Alignment.centerLeft,
+          ? Alignment.bottomRight
+          : Alignment.topLeft,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Container(
         clipBehavior: Clip.hardEdge,

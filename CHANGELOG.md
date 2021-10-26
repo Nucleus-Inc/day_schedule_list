@@ -20,3 +20,9 @@
 * Issue: Add ScrollController parameter
 * Issue: Add Feature to change start date of appointment without changing its end date
 * Add github action for test and upload code coverage to CodeCov service
+
+# 0.2.0
+* Issue: Change minimum time interval of appointment from 30 minutes to 15 minutes
+* Issue: Add tap gesture to enable and disable edition mode
+* Issue: Make possible to build child widget of Appointment based on duration of appointment
+* Issue: Make possible to tap on some available time interval to create a new appointment

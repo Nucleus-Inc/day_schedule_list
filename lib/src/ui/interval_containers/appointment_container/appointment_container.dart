@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../day_schedule_list_widget.dart';
-import '../../dynamic_height_container.dart';
+import 'dynamic_height_container.dart';
 import '../../../models/schedule_item_position.dart';
-import '../dynamic_position_container.dart';
+import 'dynamic_position_container.dart';
 
 typedef AppointmentUpdatePositionStartCallback = void Function(AppointmentUpdatingMode mode);
 
@@ -48,14 +48,17 @@ class AppointmentContainer extends StatefulWidget {
 
 class _AppointmentContainerState extends State<AppointmentContainer> {
   late ValueNotifier<AppointmentUpdatingMode> _updateMode;
+  late ValueNotifier<bool> _editingMode;
   @override
   void initState() {
+    _editingMode = ValueNotifier(false);
     _updateMode = ValueNotifier(AppointmentUpdatingMode.none);
     super.initState();
   }
 
   @override
   void dispose() {
+    _editingMode.dispose();
     _updateMode.dispose();
     super.dispose();
   }
@@ -70,24 +73,32 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
         padding: const EdgeInsets.only(
           left: DayScheduleListWidget.intervalContainerLeftInset,
         ),
-        child: DynamicTopPositionContainer(
+        child: DynamicPositionContainer(
           position: widget.position,
           canUpdatePositionTo: widget.canUpdatePositionTo,
           onNewPositionUpdate: _onNewPositionUpdate,
           onUpdatePositionEnd: _onPositionUpdateEnd,
           onUpdatePositionCancel: _onUpdatePositionCancel,
           onUpdatePositionStart: _onUpdatePositionStart,
-          child: DynamicHeightContainer(
-            currentHeight: widget.position.height,
-            updateStep: widget.updateStep,
-            canUpdateHeightTo: widget.canUpdateHeightTo,
-            dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
-            dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
-            dragIndicatorColor: widget.dragIndicatorColor,
-            onUpdateEnd: _onUpdateHeightEnd,
-            onUpdateStart: _onUpdateHeightStart,
-            onUpdateCancel: _onUpdateHeightCancel,
-            onNewUpdate: _onNewUpdateHeight,
+          onUpdateEditingModeTap: (editing) => _editingMode.value = editing,
+          child: ValueListenableBuilder<bool>(
+            valueListenable: _editingMode,
+            builder: (context, editingMode, child){
+              return DynamicHeightContainer(
+                editionEnabled: editingMode,
+                currentHeight: widget.position.height,
+                updateStep: widget.updateStep,
+                canUpdateHeightTo: widget.canUpdateHeightTo,
+                dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
+                dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
+                dragIndicatorColor: widget.dragIndicatorColor,
+                onUpdateEnd: _onUpdateHeightEnd,
+                onUpdateStart: _onUpdateHeightStart,
+                onUpdateCancel: _onUpdateHeightCancel,
+                onNewUpdate: _onNewUpdateHeight,
+                child: child!,
+              );
+            },
             child: ValueListenableBuilder<AppointmentUpdatingMode>(
               valueListenable: _updateMode,
               builder: (context, value, child) {

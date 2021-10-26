@@ -25,4 +25,22 @@ extension HelperMethods on TimeOfDay {
                 (other.hour == hour && other.minute < minute)) ||
         other == this;
   }
+
+  TimeOfDay add({required int hours,required int minutes}){
+    final now = DateTime.now();
+    final newDate = DateTime(now.year,now.month, now.day, hour, minute).add(Duration(
+      hours: hours,
+      minutes: minutes,
+    ));
+    return TimeOfDay.fromDateTime(newDate);
+  }
+
+  TimeOfDay subtract({required int hours,required int minutes}){
+    final now = DateTime.now();
+    final newDate = DateTime(now.year,now.month, now.day, hour, minute).subtract(Duration(
+      hours: hours,
+      minutes: minutes,
+    ));
+    return TimeOfDay.fromDateTime(newDate);
+  }
 }
