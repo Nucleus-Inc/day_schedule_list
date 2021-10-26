@@ -25,3 +25,4 @@
 * Issue: Change minimum time interval of appointment from 30 minutes to 15 minutes
 * Issue: Add tap gesture to enable and disable edition mode
 * Issue: Make possible to build child widget of Appointment based on duration of appointment
+* Issue: Make possible to tap on some available time interval to create a new appointment

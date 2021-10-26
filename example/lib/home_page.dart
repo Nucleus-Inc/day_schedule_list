@@ -64,6 +64,25 @@ class _MyHomePageState extends State<MyHomePage> {
           appointments: myAppointments,
           dragIndicatorColor: Colors.red,
           updateAppointDuration: _updateAppointmentDuration,
+          createNewAppointmentAt:
+              (IntervalRange? interval, DayScheduleListWidgetErrors? error) {
+            if (error != null || interval == null) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text(
+                  'Failed to create new appointment',
+                ),
+              ));
+            } else {
+              setState(() {
+                myAppointments.add(
+                  MyAppointment(
+                      title: 'New appointment',
+                      start: interval.start,
+                      end: interval.end),
+                );
+              });
+            }
+          },
           appointmentBuilder: _buildItem,
           unavailableIntervals: [
             IntervalRange(
@@ -74,12 +93,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 end: const TimeOfDay(hour: 13, minute: 15)),
             IntervalRange(
                 start: const TimeOfDay(hour: 18, minute: 0),
-                end: const TimeOfDay(hour: 23, minute: 59))
+                end: const TimeOfDay(hour: 22, minute: 30))
           ],
         ));
   }
 
-  Widget _buildItem(BuildContext context, MyAppointment appointment, double height) {
+  Widget _buildItem(
+      BuildContext context, MyAppointment appointment, double height) {
     Color color = height > 30 ? Colors.white : Colors.grey;
     return Card(
       margin: const EdgeInsets.symmetric(
