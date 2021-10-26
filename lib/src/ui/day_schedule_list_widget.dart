@@ -1,5 +1,8 @@
+import 'package:day_schedule_list/day_schedule_list.dart';
+import 'package:day_schedule_list/src/models/exceptions.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
 import 'package:day_schedule_list/src/ui/valid_time_of_day_list_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../models/interval_range.dart';
@@ -19,6 +22,10 @@ typedef AppointmentWidgetBuilder<K extends IntervalRange> = Widget Function(
 typedef UpdateAppointDuration<K extends IntervalRange> = Future<bool> Function(
     K appointment, IntervalRange newInterval);
 
+///Signature of function to update some updated appointment.
+typedef NewAppointmentAt = void Function(
+    IntervalRange? interval, DayScheduleListWidgetErrors? error);
+
 ///This is the widget that represents your daily schedule.
 ///Here you will see all your appointments for the [referenceDate].
 class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
@@ -29,6 +36,7 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     required this.appointments,
     required this.updateAppointDuration,
     required this.appointmentBuilder,
+    required this.createNewAppointmentAt,
     this.hourHeight = 100.0,
     this.scrollController,
     this.dragIndicatorBorderWidth,
@@ -64,6 +72,10 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
   ///A Builder called for every appointment of [appointments] to build your
   /// widget that represents it.
   final AppointmentWidgetBuilder<T> appointmentBuilder;
+
+  ///A Builder called for every appointment of [appointments] to build your
+  /// widget that represents it.
+  final NewAppointmentAt createNewAppointmentAt;
 
   ///The convertion parameter from one hour to height dimension.
   ///Choose a value that best fits your needs.
@@ -140,6 +152,34 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
                 minimumMinuteInterval: minimumMinuteInterval,
               ),
             ),
+            Positioned(
+              top: 0,
+              right: 0,
+              left: 0,
+              bottom: 0,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTapUp: (TapUpDetails details) {
+                  try {
+                    final appointment = newAppointmentForTappedPosition(
+                      startPosition: details.localPosition,
+                      firstValidTimeList: validTimesList.first,
+                      lastValidTimeList: validTimesList.last,
+                      appointments: widget.appointments,
+                      unavailableIntervals: widget.unavailableIntervals,
+                    );
+                    widget.createNewAppointmentAt(appointment, null);
+                  } on UnavailableIntervalToAddAppointmentException {
+                    widget.createNewAppointmentAt(
+                      null,
+                      DayScheduleListWidgetErrors
+                          .unavailableIntervalToAddAppointment,
+                    );
+                  }
+                },
+                child: Container(),
+              ),
+            ),
             const Positioned(
               top: 0,
               left: 35,
@@ -161,11 +201,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
 
   List<UnavailableIntervalContainer> _buildUnavailableIntervalsWidgetList(
       {required double insetVertical}) {
-    final List<IntervalRange> unavailableSublist =
-        widget.unavailableIntervals.length >= 3
-            ? widget.unavailableIntervals
-                .sublist(1, widget.unavailableIntervals.length - 1)
-            : [];
+    final List<IntervalRange> unavailableSublist = buildInternalUnavailableIntervals(unavailableIntervals: widget.unavailableIntervals,);
     return unavailableSublist.map((IntervalRange interval) {
       return UnavailableIntervalContainer(
         interval: interval,
@@ -235,7 +271,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         contentHeight:
             _validTimesListColumnKey.currentContext?.size?.height ?? 0,
       ),
-      onUpdatePositionEnd: (ScheduleItemPosition newPosition){
+      onUpdatePositionEnd: (ScheduleItemPosition newPosition) {
         hideAppoinmentOverlay();
         _updateAppointIntervalForNewPosition(
           index: index,
