@@ -22,6 +22,7 @@ void main() {
   _calculateItervalRangeForNewPositionTest();
   _buildInternalUnavailableIntervalsTest();
   _newAppointmentForTappedPositionTest();
+  _timeOfDayWidgetHeightTest();
 }
 
 void _calculateTimeOfDayIndicatorsInsetTest() {
@@ -910,8 +911,59 @@ void _newAppointmentForTappedPositionTest() {
   });
 }
 
+void _timeOfDayWidgetHeightTest(){
+  group('DayScheduleListWidgetMethods.timeOfDayWidgetHeight tests', (){
+    test('Default data', (){
+      final instance = _DayScheduleListWidgetMethodsTest();
+      expect(instance.timeOfDayWidgetHeight, (instance.hourHeight*instance.minimumMinuteInterval.numberValue/60.0)*10);
+    });
+    test('minimumMinuteInterval = MinuteInterval.five', (){
+      final instance = _DayScheduleListWidgetMethodsTest2();
+      expect(instance.timeOfDayWidgetHeight, 17);
+    });
+    test('minimumMinuteInterval = MinuteInterval.ten', (){
+      final instance = _DayScheduleListWidgetMethodsTest3();
+      expect(instance.timeOfDayWidgetHeight, 17);
+    });
+    test('minimumMinuteInterval = MinuteInterval.fifteen', (){
+      final instance = _DayScheduleListWidgetMethodsTest4();
+      expect(instance.timeOfDayWidgetHeight, 17);
+    });
+  });
+}
+
 class _DayScheduleListWidgetMethodsTest with DayScheduleListWidgetMethods {
   _DayScheduleListWidgetMethodsTest();
   @override
   double get hourHeight => 100;
+}
+
+class _DayScheduleListWidgetMethodsTest2 with DayScheduleListWidgetMethods {
+  _DayScheduleListWidgetMethodsTest2();
+  @override
+  double get hourHeight => 100;
+  @override
+  MinuteInterval get minimumMinuteInterval => MinuteInterval.five;
+  @override
+  MinuteInterval get appointmentMinimumDuration => MinuteInterval.thirty;
+}
+
+class _DayScheduleListWidgetMethodsTest3 with DayScheduleListWidgetMethods {
+  _DayScheduleListWidgetMethodsTest3();
+  @override
+  double get hourHeight => 100;
+  @override
+  MinuteInterval get minimumMinuteInterval => MinuteInterval.ten;
+  @override
+  MinuteInterval get appointmentMinimumDuration => MinuteInterval.thirty;
+}
+
+class _DayScheduleListWidgetMethodsTest4 with DayScheduleListWidgetMethods {
+  _DayScheduleListWidgetMethodsTest4();
+  @override
+  double get hourHeight => 100;
+  @override
+  MinuteInterval get minimumMinuteInterval => MinuteInterval.fifteen;
+  @override
+  MinuteInterval get appointmentMinimumDuration => MinuteInterval.thirty;
 }
