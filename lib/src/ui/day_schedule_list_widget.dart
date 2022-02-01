@@ -37,7 +37,7 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     required this.updateAppointDuration,
     required this.appointmentBuilder,
     required this.createNewAppointmentAt,
-    this.hourHeight = 100.0,
+    this.hourHeight = DayScheduleListWidgetMethods.defaultHourHeight,
     this.scrollController,
     this.dragIndicatorBorderWidth,
     this.dragIndicatorColor,

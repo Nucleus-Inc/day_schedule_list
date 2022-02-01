@@ -12,7 +12,9 @@ import '../helpers/time_of_day_extensions.dart';
 import '../helpers/date_time_extensions.dart';
 
 mixin DayScheduleListWidgetMethods {
-  final MinuteInterval minimumMinuteInterval = MinuteInterval.one;
+  static const double defaultHourHeight = 100;
+
+  final MinuteInterval minimumMinuteInterval = MinuteInterval.five;
   final MinuteInterval appointmentMinimumDuration = MinuteInterval.fifteen;
 
   double get hourHeight => 0;
@@ -20,7 +22,9 @@ mixin DayScheduleListWidgetMethods {
   late double minimumMinuteIntervalHeight =
       (hourHeight * minimumMinuteInterval.numberValue.toDouble()) / 60.0;
 
-  late double timeOfDayWidgetHeight = 10 * minimumMinuteIntervalHeight;
+  double get timeOfDayWidgetHeight {
+    return minimumMinuteIntervalHeight < 2 ? 10 * minimumMinuteIntervalHeight : 17;
+  }
 
   final LayerLink link = LayerLink();
   OverlayEntry? appointmentOverlayEntry;
