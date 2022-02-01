@@ -13,11 +13,12 @@ import '../helpers/date_time_extensions.dart';
 
 mixin DayScheduleListWidgetMethods {
   static const double defaultHourHeight = 100;
-
-  final MinuteInterval minimumMinuteInterval = MinuteInterval.five;
-  final MinuteInterval appointmentMinimumDuration = MinuteInterval.fifteen;
-
+  static const MinuteInterval defaultMinimumMinuteInterval = MinuteInterval.one;
+  static const MinuteInterval defaultAppointmentMinimumDuration = MinuteInterval.fifteen;
   double get hourHeight => 0;
+
+  MinuteInterval get minimumMinuteInterval => defaultMinimumMinuteInterval;
+  MinuteInterval get appointmentMinimumDuration => defaultAppointmentMinimumDuration;
 
   late double minimumMinuteIntervalHeight =
       (hourHeight * minimumMinuteInterval.numberValue.toDouble()) / 60.0;
@@ -183,8 +184,11 @@ mixin DayScheduleListWidgetMethods {
   List<ScheduleTimeOfDay> populateValidTimesList({
     required List<IntervalRange> unavailableIntervals,
   }) {
+
     List<ScheduleTimeOfDay> validTimesList = [];
     final verifyUnavailableIntervals = unavailableIntervals.isNotEmpty;
+    const minimumMinuteInterval = MinuteInterval.one;
+
     for (var item = 0; item < 25; item++) {
       final hasTimeBefore = item > 0;
       final TimeOfDay time =
