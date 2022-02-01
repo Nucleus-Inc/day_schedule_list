@@ -87,10 +87,10 @@ class _MyHomePageState extends State<MyHomePage> {
           unavailableIntervals: [
             IntervalRange(
                 start: const TimeOfDay(hour: 0, minute: 0),
-                end: const TimeOfDay(hour: 8, minute: 30)),
+                end: const TimeOfDay(hour: 8, minute: 0)),
             IntervalRange(
                 start: const TimeOfDay(hour: 12, minute: 0),
-                end: const TimeOfDay(hour: 13, minute: 15)),
+                end: const TimeOfDay(hour: 13, minute: 30)),
             IntervalRange(
                 start: const TimeOfDay(hour: 18, minute: 0),
                 end: const TimeOfDay(hour: 22, minute: 30))
