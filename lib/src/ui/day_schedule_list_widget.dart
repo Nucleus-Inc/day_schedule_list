@@ -2,10 +2,8 @@ import 'package:day_schedule_list/day_schedule_list.dart';
 import 'package:day_schedule_list/src/models/exceptions.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
 import 'package:day_schedule_list/src/ui/valid_time_of_day_list_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../models/interval_range.dart';
 import 'day_schedule_list_widget_extensions.dart';
 import 'interval_containers/appointment_container/appointment_container.dart';
 import 'interval_containers/unavailable_interval_container.dart';
