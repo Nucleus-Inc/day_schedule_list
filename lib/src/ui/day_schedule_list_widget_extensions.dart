@@ -12,15 +12,20 @@ import '../helpers/time_of_day_extensions.dart';
 import '../helpers/date_time_extensions.dart';
 
 mixin DayScheduleListWidgetMethods {
-  final MinuteInterval minimumMinuteInterval = MinuteInterval.one;
-  final MinuteInterval appointmentMinimumDuration = MinuteInterval.fifteen;
-
+  static const double defaultHourHeight = 100;
+  static const MinuteInterval defaultMinimumMinuteInterval = MinuteInterval.one;
+  static const MinuteInterval defaultAppointmentMinimumDuration = MinuteInterval.fifteen;
   double get hourHeight => 0;
+
+  MinuteInterval get minimumMinuteInterval => defaultMinimumMinuteInterval;
+  MinuteInterval get appointmentMinimumDuration => defaultAppointmentMinimumDuration;
 
   late double minimumMinuteIntervalHeight =
       (hourHeight * minimumMinuteInterval.numberValue.toDouble()) / 60.0;
 
-  late double timeOfDayWidgetHeight = 10 * minimumMinuteIntervalHeight;
+  double get timeOfDayWidgetHeight {
+    return minimumMinuteIntervalHeight < 2 ? 10 * minimumMinuteIntervalHeight : 17;
+  }
 
   final LayerLink link = LayerLink();
   OverlayEntry? appointmentOverlayEntry;
@@ -179,8 +184,11 @@ mixin DayScheduleListWidgetMethods {
   List<ScheduleTimeOfDay> populateValidTimesList({
     required List<IntervalRange> unavailableIntervals,
   }) {
+
     List<ScheduleTimeOfDay> validTimesList = [];
     final verifyUnavailableIntervals = unavailableIntervals.isNotEmpty;
+    const minimumMinuteInterval = MinuteInterval.one;
+
     for (var item = 0; item < 25; item++) {
       final hasTimeBefore = item > 0;
       final TimeOfDay time =
