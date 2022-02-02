@@ -1,5 +1,4 @@
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/drag_indicator_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -42,7 +41,7 @@ void _modeTopTest() {
     expect(positioned.right, isNull);
     expect(positioned.left, isZero);
 
-    expect(find.byWidgetPredicate((widget) => widget is AnimatedOpacity), isNotNull);
+    expect(find.byWidgetPredicate((widget) => widget is AnimatedOpacity).evaluate(), isNotEmpty);
   });
 }
 
@@ -72,12 +71,12 @@ void _modeBottomTest() {
         .first
         .widget as Positioned;
 
-    expect(positioned.top, lessThan(0));
-    expect(positioned.bottom, isNull);
-    expect(positioned.right, isNull);
-    expect(positioned.left, isZero);
+    expect(positioned.top, isNull);
+    expect(positioned.bottom, lessThan(0));
+    expect(positioned.right, isZero);
+    expect(positioned.left, isNull);
 
-    expect(find.byWidgetPredicate((widget) => widget is AnimatedOpacity), isNotNull);
+    expect(find.byWidgetPredicate((widget) => widget is AnimatedOpacity).evaluate(), isNotEmpty);
   });
 }
 
@@ -106,7 +105,7 @@ void _modeOverlayTopTest() {
     expect(positioned.right, isNull);
     expect(positioned.left, isZero);
 
-    expect(find.byWidgetPredicate((widget) => widget is AnimatedOpacity), isNotNull);
+    expect(find.byWidgetPredicate((widget) => widget is AnimatedOpacity).evaluate(), isEmpty);
   });
 }
 
@@ -130,12 +129,12 @@ void _modeOverlayBottomTest() {
         .first
         .widget as Positioned;
 
-    expect(positioned.top, lessThan(0));
-    expect(positioned.bottom, isNull);
-    expect(positioned.right, isNull);
-    expect(positioned.left, isZero);
+    expect(positioned.top, isNull);
+    expect(positioned.bottom, lessThan(0));
+    expect(positioned.right, isZero);
+    expect(positioned.left, isNull);
 
-    expect(find.byWidgetPredicate((widget) => widget is AnimatedOpacity), isNotNull);
+    expect(find.byWidgetPredicate((widget) => widget is AnimatedOpacity).evaluate(), isEmpty);
   });
 }
 
@@ -160,7 +159,7 @@ void _whenEnabledOrDisabled(){
       final finder = find
           .byWidgetPredicate((widget) => widget is AnimatedOpacity);
 
-      expect(finder, isNotNull);
+      expect(finder.evaluate(), isNotEmpty);
 
       final AnimatedOpacity animatedOpacity = finder
           .evaluate()
@@ -171,7 +170,7 @@ void _whenEnabledOrDisabled(){
 
       final gestureDetectorFinder = find
           .byWidgetPredicate((widget) => widget is GestureDetector);
-      expect(gestureDetectorFinder, isNotNull);
+      expect(gestureDetectorFinder.evaluate(), isNotEmpty);
       final GestureDetector gestureDetector = gestureDetectorFinder
           .evaluate()
           .first
@@ -201,7 +200,7 @@ void _whenEnabledOrDisabled(){
       final finder = find
           .byWidgetPredicate((widget) => widget is AnimatedOpacity);
 
-      expect(finder, isNotNull);
+      expect(finder.evaluate(), isNotEmpty);
 
       final AnimatedOpacity animatedOpacity = finder
           .evaluate()
@@ -212,7 +211,7 @@ void _whenEnabledOrDisabled(){
 
       final gestureDetectorFinder = find
           .byWidgetPredicate((widget) => widget is GestureDetector);
-      expect(gestureDetectorFinder, isNotNull);
+      expect(gestureDetectorFinder.evaluate(), isNotEmpty);
       final GestureDetector gestureDetector = gestureDetectorFinder
           .evaluate()
           .first
