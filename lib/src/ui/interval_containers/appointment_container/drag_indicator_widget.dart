@@ -71,13 +71,22 @@ class DragIndicatorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget indicatorWidget = _buildContainer(context);
+    final isTop = [_Mode.top, _Mode.overlayTop].contains(mode);
+    final isBottom = [_Mode.bottom, _Mode.overlayBottom].contains(mode);
+    final isOverlay = [_Mode.overlayBottom, _Mode.overlayTop].contains(mode);
+
+    final Widget indicatorWidget = _buildContainer(
+      context: context,
+      isBottom: isBottom,
+    );
+
     return Positioned(
-      top: [_Mode.top, _Mode.overlayTop].contains(mode) ? -2 : null,
-      right: 0,
-      left: 0,
-      bottom: [_Mode.bottom, _Mode.overlayBottom].contains(mode) ? -2 : null,
-      child: [_Mode.overlayBottom, _Mode.overlayTop].contains(mode)
+      top: isTop ? -2 : null,
+      right: isBottom ? 0 : null,//0,
+      left: isTop ? 0 : null,//0,
+      width: 100,
+      bottom: isBottom ? -2 : null,
+      child: isOverlay
           ? indicatorWidget
           : AnimatedOpacity(
               opacity: enabled ? 1 : 0,
@@ -94,12 +103,20 @@ class DragIndicatorWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildContainer(BuildContext context) {
+  Widget _buildContainer({required BuildContext context, required bool isBottom,}) {
+
     return Container(
-      alignment: [_Mode.bottom, _Mode.overlayBottom].contains(mode)
+      alignment: isBottom
           ? Alignment.bottomRight
           : Alignment.topLeft,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(
+        top: isBottom
+            ? 10
+            : 0,
+        bottom: isBottom
+            ? 0
+            : 10,
+      ),
       child: Container(
         clipBehavior: Clip.hardEdge,
         width: 10,
