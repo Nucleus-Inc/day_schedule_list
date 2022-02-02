@@ -1,4 +1,6 @@
-enum MinuteInterval { one, five, ten, fifteen, twenty, thirty }
+enum MinuteInterval {
+  one, five, ten, fifteen, twenty, thirty
+}
 
 extension NumberValue on MinuteInterval {
   int get numberValue {
@@ -16,5 +18,21 @@ extension NumberValue on MinuteInterval {
       case MinuteInterval.thirty:
         return 30;
     }
+  }
+
+  bool operator < (MinuteInterval interval) {
+    return numberValue < interval.numberValue;
+  }
+
+  bool operator > (MinuteInterval interval) {
+    return numberValue > interval.numberValue;
+  }
+
+  bool operator <= (MinuteInterval interval) {
+    return numberValue <= interval.numberValue;
+  }
+
+  bool operator >= (MinuteInterval interval) {
+    return numberValue >= interval.numberValue;
   }
 }

@@ -1,11 +1,10 @@
 import 'package:day_schedule_list/day_schedule_list.dart';
 import 'package:day_schedule_list/src/models/exceptions.dart';
+import 'package:day_schedule_list/src/models/minute_interval.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
 import 'package:day_schedule_list/src/ui/valid_time_of_day_list_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../models/interval_range.dart';
 import 'day_schedule_list_widget_extensions.dart';
 import 'interval_containers/appointment_container/appointment_container.dart';
 import 'interval_containers/unavailable_interval_container.dart';
@@ -37,13 +36,21 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     required this.updateAppointDuration,
     required this.appointmentBuilder,
     required this.createNewAppointmentAt,
-    this.hourHeight = 100.0,
+    this.hourHeight = DayScheduleListWidgetMethods.defaultHourHeight,
+    this.minimumMinuteInterval =
+        DayScheduleListWidgetMethods.defaultMinimumMinuteInterval,
+    this.appointmentMinimumDuration =
+        DayScheduleListWidgetMethods.defaultAppointmentMinimumDuration,
     this.scrollController,
     this.dragIndicatorBorderWidth,
     this.dragIndicatorColor,
     this.dragIndicatorBorderColor,
     Key? key,
-  })  : assert(hourHeight > 0, 'hourHeight must be != null and > 0'),
+  })  : assert(
+          minimumMinuteInterval <= appointmentMinimumDuration,
+          'minimumMinuteInterval must be <= appointmentMinimumDuration',
+        ),
+        assert(hourHeight > 0, 'hourHeight must be != null and > 0'),
         super(key: key);
 
   ///DateTime that it represents.
@@ -80,8 +87,18 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
   ///The convertion parameter from one hour to height dimension.
   ///Choose a value that best fits your needs.
   ///
-  /// Default value = 100.0
+  /// Default value = [DayScheduleListWidgetMethods.defaultHourHeight]
   final double hourHeight;
+
+  ///The minimum time interval that will be incremented or decremented to an appointment
+  ///
+  /// Default value = [DayScheduleListWidgetMethods.defaultMinimumMinuteInterval]
+  final MinuteInterval minimumMinuteInterval;
+
+  ///The minimum duration in minutes that an appointment will have.
+  ///
+  /// Default value = [DayScheduleListWidgetMethods.defaultAppointmentMinimumDuration]
+  final MinuteInterval appointmentMinimumDuration;
 
   /// An object that can be used to control the position to which the scroll
   /// view is scrolled.
@@ -105,6 +122,11 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     extends State<DayScheduleListWidget<S>> with DayScheduleListWidgetMethods {
   @override
   double get hourHeight => widget.hourHeight;
+  @override
+  MinuteInterval get minimumMinuteInterval => widget.minimumMinuteInterval;
+  @override
+  MinuteInterval get appointmentMinimumDuration =>
+      widget.appointmentMinimumDuration;
 
   List<ScheduleTimeOfDay> validTimesList = [];
   final GlobalKey _validTimesListColumnKey = GlobalKey();
@@ -201,7 +223,10 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
 
   List<UnavailableIntervalContainer> _buildUnavailableIntervalsWidgetList(
       {required double insetVertical}) {
-    final List<IntervalRange> unavailableSublist = buildInternalUnavailableIntervals(unavailableIntervals: widget.unavailableIntervals,);
+    final List<IntervalRange> unavailableSublist =
+        buildInternalUnavailableIntervals(
+      unavailableIntervals: widget.unavailableIntervals,
+    );
     return unavailableSublist.map((IntervalRange interval) {
       return UnavailableIntervalContainer(
         interval: interval,
