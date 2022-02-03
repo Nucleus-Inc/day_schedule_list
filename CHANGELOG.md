@@ -26,3 +26,7 @@
 * Issue: Add tap gesture to enable and disable edition mode
 * Issue: Make possible to build child widget of Appointment based on duration of appointment
 * Issue: Make possible to tap on some available time interval to create a new appointment
+
+# 0.3.0
+* Issue: Expand touch area of widget to change duration of appointment
+* Issue: Change time interval to update appointment duration from 1 min to 15 min
