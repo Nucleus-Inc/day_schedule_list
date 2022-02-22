@@ -1,6 +1,6 @@
 import 'package:day_schedule_list/src/models/interval_range.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
-import 'package:day_schedule_list/src/ui/day_schedule_list_widget_extensions.dart';
+import 'package:day_schedule_list/src/ui/day_schedule_list_widget_mixin.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/dynamic_height_container.dart';
 import 'package:day_schedule_list/src/ui/time_of_day_widget.dart';
 import 'package:flutter/material.dart';
