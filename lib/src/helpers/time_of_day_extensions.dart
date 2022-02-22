@@ -26,9 +26,18 @@ extension TimeOfDayExtensions on TimeOfDay {
         other == this;
   }
 
-  TimeOfDay add({required int hours,required int minutes}){
+  TimeOfDay add({
+    required int hours,
+    required int minutes,
+  }) {
     final now = DateTime.now();
-    final newDate = DateTime(now.year,now.month, now.day, hour, minute).add(Duration(
+    final newDate = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    ).add(Duration(
       hours: hours,
       minutes: minutes,
     ));
@@ -36,9 +45,18 @@ extension TimeOfDayExtensions on TimeOfDay {
     return TimeOfDay.fromDateTime(newDate);
   }
 
-  TimeOfDay subtract({required int hours,required int minutes}){
+  TimeOfDay subtract({
+    required int hours,
+    required int minutes,
+  }) {
     final now = DateTime.now();
-    final newDate = DateTime(now.year,now.month, now.day, hour, minute).subtract(Duration(
+    final newDate = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    ).subtract(Duration(
       hours: hours,
       minutes: minutes,
     ));

@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'time_of_day_text.dart';
 
 class TimeOfDayWidget extends StatelessWidget {
-  const TimeOfDayWidget(
-      {required this.scheduleTime, required this.height, Key? key,})
-      : super(key: key);
+  const TimeOfDayWidget({
+    required this.scheduleTime,
+    required this.height,
+    Key? key,
+  }) : super(key: key);
 
   final double height;
   final ScheduleTimeOfDay scheduleTime;
@@ -27,7 +29,7 @@ class TimeOfDayWidget extends StatelessWidget {
           ),
           const Expanded(
             child: Divider(),
-          )
+          ),
         ],
       ),
     );

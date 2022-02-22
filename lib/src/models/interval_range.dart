@@ -30,8 +30,10 @@ class IntervalRange {
 
   ///Verify if some time interval [range] intersects this one.
   bool intersects(IntervalRange range) {
-    return containsTimeOfDay(range.start) || containsTimeOfDay(range.end) ||
-        range.containsTimeOfDay(start) || range.containsTimeOfDay(end);
+    return containsTimeOfDay(range.start) ||
+        containsTimeOfDay(range.end) ||
+        range.containsTimeOfDay(start) ||
+        range.containsTimeOfDay(end);
   }
 
   ///Returns the time interval between [start] and [end] in minutes.

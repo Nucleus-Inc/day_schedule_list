@@ -105,9 +105,13 @@ mixin DayScheduleListWidgetMixin {
     final int durationInMinutes = convertDeltaYToMinutes(
       deltaY: newDurationHeight,
     );
-    final DateTime endDateTime =
-        DateTime(DateTime.now().year, 1, 1, start.hour, start.minute)
-            .add(Duration(minutes: durationInMinutes));
+    final DateTime endDateTime = DateTime(
+      DateTime.now().year,
+      1,
+      1,
+      start.hour,
+      start.minute,
+    ).add(Duration(minutes: durationInMinutes));
     TimeOfDay end;
     end = endDateTime.day != 1
         ? const TimeOfDay(hour: 23, minute: 59)
@@ -125,12 +129,19 @@ mixin DayScheduleListWidgetMixin {
     final int durationInMinutes = convertDeltaYToMinutes(
       deltaY: newDurationHeight,
     );
-    final DateTime startDateTime =
-        DateTime(DateTime.now().year, 1, 1, end.hour, end.minute).subtract(
+    final DateTime startDateTime = DateTime(
+      DateTime.now().year,
+      1,
+      1,
+      end.hour,
+      end.minute,
+    ).subtract(
       Duration(minutes: durationInMinutes),
     );
     TimeOfDay newStart;
-    newStart = startDateTime.day != 1 ? const TimeOfDay(hour: 0, minute: 0) : TimeOfDay.fromDateTime(startDateTime);
+    newStart = startDateTime.day != 1
+        ? const TimeOfDay(hour: 0, minute: 0)
+        : TimeOfDay.fromDateTime(startDateTime);
     return IntervalRange(start: newStart, end: end);
   }
 
@@ -159,14 +170,22 @@ mixin DayScheduleListWidgetMixin {
     final startDeltaInMinutes = newStartInMinutes - start.toMinutes;
     final endDeltaInMinutes = newEndInMinutes - end.toMinutes;
 
-    final DateTime startDateTime =
-        DateTime(DateTime.now().year, 1, 1, start.hour, start.minute)
-            .add(Duration(minutes: startDeltaInMinutes));
+    final DateTime startDateTime = DateTime(
+      DateTime.now().year,
+      1,
+      1,
+      start.hour,
+      start.minute,
+    ).add(Duration(minutes: startDeltaInMinutes));
     final TimeOfDay newStart = TimeOfDay.fromDateTime(startDateTime);
 
-    final DateTime endDateTime =
-        DateTime(DateTime.now().year, 1, 1, end.hour, end.minute)
-            .add(Duration(minutes: endDeltaInMinutes));
+    final DateTime endDateTime = DateTime(
+      DateTime.now().year,
+      1,
+      1,
+      end.hour,
+      end.minute,
+    ).add(Duration(minutes: endDeltaInMinutes));
     final TimeOfDay newEnd = TimeOfDay.fromDateTime(endDateTime);
 
     if (newStart < newEnd) {
@@ -202,16 +221,24 @@ mixin DayScheduleListWidgetMixin {
         final belongsToLast = last.containsTimeOfDay(time);
 
         if (hasTimeBefore) {
-          final beforeDateTime =
-              DateTime(DateTime.now().year, 1, 1, time.hour, time.minute)
-                  .subtract(const Duration(hours: 1));
+          final beforeDateTime = DateTime(
+            DateTime.now().year,
+            1,
+            1,
+            time.hour,
+            time.minute,
+          ).subtract(const Duration(hours: 1));
           final timeBefore = TimeOfDay.fromDateTime(beforeDateTime);
           final timeBeforeBelongsToFirst = first.containsTimeOfDay(timeBefore);
           final timeBeforeBelongsToLast = last.containsTimeOfDay(timeBefore);
           if (timeBeforeBelongsToFirst && !belongsToFirst) {
             final dateTimeToAdd = DateTime(
-                    DateTime.now().year, 1, 1, first.end.hour, first.end.minute)
-                .add(Duration(minutes: minimumMinuteInterval.numberValue));
+              DateTime.now().year,
+              1,
+              1,
+              first.end.hour,
+              first.end.minute,
+            ).add(Duration(minutes: minimumMinuteInterval.numberValue));
             final timeOfDayToAdd = TimeOfDay.fromDateTime(dateTimeToAdd);
             if (time.toMinutes - timeOfDayToAdd.toMinutes >=
                 minimumMinuteInterval.numberValue) {
@@ -225,9 +252,13 @@ mixin DayScheduleListWidgetMixin {
               );
             }
           } else if (!timeBeforeBelongsToLast && belongsToLast) {
-            final dateTimeToAdd = DateTime(DateTime.now().year, 1, 1,
-                    last.start.hour, last.start.minute)
-                .subtract(Duration(minutes: minimumMinuteInterval.numberValue));
+            final dateTimeToAdd = DateTime(
+              DateTime.now().year,
+              1,
+              1,
+              last.start.hour,
+              last.start.minute,
+            ).subtract(Duration(minutes: minimumMinuteInterval.numberValue));
             final timeOfDayToAdd = TimeOfDay.fromDateTime(dateTimeToAdd);
             if (time.toMinutes - timeOfDayToAdd.toMinutes >=
                 minimumMinuteInterval.numberValue) {
@@ -333,17 +364,24 @@ mixin DayScheduleListWidgetMixin {
   }
 
   ///Try to create a new appointment at the position tapped by the user
-  IntervalRange? newAppointmentForTappedPosition(
-      {required Offset startPosition,
-      required List<IntervalRange> appointments,
-      required List<IntervalRange> unavailableIntervals,
-      required ScheduleTimeOfDay firstValidTimeList,
-      required ScheduleTimeOfDay lastValidTimeList}) {
+  IntervalRange? newAppointmentForTappedPosition({
+    required Offset startPosition,
+    required List<IntervalRange> appointments,
+    required List<IntervalRange> unavailableIntervals,
+    required ScheduleTimeOfDay firstValidTimeList,
+    required ScheduleTimeOfDay lastValidTimeList,
+  }) {
     final now = DateTime.now();
     final startInMinutes = convertDeltaYToMinutes(deltaY: startPosition.dy);
 
-    final baseStartDate = DateTime(now.year, now.month, now.day,
-        firstValidTimeList.time.hour, firstValidTimeList.time.minute, 0);
+    final baseStartDate = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      firstValidTimeList.time.hour,
+      firstValidTimeList.time.minute,
+      0,
+    );
     final startDate = baseStartDate.add(
       Duration(minutes: startInMinutes - 30),
     );
@@ -353,8 +391,14 @@ mixin DayScheduleListWidgetMixin {
           )
         : firstValidTimeList.time;
 
-    final baseEndDate =
-        DateTime(now.year, now.month, now.day, start.hour, start.minute, 0);
+    final baseEndDate = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      start.hour,
+      start.minute,
+      0,
+    );
     final endDate = baseEndDate.add(const Duration(hours: 1));
     final end = endDate.isSameDay(dateTime: baseEndDate)
         ? TimeOfDay.fromDateTime(
@@ -368,7 +412,8 @@ mixin DayScheduleListWidgetMixin {
     final List<IntervalRange> fullList = [
       ...appointments,
       ...buildInternalUnavailableIntervals(
-          unavailableIntervals: unavailableIntervals),
+        unavailableIntervals: unavailableIntervals,
+      ),
     ];
 
     List<IntervalRange> intersections = [];

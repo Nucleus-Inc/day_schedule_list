@@ -51,8 +51,8 @@ dart_code_metrics:
     - prefer-correct-type-name:
         min-length: 3
         max-length: 80
-#    - prefer-trailing-comma:
-#        break-on: 2
+    - prefer-trailing-comma:
+        break-on: 4
 #    - member-ordering:
 #        alphabetize: false
 #        order:

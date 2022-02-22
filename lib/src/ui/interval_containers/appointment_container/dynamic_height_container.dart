@@ -5,24 +5,26 @@ import 'package:flutter/services.dart';
 typedef CanUpdateToHeight = bool Function(double, HeightUpdateFrom);
 typedef UpdateCallback = void Function(HeightUpdateFrom from);
 typedef UpdateHeightCallback = void Function(
-    double height, HeightUpdateFrom from,);
+  double height,
+  HeightUpdateFrom from,
+);
 
 class DynamicHeightContainer extends StatefulWidget {
-  const DynamicHeightContainer(
-      {required this.editionEnabled,
-      required this.canUpdateHeightTo,
-      required this.onUpdateStart,
-      required this.onNewUpdate,
-      required this.onUpdateEnd,
-      required this.onUpdateCancel,
-      required this.currentHeight,
-      required this.child,
-      this.dragIndicatorColor,
-      this.dragIndicatorBorderColor,
-      this.dragIndicatorBorderWidth,
-      this.updateStep,
-      Key? key})
-      : assert(
+  const DynamicHeightContainer({
+    required this.editionEnabled,
+    required this.canUpdateHeightTo,
+    required this.onUpdateStart,
+    required this.onNewUpdate,
+    required this.onUpdateEnd,
+    required this.onUpdateCancel,
+    required this.currentHeight,
+    required this.child,
+    this.dragIndicatorColor,
+    this.dragIndicatorBorderColor,
+    this.dragIndicatorBorderWidth,
+    this.updateStep,
+    Key? key,
+  })  : assert(
           dragIndicatorBorderWidth == null || dragIndicatorBorderWidth > 0,
           'dragIndicatorBorderWidth must be null or > 0',
         ),

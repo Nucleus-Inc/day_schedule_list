@@ -43,12 +43,18 @@ class _AppointmentContainerOverlayState
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            if([AppointmentUpdatingMode.changeTop, AppointmentUpdatingMode.changePosition].contains(widget.updateMode))
+            if ([
+              AppointmentUpdatingMode.changeTop,
+              AppointmentUpdatingMode.changePosition
+            ].contains(widget.updateMode))
               AppointmentTimeOfDayIndicatorWidget.start(
                 time: widget.interval.start,
                 timeIndicatorsInset: widget.timeIndicatorsInset,
               ),
-            if([AppointmentUpdatingMode.changeHeight, AppointmentUpdatingMode.changePosition].contains(widget.updateMode))
+            if ([
+              AppointmentUpdatingMode.changeHeight,
+              AppointmentUpdatingMode.changePosition
+            ].contains(widget.updateMode))
               AppointmentTimeOfDayIndicatorWidget.end(
                 time: widget.interval.end,
                 timeIndicatorsInset: widget.timeIndicatorsInset,

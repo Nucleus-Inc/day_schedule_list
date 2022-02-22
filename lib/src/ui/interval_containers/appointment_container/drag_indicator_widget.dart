@@ -75,11 +75,11 @@ class DragIndicatorWidget extends StatelessWidget {
         [_DragIndicatorMode.top, _DragIndicatorMode.overlayTop].contains(mode);
     final isBottom = [
       _DragIndicatorMode.bottom,
-      _DragIndicatorMode.overlayBottom
+      _DragIndicatorMode.overlayBottom,
     ].contains(mode);
     final isOverlay = [
       _DragIndicatorMode.overlayBottom,
-      _DragIndicatorMode.overlayTop
+      _DragIndicatorMode.overlayTop,
     ].contains(mode);
 
     final Widget indicatorWidget = isBottom
@@ -118,7 +118,12 @@ class DragIndicatorWidget extends StatelessWidget {
   }
 }
 
-enum _DragIndicatorMode { top, bottom, overlayTop, overlayBottom }
+enum _DragIndicatorMode {
+  top,
+  bottom,
+  overlayTop,
+  overlayBottom,
+}
 
 class _IndicatorWidget extends StatelessWidget {
   const _IndicatorWidget.bottom({
@@ -158,19 +163,20 @@ class _IndicatorWidget extends StatelessWidget {
         width: 10,
         height: 10,
         decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: dragIndicatorColor ?? Colors.white,
-            border: Border.all(
-              color: dragIndicatorBorderColor ?? Theme.of(context).primaryColor,
-              width: dragIndicatorBorderWidth ?? 3,
+          shape: BoxShape.circle,
+          color: dragIndicatorColor ?? Colors.white,
+          border: Border.all(
+            color: dragIndicatorBorderColor ?? Theme.of(context).primaryColor,
+            width: dragIndicatorBorderWidth ?? 3,
+          ),
+          boxShadow: const [
+            BoxShadow(
+              offset: Offset(1, 1),
+              blurRadius: 1,
+              color: Colors.black45,
             ),
-            boxShadow: const [
-              BoxShadow(
-                offset: Offset(1, 1),
-                blurRadius: 1,
-                color: Colors.black45,
-              )
-            ]),
+          ],
+        ),
       ),
     );
   }
