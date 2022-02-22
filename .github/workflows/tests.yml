@@ -25,7 +25,7 @@ jobs:
         run: flutter analyze
 
       - name: Dart Code Metrics Analyze
-        run: flutter pub run dart_code_metrics:metrics analyze lib
+        run: flutter pub run dart_code_metrics:metrics analyze lib --fatal-style --fatal-performance --fatal-warnings
 
       - name: Run tests
         run: flutter test --coverage
