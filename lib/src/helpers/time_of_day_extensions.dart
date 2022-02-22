@@ -32,6 +32,7 @@ extension HelperMethods on TimeOfDay {
       hours: hours,
       minutes: minutes,
     ));
+
     return TimeOfDay.fromDateTime(newDate);
   }
 

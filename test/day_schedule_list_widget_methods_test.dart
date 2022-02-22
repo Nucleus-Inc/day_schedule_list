@@ -54,7 +54,7 @@ void _intersectsOtherIntervalTest() {
       IntervalRange(
         start: const TimeOfDay(hour: 17, minute: 0),
         end: const TimeOfDay(hour: 20, minute: 30),
-      )
+      ),
     ];
 
     test('verify some interval intersects interval', () {

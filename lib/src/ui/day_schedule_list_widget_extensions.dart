@@ -14,17 +14,21 @@ import '../helpers/date_time_extensions.dart';
 mixin DayScheduleListWidgetMethods {
   static const double defaultHourHeight = 100;
   static const MinuteInterval defaultMinimumMinuteInterval = MinuteInterval.one;
-  static const MinuteInterval defaultAppointmentMinimumDuration = MinuteInterval.fifteen;
+  static const MinuteInterval defaultAppointmentMinimumDuration =
+      MinuteInterval.fifteen;
   double get hourHeight => 0;
 
   MinuteInterval get minimumMinuteInterval => defaultMinimumMinuteInterval;
-  MinuteInterval get appointmentMinimumDuration => defaultAppointmentMinimumDuration;
+  MinuteInterval get appointmentMinimumDuration =>
+      defaultAppointmentMinimumDuration;
 
   late double minimumMinuteIntervalHeight =
       (hourHeight * minimumMinuteInterval.numberValue.toDouble()) / 60.0;
 
   double get timeOfDayWidgetHeight {
-    return minimumMinuteIntervalHeight < 2 ? 10 * minimumMinuteIntervalHeight : 17;
+    return minimumMinuteIntervalHeight < 2
+        ? 10 * minimumMinuteIntervalHeight
+        : 17;
   }
 
   final LayerLink link = LayerLink();
@@ -86,11 +90,12 @@ mixin DayScheduleListWidgetMethods {
     final deltaIntervalInMinutes = itemRange.deltaIntervalIMinutes;
 
     return ScheduleItemPosition(
-        top: minimumMinuteIntervalHeight *
-                (deltaTop / minimumMinuteInterval.numberValue) +
-            insetVertical,
-        height: minimumMinuteIntervalHeight *
-            (deltaIntervalInMinutes / minimumMinuteInterval.numberValue));
+      top: minimumMinuteIntervalHeight *
+              (deltaTop / minimumMinuteInterval.numberValue) +
+          insetVertical,
+      height: minimumMinuteIntervalHeight *
+          (deltaIntervalInMinutes / minimumMinuteInterval.numberValue),
+    );
   }
 
   IntervalRange calculateItervalRangeForNewHeight({
@@ -104,12 +109,13 @@ mixin DayScheduleListWidgetMethods {
         DateTime(DateTime.now().year, 1, 1, start.hour, start.minute)
             .add(Duration(minutes: durationInMinutes));
     TimeOfDay end;
-    if (endDateTime.day != 1) {
-      end = const TimeOfDay(hour: 23, minute: 59);
-    } else {
-      end = TimeOfDay.fromDateTime(endDateTime);
-    }
-    return IntervalRange(start: start, end: end);
+    end = endDateTime.day != 1
+        ? const TimeOfDay(hour: 23, minute: 59)
+        : TimeOfDay.fromDateTime(endDateTime);
+    return IntervalRange(
+      start: start,
+      end: end,
+    );
   }
 
   IntervalRange calculateItervalRangeForNewHeightFromTop({
@@ -124,11 +130,7 @@ mixin DayScheduleListWidgetMethods {
       Duration(minutes: durationInMinutes),
     );
     TimeOfDay newStart;
-    if (startDateTime.day != 1) {
-      newStart = const TimeOfDay(hour: 0, minute: 0);
-    } else {
-      newStart = TimeOfDay.fromDateTime(startDateTime);
-    }
+    newStart = startDateTime.day != 1 ? const TimeOfDay(hour: 0, minute: 0) : TimeOfDay.fromDateTime(startDateTime);
     return IntervalRange(start: newStart, end: end);
   }
 
@@ -167,7 +169,7 @@ mixin DayScheduleListWidgetMethods {
             .add(Duration(minutes: endDeltaInMinutes));
     final TimeOfDay newEnd = TimeOfDay.fromDateTime(endDateTime);
 
-    if(newStart < newEnd) {
+    if (newStart < newEnd) {
       return IntervalRange(start: newStart, end: newEnd);
     }
     return IntervalRange(start: start, end: end);
@@ -184,7 +186,6 @@ mixin DayScheduleListWidgetMethods {
   List<ScheduleTimeOfDay> populateValidTimesList({
     required List<IntervalRange> unavailableIntervals,
   }) {
-
     List<ScheduleTimeOfDay> validTimesList = [];
     final verifyUnavailableIntervals = unavailableIntervals.isNotEmpty;
     const minimumMinuteInterval = MinuteInterval.one;
@@ -349,16 +350,20 @@ mixin DayScheduleListWidgetMethods {
     final startDate = baseStartDate.add(
       Duration(minutes: startInMinutes - 30),
     );
-    final start = baseStartDate.isSameDay(dateTime: startDate) ? TimeOfDay.fromDateTime(
-      startDate,
-    ) : firstValidTimeList.time;
+    final start = baseStartDate.isSameDay(dateTime: startDate)
+        ? TimeOfDay.fromDateTime(
+            startDate,
+          )
+        : firstValidTimeList.time;
 
-    final baseEndDate = DateTime(now.year, now.month, now.day,
-        start.hour, start.minute, 0);
+    final baseEndDate =
+        DateTime(now.year, now.month, now.day, start.hour, start.minute, 0);
     final endDate = baseEndDate.add(const Duration(hours: 1));
-    final end = endDate.isSameDay(dateTime: baseEndDate) ? TimeOfDay.fromDateTime(
-      endDate,
-    ) : lastValidTimeList.time;
+    final end = endDate.isSameDay(dateTime: baseEndDate)
+        ? TimeOfDay.fromDateTime(
+            endDate,
+          )
+        : lastValidTimeList.time;
 
     IntervalRange? possibleNewAppointment =
         IntervalRange(start: start, end: end);

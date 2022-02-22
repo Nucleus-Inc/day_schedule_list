@@ -62,7 +62,7 @@ class _AppointmentContainerOverlayState
                 height: widget.position.height,
                 child: widget.child,
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -8,7 +8,7 @@ class TimeOfDayText extends Text {
       required BuildContext context,
       TimeOfDayAvailability availability = TimeOfDayAvailability.available,
       Color? color,
-      Key? key})
+      Key? key,})
       : super(
           time.format(context),
           style: color != null

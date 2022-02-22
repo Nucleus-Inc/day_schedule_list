@@ -21,7 +21,7 @@ void _modeTopTest() {
             onLongPressStart: (start) {},
             onLongPressEnd: (end) {},
             onLongPressMoveUpdate: (update) {},
-          )
+          ),
         ],
       ),
     ));

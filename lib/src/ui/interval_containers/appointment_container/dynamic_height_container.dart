@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 typedef CanUpdateToHeight = bool Function(double, HeightUpdateFrom);
 typedef UpdateCallback = void Function(HeightUpdateFrom from);
 typedef UpdateHeightCallback = void Function(
-    double height, HeightUpdateFrom from);
+    double height, HeightUpdateFrom from,);
 
 enum HeightUpdateFrom { top, bottom }
 

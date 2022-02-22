@@ -66,6 +66,7 @@ class ValidTimeOfDayListWidget extends StatelessWidget {
         items.add(item);
       }
     }
+
     return items;
   }
 }

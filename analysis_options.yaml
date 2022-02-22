@@ -1,5 +1,45 @@
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  plugins:
+    - dart_code_metrics
+
+#Dart code metrics configs
+dart_code_metrics:
+  anti-patterns:
+    - long-method
+    - long-parameter-list
+  metrics:
+    cyclomatic-complexity: 20
+    maximum-nesting-level: 5
+    number-of-parameters: 10
+    source-lines-of-code: 50
+  metrics-exclude:
+    - test/**
+  rules:
+    - avoid-unused-parameters
+    - no-empty-block
+#    - prefer-trailing-comma:
+#        break-on: 2
+#    - member-ordering:
+#        alphabetize: false
+#        order:
+#          - constructors
+#          - public-fields
+#          - getters-setters
+#          - private-fields
+#          - public-methods
+#          - private-methods
+#          - public-static-methods
+#          - private-static-methods
+
+#    - newline-before-return
+#    - no-boolean-literal-compare
+#    - prefer-conditional-expressions
+#    - no-equal-then-else
+#    - no-magic-number
+
+#Flutter lints configs
 linter:
   rules:
     omit_local_variable_types: false

@@ -15,7 +15,7 @@ import '../helpers/time_of_day_extensions.dart';
 ///Never forget to consider the parameter height, it is the available space you
 ///have to alocate it.
 typedef AppointmentWidgetBuilder<K extends IntervalRange> = Widget Function(
-    BuildContext context, K appointment, double height);
+    BuildContext context, K appointment, double height,);
 
 ///Signature of function to update some updated appointment.
 typedef UpdateAppointDuration<K extends IntervalRange> = Future<bool> Function(
@@ -155,6 +155,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     const baseInsetVertical = 20.0;
     final insetVertical = baseInsetVertical +
         calculateTimeOfDayIndicatorsInset(timeOfDayWidgetHeight);
+
     return SingleChildScrollView(
       controller: widget.scrollController,
       child: Padding(
