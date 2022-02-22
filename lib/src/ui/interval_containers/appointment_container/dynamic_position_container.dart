@@ -78,13 +78,7 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
         valueListenable: editingMode,
         builder: (context, editing, child) {
           return GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              if (widget.onUpdateEditingModeTap != null) {
-                editingMode.value = !editingMode.value;
-                widget.onUpdateEditingModeTap!(editingMode.value);
-              }
-            },
+            onTap: _onDynamicPositionContainerTap,
             onLongPress: editing ? onRescheduleLongPressDown : null,
             //onLongPressStart: onRescheduleLongPressStart,
             onLongPressEnd: editing ? onRescheduleLongPressEnd : null,
@@ -92,6 +86,14 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
             child: widget.child,
           );
         });
+  }
+
+  void _onDynamicPositionContainerTap(){
+    HapticFeedback.selectionClick();
+    if (widget.onUpdateEditingModeTap != null) {
+      editingMode.value = !editingMode.value;
+      widget.onUpdateEditingModeTap!(editingMode.value);
+    }
   }
 
   void onRescheduleLongPressDown() {
@@ -121,7 +123,7 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
     _oldOffsetFromOrigin = details.offsetFromOrigin;
   }
 
-  void onRescheduleLongPressEnd(LongPressEndDetails details) {
+  void onRescheduleLongPressEnd(LongPressEndDetails _) {
     if (_didMove && widget.canUpdatePositionTo(_currentPosition)) {
       debugPrint('end');
       if (widget.canUpdatePositionTo(_currentPosition)) {

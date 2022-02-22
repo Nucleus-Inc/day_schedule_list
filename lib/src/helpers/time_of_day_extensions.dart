@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-extension HelperMethods on TimeOfDay {
+extension TimeOfDayExtensions on TimeOfDay {
   int get toMinutes => hour * 60 + minute;
   bool operator <(Object other) {
     return other is TimeOfDay &&

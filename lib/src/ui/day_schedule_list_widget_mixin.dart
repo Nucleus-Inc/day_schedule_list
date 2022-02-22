@@ -1,4 +1,4 @@
-import 'package:day_schedule_list/src/models/exceptions.dart';
+import 'package:day_schedule_list/src/models/unavailable_interval_to_add_appointment_exception.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/dynamic_height_container.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/appointment_container.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ import 'time_of_day_widget.dart';
 import '../helpers/time_of_day_extensions.dart';
 import '../helpers/date_time_extensions.dart';
 
-mixin DayScheduleListWidgetMethods {
+mixin DayScheduleListWidgetMixin {
   static const double defaultHourHeight = 100;
   static const MinuteInterval defaultMinimumMinuteInterval = MinuteInterval.one;
   static const MinuteInterval defaultAppointmentMinimumDuration =
@@ -274,7 +274,6 @@ mixin DayScheduleListWidgetMethods {
     required List<IntervalRange> unavailableIntervals,
     required double newHeight,
     required List<ScheduleTimeOfDay> validTimesList,
-    required double insetVertical,
   }) {
     bool canUpdate = true;
     final interval = appointments[index];
@@ -323,8 +322,6 @@ mixin DayScheduleListWidgetMethods {
   }
 
   bool canUpdatePositionOfInterval<S extends IntervalRange>({
-    required int index,
-    required List<S> appointments,
     required ScheduleItemPosition newPosition,
     required double insetVertical,
     required double contentHeight,

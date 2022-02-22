@@ -7,8 +7,6 @@ typedef UpdateCallback = void Function(HeightUpdateFrom from);
 typedef UpdateHeightCallback = void Function(
     double height, HeightUpdateFrom from,);
 
-enum HeightUpdateFrom { top, bottom }
-
 class DynamicHeightContainer extends StatefulWidget {
   const DynamicHeightContainer(
       {required this.editionEnabled,
@@ -107,7 +105,7 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
         DragIndicatorWidget.top(
           enabled: widget.editionEnabled,
           onLongPressDown: () => onLongPressDown(HeightUpdateFrom.top),
-          onLongPressStart: (_) {}, //onLongPressStart,
+          onLongPressStart: null,
           onLongPressEnd: onLongPressEnd,
           onLongPressMoveUpdate: onLongPressMoveUpdate,
           dragIndicatorColor: widget.dragIndicatorColor,
@@ -117,7 +115,7 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
         DragIndicatorWidget.bottom(
           enabled: widget.editionEnabled,
           onLongPressDown: () => onLongPressDown(HeightUpdateFrom.bottom),
-          onLongPressStart: (_) {}, //onLongPressStart,
+          onLongPressStart: null,
           onLongPressEnd: onLongPressEnd,
           onLongPressMoveUpdate: onLongPressMoveUpdate,
           dragIndicatorColor: widget.dragIndicatorColor,
@@ -158,7 +156,7 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
     _oldOffsetFromOrigin = details.offsetFromOrigin;
   }
 
-  void onLongPressEnd(LongPressEndDetails details) {
+  void onLongPressEnd(LongPressEndDetails _) {
     if (_didMove) {
       debugPrint('end');
       _informUpdateEnd();
@@ -213,3 +211,5 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
     }
   }
 }
+
+enum HeightUpdateFrom { top, bottom }

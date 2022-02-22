@@ -1,3 +1,4 @@
+import 'package:day_schedule_list/src/ui/day_schedule_list_inherited.dart';
 import 'package:flutter/material.dart';
 
 import '../../day_schedule_list_widget.dart';
@@ -19,9 +20,6 @@ class AppointmentContainer extends StatefulWidget {
     required this.onUpdatePositionStart,
     required this.onUpdatePositionCancel,
     required this.child,
-    this.dragIndicatorBorderWidth,
-    this.dragIndicatorColor,
-    this.dragIndicatorBorderColor,
     Key? key,
   }) : super(key: key);
 
@@ -38,9 +36,6 @@ class AppointmentContainer extends StatefulWidget {
   final AppointmentUpdatePositionStartCallback onUpdatePositionStart;
   final void Function() onUpdatePositionCancel;
 
-  final Color? dragIndicatorColor;
-  final Color? dragIndicatorBorderColor;
-  final double? dragIndicatorBorderWidth;
 
   @override
   _AppointmentContainerState createState() => _AppointmentContainerState();
@@ -65,6 +60,12 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
 
   @override
   Widget build(BuildContext context) {
+    final inherited = DayScheduleListInherited.of(context);
+    
+    final Color? dragIndicatorColor = inherited.dragIndicatorColor;
+    final Color? dragIndicatorBorderColor = inherited.dragIndicatorBorderColor;
+    final double? dragIndicatorBorderWidth = inherited.dragIndicatorBorderWidth;
+
     return Positioned(
       top: widget.position.top,
       right: 0,
@@ -89,9 +90,9 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
                 currentHeight: widget.position.height,
                 updateStep: widget.updateStep,
                 canUpdateHeightTo: widget.canUpdateHeightTo,
-                dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
-                dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
-                dragIndicatorColor: widget.dragIndicatorColor,
+                dragIndicatorBorderColor: dragIndicatorBorderColor,
+                dragIndicatorBorderWidth: dragIndicatorBorderWidth,
+                dragIndicatorColor: dragIndicatorColor,
                 onUpdateEnd: _onUpdateHeightEnd,
                 onUpdateStart: _onUpdateHeightStart,
                 onUpdateCancel: _onUpdateHeightCancel,
