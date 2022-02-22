@@ -14,13 +14,13 @@ void _modeTopTest() {
   testWidgets('DragIndicatorWidget.top', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
       home: Stack(
-        children: [
+        children: const [
           DragIndicatorWidget.top(
             enabled: true,
-            onLongPressDown: () {},
-            onLongPressStart: (start) {},
-            onLongPressEnd: (end) {},
-            onLongPressMoveUpdate: (update) {},
+            onLongPressDown: null,
+            onLongPressStart: null,
+            onLongPressEnd: null,
+            onLongPressMoveUpdate: null,
           ),
         ],
       ),
@@ -49,13 +49,13 @@ void _modeBottomTest() {
   testWidgets('DragIndicatorWidget.bottom', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
       home: Stack(
-        children: [
+        children: const [
           DragIndicatorWidget.bottom(
             enabled: true,
-            onLongPressDown: () {},
-            onLongPressStart: (start) {},
-            onLongPressEnd: (end) {},
-            onLongPressMoveUpdate: (update) {},
+            onLongPressDown: null,
+            onLongPressStart: null,
+            onLongPressEnd: null,
+            onLongPressMoveUpdate: null,
           )
         ],
       ),
@@ -144,13 +144,13 @@ void _whenEnabledOrDisabled(){
     testWidgets('enabled = true', (tester) async {
       await tester.pumpWidget(MaterialApp(
         home: Stack(
-          children: [
+          children: const [
             DragIndicatorWidget.top(
               enabled: true,
-              onLongPressDown: () {},
-              onLongPressStart: (start) {},
-              onLongPressEnd: (end) {},
-              onLongPressMoveUpdate: (update) {},
+              onLongPressDown: null,
+              onLongPressStart: null,
+              onLongPressEnd: null,
+              onLongPressMoveUpdate: null,
             )
           ],
         ),
@@ -185,13 +185,13 @@ void _whenEnabledOrDisabled(){
     testWidgets('enabled = false', (tester) async {
       await tester.pumpWidget(MaterialApp(
         home: Stack(
-          children: [
+          children: const [
             DragIndicatorWidget.top(
               enabled: false,
-              onLongPressDown: () {},
-              onLongPressStart: (start) {},
-              onLongPressEnd: (end) {},
-              onLongPressMoveUpdate: (update) {},
+              onLongPressDown: null,
+              onLongPressStart: null,
+              onLongPressEnd: null,
+              onLongPressMoveUpdate: null,
             )
           ],
         ),
