@@ -60,8 +60,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         body: DayScheduleListWidget<MyAppointment>(
           hourHeight: 100,
-          minimumMinuteInterval: MinuteInterval.thirty,
-          appointmentMinimumDuration: MinuteInterval.thirty,
+          minimumMinuteInterval: MinuteInterval.fifteen,
+          appointmentMinimumDuration: MinuteInterval.fifteen,
           referenceDate: DateTime.now(),
           appointments: myAppointments,
           dragIndicatorColor: Colors.red,
