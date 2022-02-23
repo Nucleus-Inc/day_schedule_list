@@ -95,11 +95,11 @@ class DragIndicatorWidget extends StatelessWidget {
           );
 
     return Positioned(
-      top: isTop ? -2 : null,
+      top: isTop ? -0.5 : null,
       right: isBottom ? 0 : null, //0,
       left: isTop ? 0 : null, //0,
       width: 100,
-      bottom: isBottom ? -2 : null,
+      bottom: isBottom ? -0.5 : null,
       child: isOverlay
           ? indicatorWidget
           : AnimatedOpacity(

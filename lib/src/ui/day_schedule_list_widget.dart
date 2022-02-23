@@ -322,6 +322,8 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     );
 
     if (intersectsOtherAppt || intersectsSomeUnavailableRange) {
+      print("intersects something");
+      print(newInterval);
       return false;
     }
 

@@ -35,8 +35,9 @@ void _containsTimeOfDayTests() {
             start: start,
             end: end,
           );
-          expect(intervalRange.containsTimeOfDay(end), true);
-        },
+          expect(intervalRange.containsTimeOfDay(end, closedRange: true), true);
+          expect(intervalRange.containsTimeOfDay(end, closedRange: false), false);
+            },
       );
 
       test(
@@ -49,8 +50,9 @@ void _containsTimeOfDayTests() {
             end: end,
           );
           const timeOfDayBefore = TimeOfDay(hour: 9, minute: 59);
-          expect(intervalRange.containsTimeOfDay(timeOfDayBefore), false);
-        },
+          expect(intervalRange.containsTimeOfDay(timeOfDayBefore, closedRange: true), false);
+          expect(intervalRange.containsTimeOfDay(timeOfDayBefore, closedRange: false), false);
+            },
       );
 
       test(
@@ -63,8 +65,9 @@ void _containsTimeOfDayTests() {
             end: end,
           );
           const timeOfDayAfter = TimeOfDay(hour: 12, minute: 40);
-          expect(intervalRange.containsTimeOfDay(timeOfDayAfter), false);
-        },
+          expect(intervalRange.containsTimeOfDay(timeOfDayAfter, closedRange: true), false);
+          expect(intervalRange.containsTimeOfDay(timeOfDayAfter, closedRange: false), false);
+            },
       );
 
       test(
@@ -78,8 +81,9 @@ void _containsTimeOfDayTests() {
             end: end,
           );
           const timeOfDayBetween = TimeOfDay(hour: 11, minute: 59);
-          expect(intervalRange.containsTimeOfDay(timeOfDayBetween), true);
-        },
+          expect(intervalRange.containsTimeOfDay(timeOfDayBetween, closedRange: true), true);
+          expect(intervalRange.containsTimeOfDay(timeOfDayBetween, closedRange: false), true);
+          },
       );
     },
   );
@@ -106,7 +110,8 @@ void _intersectsTests() {
           start: const TimeOfDay(hour: 11, minute: 0),
           end: const TimeOfDay(hour: 12, minute: 0),
         );
-        expect(intervalRange.intersects(intervalRangeTwo), true);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: true), true);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: false), true);
       },);
       test('IntervalRange intersects other because is contained on the other', () {
         final intervalRange = IntervalRange(
@@ -117,7 +122,8 @@ void _intersectsTests() {
           start: const TimeOfDay(hour: 0, minute: 0),
           end: const TimeOfDay(hour: 23, minute: 59),
         );
-        expect(intervalRange.intersects(intervalRangeTwo), true);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: true), true);
+        expect(intervalRange.intersects(intervalRangeTwo,closedRange: false), true);
       });
       test('IntervalRange intersects other by start', () {
         final intervalRange = IntervalRange(
@@ -128,7 +134,8 @@ void _intersectsTests() {
           start: const TimeOfDay(hour: 11, minute: 0),
           end: const TimeOfDay(hour: 16, minute: 0),
         );
-        expect(intervalRange.intersects(intervalRangeTwo), true);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: true), true);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: false), true);
       });
       test('IntervalRange intersects other by end', () {
         final intervalRange = IntervalRange(
@@ -139,7 +146,8 @@ void _intersectsTests() {
           start: const TimeOfDay(hour: 9, minute: 0),
           end: const TimeOfDay(hour: 11, minute: 47),
         );
-        expect(intervalRange.intersects(intervalRangeTwo), true);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: true), true);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: false), true);
       });
       test('IntervalRange intersects other by end', () {
         final intervalRange = IntervalRange(
@@ -150,7 +158,8 @@ void _intersectsTests() {
           start: const TimeOfDay(hour: 9, minute: 0),
           end: const TimeOfDay(hour: 11, minute: 47),
         );
-        expect(intervalRange.intersects(intervalRangeTwo), true);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: true), true);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: false), true);
       });
       test('IntervalRange intersects other before it', () {
         final intervalRange = IntervalRange(
@@ -161,7 +170,8 @@ void _intersectsTests() {
           start: const TimeOfDay(hour: 9, minute: 0),
           end: const TimeOfDay(hour: 9, minute: 47),
         );
-        expect(intervalRange.intersects(intervalRangeTwo), false);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: true), false);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: false), false);
       });
       test('IntervalRange intersects other after it', () {
         final intervalRange = IntervalRange(
@@ -172,7 +182,22 @@ void _intersectsTests() {
           start: const TimeOfDay(hour: 13, minute: 0),
           end: const TimeOfDay(hour: 18, minute: 29),
         );
-        expect(intervalRange.intersects(intervalRangeTwo), false);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: true), false);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: false), false);
+      });
+      test('IntervalRange intersects other equal to it', () {
+        final intervalRange = IntervalRange(
+          start: const TimeOfDay(hour: 10, minute: 0),
+          end: const TimeOfDay(hour: 12, minute: 39),
+        );
+
+        final intervalRangeTwo = IntervalRange(
+          start: const TimeOfDay(hour: 10, minute: 0),
+          end: const TimeOfDay(hour: 12, minute: 39),
+        );
+
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: true), true);
+        expect(intervalRange.intersects(intervalRangeTwo, closedRange: false), true);
       });
     },
   );

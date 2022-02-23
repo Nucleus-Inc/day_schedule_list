@@ -23,7 +23,7 @@ mixin DayScheduleListWidgetMixin {
       defaultAppointmentMinimumDuration;
 
   late double minimumMinuteIntervalHeight =
-      (hourHeight * minimumMinuteInterval.numberValue.toDouble()) / 60.0;
+      (hourHeight * minimumMinuteInterval.numberValue) / 60.0;
 
   double get timeOfDayWidgetHeight {
     return minimumMinuteIntervalHeight < 2
@@ -404,8 +404,9 @@ mixin DayScheduleListWidgetMixin {
   }) {
     final minTop = insetVertical;
     final maxEnd = contentHeight - insetVertical;
-    return newPosition.top >= minTop &&
+    final canUpdate = newPosition.top >= minTop &&
         newPosition.top + newPosition.height <= maxEnd;
+    return canUpdate;
   }
 
   ///Try to create a new appointment at the position tapped by the user
