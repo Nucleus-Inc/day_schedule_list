@@ -45,7 +45,7 @@ class _AppointmentContainerOverlayState
           children: [
             if ([
               AppointmentUpdatingMode.changeTop,
-              AppointmentUpdatingMode.changePosition
+              AppointmentUpdatingMode.changePosition,
             ].contains(widget.updateMode))
               AppointmentTimeOfDayIndicatorWidget.start(
                 time: widget.interval.start,
@@ -53,7 +53,7 @@ class _AppointmentContainerOverlayState
               ),
             if ([
               AppointmentUpdatingMode.changeHeight,
-              AppointmentUpdatingMode.changePosition
+              AppointmentUpdatingMode.changePosition,
             ].contains(widget.updateMode))
               AppointmentTimeOfDayIndicatorWidget.end(
                 time: widget.interval.end,

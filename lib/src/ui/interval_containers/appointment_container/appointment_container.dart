@@ -7,7 +7,8 @@ import '../../../models/schedule_item_position.dart';
 import 'dynamic_position_container.dart';
 
 typedef AppointmentUpdatePositionStartCallback = void Function(
-    AppointmentUpdatingMode mode);
+  AppointmentUpdatingMode mode,
+);
 
 class AppointmentContainer extends StatefulWidget {
   const AppointmentContainer({
@@ -174,7 +175,9 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
   }
 
   ScheduleItemPosition _newPositionFor(
-      double newHeight, HeightUpdateFrom from) {
+    double newHeight,
+    HeightUpdateFrom from,
+  ) {
     switch (from) {
       case HeightUpdateFrom.top:
         final deltaHeight = newHeight - widget.position.height;

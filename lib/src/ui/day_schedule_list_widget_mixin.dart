@@ -207,83 +207,19 @@ mixin DayScheduleListWidgetMixin {
   }) {
     List<ScheduleTimeOfDay> validTimesList = [];
     final verifyUnavailableIntervals = unavailableIntervals.isNotEmpty;
-    const minimumMinuteInterval = MinuteInterval.one;
 
     for (var item = 0; item < 25; item++) {
       final hasTimeBefore = item > 0;
       final TimeOfDay time =
           TimeOfDay(hour: item == 24 ? 23 : item, minute: item == 24 ? 59 : 0);
       if (verifyUnavailableIntervals) {
-        final IntervalRange first = unavailableIntervals.first;
-        final IntervalRange last = unavailableIntervals.last;
-
-        final belongsToFirst = first.containsTimeOfDay(time);
-        final belongsToLast = last.containsTimeOfDay(time);
-
-        if (hasTimeBefore) {
-          final beforeDateTime = DateTime(
-            DateTime.now().year,
-            1,
-            1,
-            time.hour,
-            time.minute,
-          ).subtract(const Duration(hours: 1));
-          final timeBefore = TimeOfDay.fromDateTime(beforeDateTime);
-          final timeBeforeBelongsToFirst = first.containsTimeOfDay(timeBefore);
-          final timeBeforeBelongsToLast = last.containsTimeOfDay(timeBefore);
-          if (timeBeforeBelongsToFirst && !belongsToFirst) {
-            final dateTimeToAdd = DateTime(
-              DateTime.now().year,
-              1,
-              1,
-              first.end.hour,
-              first.end.minute,
-            ).add(Duration(minutes: minimumMinuteInterval.numberValue));
-            final timeOfDayToAdd = TimeOfDay.fromDateTime(dateTimeToAdd);
-            if (time.toMinutes - timeOfDayToAdd.toMinutes >=
-                minimumMinuteInterval.numberValue) {
-              validTimesList.add(
-                belongsToInternalUnavailableRange(
-                  time: timeOfDayToAdd,
-                  unavailableIntervals: unavailableIntervals,
-                )
-                    ? ScheduleTimeOfDay.unavailable(time: timeOfDayToAdd)
-                    : ScheduleTimeOfDay.available(time: timeOfDayToAdd),
-              );
-            }
-          } else if (!timeBeforeBelongsToLast && belongsToLast) {
-            final dateTimeToAdd = DateTime(
-              DateTime.now().year,
-              1,
-              1,
-              last.start.hour,
-              last.start.minute,
-            ).subtract(Duration(minutes: minimumMinuteInterval.numberValue));
-            final timeOfDayToAdd = TimeOfDay.fromDateTime(dateTimeToAdd);
-            if (time.toMinutes - timeOfDayToAdd.toMinutes >=
-                minimumMinuteInterval.numberValue) {
-              validTimesList.add(
-                belongsToInternalUnavailableRange(
-                  time: timeOfDayToAdd,
-                  unavailableIntervals: unavailableIntervals,
-                )
-                    ? ScheduleTimeOfDay.unavailable(time: timeOfDayToAdd)
-                    : ScheduleTimeOfDay.available(time: timeOfDayToAdd),
-              );
-            }
-          }
-        }
-
-        if (!belongsToFirst && !belongsToLast) {
-          validTimesList.add(
-            belongsToInternalUnavailableRange(
+        validTimesList.addAll(
+            _validScheduleTimeOfDayListWhenNeedToVerifyForUnavailableIntervals(
               time: time,
+              hasTimeBefore: hasTimeBefore,
               unavailableIntervals: unavailableIntervals,
-            )
-                ? ScheduleTimeOfDay.unavailable(time: time)
-                : ScheduleTimeOfDay.available(time: time),
-          );
-        }
+            ),
+        );
       } else {
         validTimesList.add(
           belongsToInternalUnavailableRange(
@@ -296,6 +232,115 @@ mixin DayScheduleListWidgetMixin {
       }
     }
     return validTimesList;
+  }
+
+  List<ScheduleTimeOfDay> _validScheduleTimeOfDayListWhenNeedToVerifyForUnavailableIntervals({
+    required TimeOfDay time,
+    required bool hasTimeBefore,
+    required List<IntervalRange> unavailableIntervals,
+  }){
+    List<ScheduleTimeOfDay> validTimesList = [];
+
+    final IntervalRange firstUnavailableInterval =
+        unavailableIntervals.first;
+    final IntervalRange lastUnavailableInterval = unavailableIntervals.last;
+
+    final belongsToFirst = firstUnavailableInterval.containsTimeOfDay(time);
+    final belongsToLast = lastUnavailableInterval.containsTimeOfDay(time);
+
+    if (hasTimeBefore) {
+      final beforeDateTime = DateTime(
+        DateTime.now().year,
+        1,
+        1,
+        time.hour,
+        time.minute,
+      ).subtract(const Duration(hours: 1));
+
+      final timeBefore = TimeOfDay.fromDateTime(beforeDateTime);
+      final timeBeforeBelongsToFirst =
+      firstUnavailableInterval.containsTimeOfDay(timeBefore);
+      final timeBeforeBelongsToLast =
+      lastUnavailableInterval.containsTimeOfDay(timeBefore);
+
+      final validTime = _validScheduleTimeOfDayWhenHaveTimeBefore(
+        time: time,
+        belongsToFirst: belongsToFirst,
+        belongsToLast: belongsToLast,
+        timeBeforeBelongsToFirst: timeBeforeBelongsToFirst,
+        timeBeforeBelongsToLast: timeBeforeBelongsToLast,
+        firstUnavailableInterval: firstUnavailableInterval,
+        lastUnavailableInterval: lastUnavailableInterval,
+        unavailableIntervals: unavailableIntervals,
+      );
+
+      if (validTime != null) {
+        validTimesList.add(validTime);
+      }
+    }
+
+    if (!belongsToFirst && !belongsToLast) {
+      validTimesList.add(
+        belongsToInternalUnavailableRange(
+          time: time,
+          unavailableIntervals: unavailableIntervals,
+        )
+            ? ScheduleTimeOfDay.unavailable(time: time)
+            : ScheduleTimeOfDay.available(time: time),
+      );
+    }
+
+    return validTimesList;
+  }
+
+  ScheduleTimeOfDay? _validScheduleTimeOfDayWhenHaveTimeBefore(
+      {required TimeOfDay time,
+      required bool timeBeforeBelongsToFirst,
+      required bool belongsToFirst,
+      required bool timeBeforeBelongsToLast,
+      required bool belongsToLast,
+      required IntervalRange firstUnavailableInterval,
+      required IntervalRange lastUnavailableInterval,
+      required List<IntervalRange> unavailableIntervals}) {
+
+    if (timeBeforeBelongsToFirst && !belongsToFirst) {
+      final dateTimeToAdd = DateTime(
+              DateTime.now().year,
+              1,
+              1,
+              firstUnavailableInterval.end.hour,
+              firstUnavailableInterval.end.minute)
+          .add(Duration(minutes: minimumMinuteInterval.numberValue));
+      final timeOfDayToAdd = TimeOfDay.fromDateTime(dateTimeToAdd);
+      if (time.toMinutes - timeOfDayToAdd.toMinutes >=
+          minimumMinuteInterval.numberValue) {
+        return belongsToInternalUnavailableRange(
+          time: timeOfDayToAdd,
+          unavailableIntervals: unavailableIntervals,
+        )
+            ? ScheduleTimeOfDay.unavailable(time: timeOfDayToAdd)
+            : ScheduleTimeOfDay.available(time: timeOfDayToAdd);
+      }
+    } else if (!timeBeforeBelongsToLast && belongsToLast) {
+      final dateTimeToAdd = DateTime(
+              DateTime.now().year,
+              1,
+              1,
+              lastUnavailableInterval.start.hour,
+              lastUnavailableInterval.start.minute)
+          .subtract(Duration(minutes: minimumMinuteInterval.numberValue));
+      final timeOfDayToAdd = TimeOfDay.fromDateTime(dateTimeToAdd);
+      if (time.toMinutes - timeOfDayToAdd.toMinutes >=
+          minimumMinuteInterval.numberValue) {
+        return belongsToInternalUnavailableRange(
+          time: timeOfDayToAdd,
+          unavailableIntervals: unavailableIntervals,
+        )
+            ? ScheduleTimeOfDay.unavailable(time: timeOfDayToAdd)
+            : ScheduleTimeOfDay.available(time: timeOfDayToAdd);
+      }
+    }
+    return null;
   }
 
   bool canUpdateHeightOfInterval<S extends IntervalRange>({
@@ -374,14 +419,8 @@ mixin DayScheduleListWidgetMixin {
     final now = DateTime.now();
     final startInMinutes = convertDeltaYToMinutes(deltaY: startPosition.dy);
 
-    final baseStartDate = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      firstValidTimeList.time.hour,
-      firstValidTimeList.time.minute,
-      0,
-    );
+    final baseStartDate = DateTime(now.year, now.month, now.day,
+        firstValidTimeList.time.hour, firstValidTimeList.time.minute, 0);
     final startDate = baseStartDate.add(
       Duration(minutes: startInMinutes - 30),
     );
@@ -391,14 +430,8 @@ mixin DayScheduleListWidgetMixin {
           )
         : firstValidTimeList.time;
 
-    final baseEndDate = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      start.hour,
-      start.minute,
-      0,
-    );
+    final baseEndDate =
+        DateTime(now.year, now.month, now.day, start.hour, start.minute, 0);
     final endDate = baseEndDate.add(const Duration(hours: 1));
     final end = endDate.isSameDay(dateTime: baseEndDate)
         ? TimeOfDay.fromDateTime(
@@ -428,6 +461,36 @@ mixin DayScheduleListWidgetMixin {
     }
 
     ///Adjusts duration avoiding intersections
+    possibleNewAppointment =
+        _adjustPossibleNewAppointmentDurationAvoidingIntersections(
+      intersections: intersections,
+      possibleNewAppointment: possibleNewAppointment,
+    );
+
+    ///Adjusts duration avoiding min valid time interval and max valid time interval
+    if (possibleNewAppointment != null &&
+        possibleNewAppointment.start < firstValidTimeList.time) {
+      possibleNewAppointment.start = firstValidTimeList.time;
+    } else if (possibleNewAppointment != null &&
+        possibleNewAppointment.end > lastValidTimeList.time) {
+      possibleNewAppointment.end = lastValidTimeList.time;
+    }
+
+    if (possibleNewAppointment == null ||
+        possibleNewAppointment.deltaIntervalIMinutes <
+            appointmentMinimumDuration.numberValue) {
+      throw UnavailableIntervalToAddAppointmentException(
+        appointmentMinimumDuration: appointmentMinimumDuration,
+      );
+    }
+
+    return possibleNewAppointment;
+  }
+
+  IntervalRange? _adjustPossibleNewAppointmentDurationAvoidingIntersections({
+    required List<IntervalRange> intersections,
+    required IntervalRange? possibleNewAppointment,
+  }) {
     for (var index = 0; index < intersections.length; index++) {
       if (possibleNewAppointment != null) {
         final intersectedInterval = intersections[index];
@@ -456,24 +519,6 @@ mixin DayScheduleListWidgetMixin {
         }
       }
     }
-
-    ///Adjusts duration avoiding min valid time interval and max valid time interval
-    if (possibleNewAppointment != null &&
-        possibleNewAppointment.start < firstValidTimeList.time) {
-      possibleNewAppointment.start = firstValidTimeList.time;
-    } else if (possibleNewAppointment != null &&
-        possibleNewAppointment.end > lastValidTimeList.time) {
-      possibleNewAppointment.end = lastValidTimeList.time;
-    }
-
-    if (possibleNewAppointment == null ||
-        possibleNewAppointment.deltaIntervalIMinutes <
-            appointmentMinimumDuration.numberValue) {
-      throw UnavailableIntervalToAddAppointmentException(
-        appointmentMinimumDuration: appointmentMinimumDuration,
-      );
-    }
-
     return possibleNewAppointment;
   }
 

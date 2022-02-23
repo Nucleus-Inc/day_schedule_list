@@ -32,7 +32,7 @@ dart_code_metrics:
     cyclomatic-complexity: 20
     maximum-nesting-level: 5
     number-of-parameters: 8
-    source-lines-of-code: 80
+    source-lines-of-code: 60
   rules:
     # Flutter rules start
     - avoid-returning-widgets
@@ -52,7 +52,7 @@ dart_code_metrics:
         min-length: 3
         max-length: 80
     - prefer-trailing-comma:
-        break-on: 4
+        #break-on: 6
 #    - member-ordering:
 #        alphabetize: false
 #        order:
