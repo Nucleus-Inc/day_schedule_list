@@ -1,5 +1,10 @@
 enum MinuteInterval {
-  one, five, ten, fifteen, twenty, thirty
+  one,
+  five,
+  ten,
+  fifteen,
+  twenty,
+  thirty,
 }
 
 extension NumberValue on MinuteInterval {
@@ -20,19 +25,19 @@ extension NumberValue on MinuteInterval {
     }
   }
 
-  bool operator < (MinuteInterval interval) {
+  bool operator <(MinuteInterval interval) {
     return numberValue < interval.numberValue;
   }
 
-  bool operator > (MinuteInterval interval) {
+  bool operator >(MinuteInterval interval) {
     return numberValue > interval.numberValue;
   }
 
-  bool operator <= (MinuteInterval interval) {
+  bool operator <=(MinuteInterval interval) {
     return numberValue <= interval.numberValue;
   }
 
-  bool operator >= (MinuteInterval interval) {
+  bool operator >=(MinuteInterval interval) {
     return numberValue >= interval.numberValue;
   }
 }

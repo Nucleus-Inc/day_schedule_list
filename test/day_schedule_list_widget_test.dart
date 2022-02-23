@@ -91,7 +91,7 @@ void _minimumMinuteIntervalAndAppointmentMinimumDurationAssertionsTest(){
               }
               expect(error, isNull);
             });
-      }
+      },
   );
 }
 

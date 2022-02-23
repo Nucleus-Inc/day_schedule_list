@@ -69,29 +69,33 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
   @override
   void didUpdateWidget(covariant DynamicPositionContainer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _currentPosition = widget.position;
+    _resetCurrentPosition();
   }
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<bool>(
-        valueListenable: editingMode,
-        builder: (context, editing, child) {
-          return GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              if (widget.onUpdateEditingModeTap != null) {
-                editingMode.value = !editingMode.value;
-                widget.onUpdateEditingModeTap!(editingMode.value);
-              }
-            },
-            onLongPress: editing ? onRescheduleLongPressDown : null,
-            //onLongPressStart: onRescheduleLongPressStart,
-            onLongPressEnd: editing ? onRescheduleLongPressEnd : null,
-            onLongPressMoveUpdate: editing ? onRescheduleLongPressMoveUpdate : null,
-            child: widget.child,
-          );
-        });
+      valueListenable: editingMode,
+      builder: (context, editing, child) {
+        return GestureDetector(
+          onTap: _onDynamicPositionContainerTap,
+          onLongPress: editing ? onRescheduleLongPressDown : null,
+          //onLongPressStart: onRescheduleLongPressStart,
+          onLongPressEnd: editing ? onRescheduleLongPressEnd : null,
+          onLongPressMoveUpdate:
+              editing ? onRescheduleLongPressMoveUpdate : null,
+          child: widget.child,
+        );
+      },
+    );
+  }
+
+  void _onDynamicPositionContainerTap() {
+    HapticFeedback.selectionClick();
+    if (widget.onUpdateEditingModeTap != null) {
+      editingMode.value = !editingMode.value;
+      widget.onUpdateEditingModeTap!(editingMode.value);
+    }
   }
 
   void onRescheduleLongPressDown() {
@@ -110,7 +114,8 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
       final double nextPendingIncrement = _pendingDeltaYForUpdateStep + offsetY;
       if (nextPendingIncrement.abs() >= updateStep) {
         _performRescheduleIncrementBy(
-            updateStep * (nextPendingIncrement / nextPendingIncrement.abs()));
+          updateStep * (nextPendingIncrement / nextPendingIncrement.abs()),
+        );
         _pendingDeltaYForUpdateStep = 0;
       } else {
         _pendingDeltaYForUpdateStep = nextPendingIncrement;
@@ -121,11 +126,11 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
     _oldOffsetFromOrigin = details.offsetFromOrigin;
   }
 
-  void onRescheduleLongPressEnd(LongPressEndDetails details) {
+  void onRescheduleLongPressEnd(LongPressEndDetails _) {
     if (_didMove && widget.canUpdatePositionTo(_currentPosition)) {
-      debugPrint('end');
       if (widget.canUpdatePositionTo(_currentPosition)) {
         widget.onUpdatePositionEnd(_currentPosition);
+        _resetCurrentPosition();
       }
     } else {
       onRescheduleLongPressCancel();
@@ -135,6 +140,7 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
   void onRescheduleLongPressCancel() {
     debugPrint('cancel');
     widget.onUpdatePositionCancel();
+    _resetCurrentPosition();
   }
 
   void _performRescheduleIncrementBy(double value) {
@@ -145,5 +151,9 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
       _currentPosition = finalPosition;
       widget.onNewPositionUpdate(_currentPosition);
     }
+  }
+
+  void _resetCurrentPosition() {
+    _currentPosition = widget.position;
   }
 }

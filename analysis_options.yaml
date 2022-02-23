@@ -1,5 +1,12 @@
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  exclude:
+    - lib/**/*.g.dart
+  plugins:
+    - dart_code_metrics
+
+#Flutter lints configs
 linter:
   rules:
     omit_local_variable_types: false
@@ -12,3 +19,51 @@ linter:
     sort_child_properties_last: true
     unawaited_futures: true
     unsafe_html: true
+
+
+#Dart code metrics configs
+#documentation https://dartcodemetrics.dev/docs/getting-started/introduction
+dart_code_metrics:
+  anti-patterns:
+    - long-method
+    - long-parameter-list
+  metrics:
+    cyclomatic-complexity: 20
+    maximum-nesting-level: 5
+    number-of-parameters: 8
+    source-lines-of-code: 60
+  metrics-exclude:
+    - test/**
+  rules:
+    # Flutter rules start
+    - avoid-returning-widgets
+    - avoid-unnecessary-setstate
+    - avoid-wrapping-in-padding
+    - prefer-extracting-callbacks
+    - prefer-single-widget-per-file:
+        ignore-private-widgets: true
+    # Flutter rules end
+    - avoid-unused-parameters
+    - no-empty-block
+    - no-boolean-literal-compare
+    - no-equal-then-else
+    - no-object-declaration
+    - prefer-match-file-name
+    - prefer-correct-type-name:
+        min-length: 3
+        max-length: 80
+    - prefer-trailing-comma:
+        #break-on: 6
+#    - member-ordering:
+#        alphabetize: false
+#        order:
+#          - constructors
+#          - public-fields
+#          - getters-setters
+#          - private-fields
+#          - public-methods
+#          - private-methods
+#          - public-static-methods
+#          - private-static-methods
+  rules-exclude:
+    - test/**

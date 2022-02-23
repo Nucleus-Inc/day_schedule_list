@@ -1,6 +1,6 @@
 import 'package:day_schedule_list/src/models/interval_range.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
-import 'package:day_schedule_list/src/ui/day_schedule_list_widget_extensions.dart';
+import 'package:day_schedule_list/src/ui/day_schedule_list_widget_mixin.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/dynamic_height_container.dart';
 import 'package:day_schedule_list/src/ui/time_of_day_widget.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +54,7 @@ void _intersectsOtherIntervalTest() {
       IntervalRange(
         start: const TimeOfDay(hour: 17, minute: 0),
         end: const TimeOfDay(hour: 20, minute: 30),
-      )
+      ),
     ];
 
     test('verify some interval intersects interval', () {
@@ -268,7 +268,6 @@ void _convertDeltaYToMinutesTest() {
 }
 
 void _canUpdateHeightOfIntervalFromBottomTest() {
-  const insetVertical = 10.0;
   final methods = _DayScheduleListWidgetMethodsTest();
   final List<IntervalRange> appointments = [
     IntervalRange(
@@ -307,7 +306,6 @@ void _canUpdateHeightOfIntervalFromBottomTest() {
       expect(
           methods.canUpdateHeightOfInterval(
             from: HeightUpdateFrom.bottom,
-            insetVertical: insetVertical,
             index: 0,
             appointments: appointments,
             unavailableIntervals: unavailableItems,
@@ -320,7 +318,6 @@ void _canUpdateHeightOfIntervalFromBottomTest() {
       expect(
           methods.canUpdateHeightOfInterval(
             from: HeightUpdateFrom.bottom,
-            insetVertical: insetVertical,
             index: 0,
             appointments: appointments,
             unavailableIntervals: unavailableItems,
@@ -333,7 +330,6 @@ void _canUpdateHeightOfIntervalFromBottomTest() {
 }
 
 void _canUpdateHeightOfIntervalFromTopTest() {
-  const insetVertical = 10.0;
   final methods = _DayScheduleListWidgetMethodsTest();
   final List<IntervalRange> appointments = [
     IntervalRange(
@@ -372,7 +368,6 @@ void _canUpdateHeightOfIntervalFromTopTest() {
       expect(
           methods.canUpdateHeightOfInterval(
             from: HeightUpdateFrom.top,
-            insetVertical: insetVertical,
             index: 0,
             appointments: appointments,
             unavailableIntervals: unavailableItems,
@@ -385,7 +380,6 @@ void _canUpdateHeightOfIntervalFromTopTest() {
       expect(
           methods.canUpdateHeightOfInterval(
             from: HeightUpdateFrom.top,
-            insetVertical: insetVertical,
             index: 1,
             appointments: appointments,
             unavailableIntervals: unavailableItems,
@@ -400,25 +394,6 @@ void _canUpdateHeightOfIntervalFromTopTest() {
 void _canUpdatePositionOfIntervalTest() {
   const insetVertical = 10.0;
   final methods = _DayScheduleListWidgetMethodsTest();
-  final List<IntervalRange> appointments = [
-    IntervalRange(
-      start: const TimeOfDay(hour: 8, minute: 0),
-      end: const TimeOfDay(hour: 10, minute: 0),
-    ),
-    IntervalRange(
-      start: const TimeOfDay(hour: 12, minute: 0),
-      end: const TimeOfDay(hour: 14, minute: 35),
-    ),
-    IntervalRange(
-      start: const TimeOfDay(hour: 16, minute: 0),
-      end: const TimeOfDay(hour: 16, minute: 32),
-    ),
-    IntervalRange(
-      start: const TimeOfDay(hour: 17, minute: 0),
-      end: const TimeOfDay(hour: 20, minute: 30),
-    )
-  ];
-
   final List<IntervalRange> unavailableItems = [
     IntervalRange(
       start: const TimeOfDay(hour: 0, minute: 0),
@@ -449,8 +424,6 @@ void _canUpdatePositionOfIntervalTest() {
       );
       expect(
           methods.canUpdatePositionOfInterval(
-            index: 0,
-            appointments: appointments,
             newPosition: newPosition,
             insetVertical: insetVertical,
             contentHeight: contentHeight,
@@ -469,8 +442,6 @@ void _canUpdatePositionOfIntervalTest() {
       );
       expect(
           methods.canUpdatePositionOfInterval(
-            index: 0,
-            appointments: appointments,
             newPosition: newPosition,
             insetVertical: insetVertical,
             contentHeight: contentHeight,
@@ -489,8 +460,6 @@ void _canUpdatePositionOfIntervalTest() {
       );
       expect(
           methods.canUpdatePositionOfInterval(
-            index: 3,
-            appointments: appointments,
             newPosition: newPosition,
             insetVertical: insetVertical,
             contentHeight: contentHeight,
@@ -932,13 +901,13 @@ void _timeOfDayWidgetHeightTest(){
   });
 }
 
-class _DayScheduleListWidgetMethodsTest with DayScheduleListWidgetMethods {
+class _DayScheduleListWidgetMethodsTest with DayScheduleListWidgetMixin {
   _DayScheduleListWidgetMethodsTest();
   @override
   double get hourHeight => 100;
 }
 
-class _DayScheduleListWidgetMethodsTest2 with DayScheduleListWidgetMethods {
+class _DayScheduleListWidgetMethodsTest2 with DayScheduleListWidgetMixin {
   _DayScheduleListWidgetMethodsTest2();
   @override
   double get hourHeight => 100;
@@ -948,7 +917,7 @@ class _DayScheduleListWidgetMethodsTest2 with DayScheduleListWidgetMethods {
   MinuteInterval get appointmentMinimumDuration => MinuteInterval.thirty;
 }
 
-class _DayScheduleListWidgetMethodsTest3 with DayScheduleListWidgetMethods {
+class _DayScheduleListWidgetMethodsTest3 with DayScheduleListWidgetMixin {
   _DayScheduleListWidgetMethodsTest3();
   @override
   double get hourHeight => 100;
@@ -958,7 +927,7 @@ class _DayScheduleListWidgetMethodsTest3 with DayScheduleListWidgetMethods {
   MinuteInterval get appointmentMinimumDuration => MinuteInterval.thirty;
 }
 
-class _DayScheduleListWidgetMethodsTest4 with DayScheduleListWidgetMethods {
+class _DayScheduleListWidgetMethodsTest4 with DayScheduleListWidgetMixin {
   _DayScheduleListWidgetMethodsTest4();
   @override
   double get hourHeight => 100;

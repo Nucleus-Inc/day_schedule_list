@@ -1,4 +1,5 @@
 import 'package:day_schedule_list/src/models/minute_interval.dart';
+import 'package:day_schedule_list/src/ui/day_schedule_list_inherited.dart';
 import 'package:flutter/material.dart';
 
 import 'time_of_day_widget.dart';
@@ -8,52 +9,30 @@ class ValidTimeOfDayListWidget extends StatelessWidget {
   static const double baseInsetVertical = 20;
 
   const ValidTimeOfDayListWidget({
-    required this.validTimesList,
-    required this.timeOfDayWidgetHeight,
-    required this.minimumMinuteInterval,
-    required this.minimumMinuteIntervalHeight,
     Key? key,
   }) : super(key: key);
 
-  final List<ScheduleTimeOfDay> validTimesList;
-  final double timeOfDayWidgetHeight;
-  final MinuteInterval minimumMinuteInterval;
-  final double minimumMinuteIntervalHeight;
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(
-          height: baseInsetVertical,
-        ),
-        ..._buildTimeOfDayWidgetList(),
-        const SizedBox(
-          height: baseInsetVertical,
-        ),
-      ],
-    );
-  }
+    final inherited = DayScheduleListInherited.of(context);
+    final List<ScheduleTimeOfDay> validTimesList = inherited.validTimesList;
+    final double timeOfDayWidgetHeight = inherited.timeOfDayWidgetHeight;
 
-  List<Widget> _buildTimeOfDayWidgetList() {
     List<Widget> items = [];
     for (var index = 0; index < validTimesList.length; index++) {
       final hasNextItem = index < validTimesList.length - 1;
       final ScheduleTimeOfDay scheduleTime = validTimesList[index];
       final item = TimeOfDayWidget(
-          scheduleTime: scheduleTime, height: timeOfDayWidgetHeight);
+        scheduleTime: scheduleTime,
+        height: timeOfDayWidgetHeight,
+      );
       if (hasNextItem) {
         final nextTime = validTimesList[index + 1];
-        final timeInMinutes = scheduleTime.time.toMinutes;
-        final nextTimeInMinutes = nextTime.time.toMinutes;
-        final intervalInMinutes = nextTimeInMinutes - timeInMinutes;
-        final numberOfStepsBetween =
-            intervalInMinutes / minimumMinuteInterval.numberValue;
-        final spaceBetween =
-            numberOfStepsBetween * minimumMinuteIntervalHeight -
-                timeOfDayWidgetHeight;
+        final spaceBetween = calculateSpaceBetween(
+          context: context,
+          currentTime: scheduleTime,
+          nextTime: nextTime,
+        );
         if (spaceBetween >= 0) {
           items.addAll([
             item,
@@ -66,6 +45,41 @@ class ValidTimeOfDayListWidget extends StatelessWidget {
         items.add(item);
       }
     }
-    return items;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(
+          height: baseInsetVertical,
+        ),
+        ...items,
+        const SizedBox(
+          height: baseInsetVertical,
+        ),
+      ],
+    );
+  }
+
+  double calculateSpaceBetween({
+    required BuildContext context,
+    required ScheduleTimeOfDay currentTime,
+    required ScheduleTimeOfDay nextTime,
+  }) {
+    final inherited = DayScheduleListInherited.of(context);
+
+    final MinuteInterval minimumMinuteInterval =
+        inherited.minimumMinuteInterval;
+    final double minimumMinuteIntervalHeight =
+        inherited.minimumMinuteIntervalHeight;
+    final double timeOfDayWidgetHeight = inherited.timeOfDayWidgetHeight;
+
+    final timeInMinutes = currentTime.time.toMinutes;
+    final nextTimeInMinutes = nextTime.time.toMinutes;
+    final intervalInMinutes = nextTimeInMinutes - timeInMinutes;
+    final numberOfStepsBetween =
+        intervalInMinutes / minimumMinuteInterval.numberValue;
+    return numberOfStepsBetween * minimumMinuteIntervalHeight -
+        timeOfDayWidgetHeight;
   }
 }

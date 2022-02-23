@@ -1,3 +1,4 @@
+import 'package:day_schedule_list/src/ui/day_schedule_list_inherited.dart';
 import 'package:flutter/material.dart';
 
 import '../../day_schedule_list_widget.dart';
@@ -5,7 +6,9 @@ import 'dynamic_height_container.dart';
 import '../../../models/schedule_item_position.dart';
 import 'dynamic_position_container.dart';
 
-typedef AppointmentUpdatePositionStartCallback = void Function(AppointmentUpdatingMode mode);
+typedef AppointmentUpdatePositionStartCallback = void Function(
+  AppointmentUpdatingMode mode,
+);
 
 class AppointmentContainer extends StatefulWidget {
   const AppointmentContainer({
@@ -19,9 +22,6 @@ class AppointmentContainer extends StatefulWidget {
     required this.onUpdatePositionStart,
     required this.onUpdatePositionCancel,
     required this.child,
-    this.dragIndicatorBorderWidth,
-    this.dragIndicatorColor,
-    this.dragIndicatorBorderColor,
     Key? key,
   }) : super(key: key);
 
@@ -37,10 +37,6 @@ class AppointmentContainer extends StatefulWidget {
   final UpdatePositionCallback onNewUpdatePosition;
   final AppointmentUpdatePositionStartCallback onUpdatePositionStart;
   final void Function() onUpdatePositionCancel;
-
-  final Color? dragIndicatorColor;
-  final Color? dragIndicatorBorderColor;
-  final double? dragIndicatorBorderWidth;
 
   @override
   _AppointmentContainerState createState() => _AppointmentContainerState();
@@ -65,6 +61,12 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
 
   @override
   Widget build(BuildContext context) {
+    final inherited = DayScheduleListInherited.of(context);
+
+    final Color? dragIndicatorColor = inherited.dragIndicatorColor;
+    final Color? dragIndicatorBorderColor = inherited.dragIndicatorBorderColor;
+    final double? dragIndicatorBorderWidth = inherited.dragIndicatorBorderWidth;
+
     return Positioned(
       top: widget.position.top,
       right: 0,
@@ -83,15 +85,19 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
           onUpdateEditingModeTap: (editing) => _editingMode.value = editing,
           child: ValueListenableBuilder<bool>(
             valueListenable: _editingMode,
-            builder: (context, editingMode, child){
+            builder: (
+              context,
+              editingMode,
+              child,
+            ) {
               return DynamicHeightContainer(
                 editionEnabled: editingMode,
                 currentHeight: widget.position.height,
                 updateStep: widget.updateStep,
                 canUpdateHeightTo: widget.canUpdateHeightTo,
-                dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
-                dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
-                dragIndicatorColor: widget.dragIndicatorColor,
+                dragIndicatorBorderColor: dragIndicatorBorderColor,
+                dragIndicatorBorderWidth: dragIndicatorBorderWidth,
+                dragIndicatorColor: dragIndicatorColor,
                 onUpdateEnd: _onUpdateHeightEnd,
                 onUpdateStart: _onUpdateHeightStart,
                 onUpdateCancel: _onUpdateHeightCancel,
@@ -103,8 +109,7 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
               valueListenable: _updateMode,
               builder: (context, value, child) {
                 return Opacity(
-                  opacity:
-                  value != AppointmentUpdatingMode.none ? 0.5 : 1,
+                  opacity: value != AppointmentUpdatingMode.none ? 0.5 : 1,
                   child: child!,
                 );
               },
@@ -169,8 +174,11 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
     }
   }
 
-  ScheduleItemPosition _newPositionFor(double newHeight, HeightUpdateFrom from) {
-    switch(from){
+  ScheduleItemPosition _newPositionFor(
+    double newHeight,
+    HeightUpdateFrom from,
+  ) {
+    switch (from) {
       case HeightUpdateFrom.top:
         final deltaHeight = newHeight - widget.position.height;
         final newTop = widget.position.top - deltaHeight;
@@ -184,11 +192,16 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
   }
 }
 
-enum AppointmentUpdatingMode { changePosition, changeHeight, changeTop, none }
+enum AppointmentUpdatingMode {
+  changePosition,
+  changeHeight,
+  changeTop,
+  none,
+}
 
 extension AppointmentUpdatingModeFromHeightUpdate on AppointmentUpdatingMode {
   static AppointmentUpdatingMode create(HeightUpdateFrom from) {
-    switch(from){
+    switch (from) {
       case HeightUpdateFrom.top:
         return AppointmentUpdatingMode.changeTop;
       case HeightUpdateFrom.bottom:

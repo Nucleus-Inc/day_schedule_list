@@ -14,14 +14,14 @@ void _modeTopTest() {
   testWidgets('DragIndicatorWidget.top', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
       home: Stack(
-        children: [
+        children: const [
           DragIndicatorWidget.top(
             enabled: true,
-            onLongPressDown: () {},
-            onLongPressStart: (start) {},
-            onLongPressEnd: (end) {},
-            onLongPressMoveUpdate: (update) {},
-          )
+            onLongPressDown: null,
+            onLongPressStart: null,
+            onLongPressEnd: null,
+            onLongPressMoveUpdate: null,
+          ),
         ],
       ),
     ));
@@ -52,10 +52,10 @@ void _modeBottomTest() {
         children: [
           DragIndicatorWidget.bottom(
             enabled: true,
-            onLongPressDown: () {},
-            onLongPressStart: (start) {},
-            onLongPressEnd: (end) {},
-            onLongPressMoveUpdate: (update) {},
+            onLongPressDown: (){},
+            onLongPressStart: (_){},
+            onLongPressEnd: (_){},
+            onLongPressMoveUpdate: (_){},
           )
         ],
       ),
@@ -147,10 +147,10 @@ void _whenEnabledOrDisabled(){
           children: [
             DragIndicatorWidget.top(
               enabled: true,
-              onLongPressDown: () {},
-              onLongPressStart: (start) {},
-              onLongPressEnd: (end) {},
-              onLongPressMoveUpdate: (update) {},
+              onLongPressDown: (){},
+              onLongPressStart: (_){},
+              onLongPressEnd: (_){},
+              onLongPressMoveUpdate: (_){},
             )
           ],
         ),
@@ -185,13 +185,13 @@ void _whenEnabledOrDisabled(){
     testWidgets('enabled = false', (tester) async {
       await tester.pumpWidget(MaterialApp(
         home: Stack(
-          children: [
+          children: const [
             DragIndicatorWidget.top(
               enabled: false,
-              onLongPressDown: () {},
-              onLongPressStart: (start) {},
-              onLongPressEnd: (end) {},
-              onLongPressMoveUpdate: (update) {},
+              onLongPressDown: null,
+              onLongPressStart: null,
+              onLongPressEnd: null,
+              onLongPressMoveUpdate: null,
             )
           ],
         ),

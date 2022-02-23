@@ -1,8 +1,9 @@
 import 'package:day_schedule_list/src/models/minute_interval.dart';
 
 class UnavailableIntervalToAddAppointmentException implements Exception {
-  UnavailableIntervalToAddAppointmentException(
-      {required this.appointmentMinimumDuration});
+  UnavailableIntervalToAddAppointmentException({
+    required this.appointmentMinimumDuration,
+  });
 
   MinuteInterval appointmentMinimumDuration;
 
