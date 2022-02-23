@@ -2,7 +2,6 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
-    - test/**
     - lib/**/*.g.dart
   plugins:
     - dart_code_metrics
@@ -33,6 +32,8 @@ dart_code_metrics:
     maximum-nesting-level: 5
     number-of-parameters: 8
     source-lines-of-code: 60
+  metrics-exclude:
+    - test/**
   rules:
     # Flutter rules start
     - avoid-returning-widgets
@@ -64,4 +65,5 @@ dart_code_metrics:
 #          - private-methods
 #          - public-static-methods
 #          - private-static-methods
-
+  rules-exclude:
+    - test/**
