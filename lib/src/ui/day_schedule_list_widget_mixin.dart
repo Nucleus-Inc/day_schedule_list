@@ -23,7 +23,7 @@ mixin DayScheduleListWidgetMixin {
       defaultAppointmentMinimumDuration;
 
   late double minimumMinuteIntervalHeight =
-      (hourHeight * minimumMinuteInterval.numberValue.toDouble()) / 60.0;
+      (hourHeight * minimumMinuteInterval.numberValue) / 60.0;
 
   double get timeOfDayWidgetHeight {
     return minimumMinuteIntervalHeight < 2
@@ -202,6 +202,12 @@ mixin DayScheduleListWidgetMixin {
         .round();
   }
 
+  int calculateCloserMinutesThatIsMultipleOfMinimumMinuteInterval(
+      {required int minutes}) {
+    return (minutes ~/ minimumMinuteInterval.numberValue) *
+        minimumMinuteInterval.numberValue;
+  }
+
   List<ScheduleTimeOfDay> populateValidTimesList({
     required List<IntervalRange> unavailableIntervals,
   }) {
@@ -214,11 +220,11 @@ mixin DayScheduleListWidgetMixin {
           TimeOfDay(hour: item == 24 ? 23 : item, minute: item == 24 ? 59 : 0);
       if (verifyUnavailableIntervals) {
         validTimesList.addAll(
-            _validScheduleTimeOfDayListWhenNeedToVerifyForUnavailableIntervals(
-              time: time,
-              hasTimeBefore: hasTimeBefore,
-              unavailableIntervals: unavailableIntervals,
-            ),
+          _validScheduleTimeOfDayListWhenNeedToVerifyForUnavailableIntervals(
+            time: time,
+            hasTimeBefore: hasTimeBefore,
+            unavailableIntervals: unavailableIntervals,
+          ),
         );
       } else {
         validTimesList.add(
@@ -234,15 +240,15 @@ mixin DayScheduleListWidgetMixin {
     return validTimesList;
   }
 
-  List<ScheduleTimeOfDay> _validScheduleTimeOfDayListWhenNeedToVerifyForUnavailableIntervals({
+  List<ScheduleTimeOfDay>
+      _validScheduleTimeOfDayListWhenNeedToVerifyForUnavailableIntervals({
     required TimeOfDay time,
     required bool hasTimeBefore,
     required List<IntervalRange> unavailableIntervals,
-  }){
+  }) {
     List<ScheduleTimeOfDay> validTimesList = [];
 
-    final IntervalRange firstUnavailableInterval =
-        unavailableIntervals.first;
+    final IntervalRange firstUnavailableInterval = unavailableIntervals.first;
     final IntervalRange lastUnavailableInterval = unavailableIntervals.last;
 
     final belongsToFirst = firstUnavailableInterval.containsTimeOfDay(time);
@@ -259,9 +265,9 @@ mixin DayScheduleListWidgetMixin {
 
       final timeBefore = TimeOfDay.fromDateTime(beforeDateTime);
       final timeBeforeBelongsToFirst =
-      firstUnavailableInterval.containsTimeOfDay(timeBefore);
+          firstUnavailableInterval.containsTimeOfDay(timeBefore);
       final timeBeforeBelongsToLast =
-      lastUnavailableInterval.containsTimeOfDay(timeBefore);
+          lastUnavailableInterval.containsTimeOfDay(timeBefore);
 
       final validTime = _validScheduleTimeOfDayWhenHaveTimeBefore(
         time: time,
@@ -302,7 +308,6 @@ mixin DayScheduleListWidgetMixin {
       required IntervalRange firstUnavailableInterval,
       required IntervalRange lastUnavailableInterval,
       required List<IntervalRange> unavailableIntervals}) {
-
     if (timeBeforeBelongsToFirst && !belongsToFirst) {
       final dateTimeToAdd = DateTime(
               DateTime.now().year,
@@ -404,8 +409,9 @@ mixin DayScheduleListWidgetMixin {
   }) {
     final minTop = insetVertical;
     final maxEnd = contentHeight - insetVertical;
-    return newPosition.top >= minTop &&
+    final canUpdate = newPosition.top >= minTop &&
         newPosition.top + newPosition.height <= maxEnd;
+    return canUpdate;
   }
 
   ///Try to create a new appointment at the position tapped by the user
@@ -416,31 +422,20 @@ mixin DayScheduleListWidgetMixin {
     required ScheduleTimeOfDay firstValidTimeList,
     required ScheduleTimeOfDay lastValidTimeList,
   }) {
-    final now = DateTime.now();
-    final startInMinutes = convertDeltaYToMinutes(deltaY: startPosition.dy);
 
-    final baseStartDate = DateTime(now.year, now.month, now.day,
-        firstValidTimeList.time.hour, firstValidTimeList.time.minute, 0);
-    final startDate = baseStartDate.add(
-      Duration(minutes: startInMinutes - 30),
+    final possibleStart =
+        _calculatePossibleStartOfNewAppointmentForTappedPosition(
+      startPosition: startPosition,
+      firstValidTimeList: firstValidTimeList,
     );
-    final start = baseStartDate.isSameDay(dateTime: startDate)
-        ? TimeOfDay.fromDateTime(
-            startDate,
-          )
-        : firstValidTimeList.time;
 
-    final baseEndDate =
-        DateTime(now.year, now.month, now.day, start.hour, start.minute, 0);
-    final endDate = baseEndDate.add(const Duration(hours: 1));
-    final end = endDate.isSameDay(dateTime: baseEndDate)
-        ? TimeOfDay.fromDateTime(
-            endDate,
-          )
-        : lastValidTimeList.time;
+    final possibleEnd = _calculatePossibleEndOfNewAppointment(
+      possibleStart: possibleStart,
+      lastValidTimeList: lastValidTimeList,
+    );
 
     IntervalRange? possibleNewAppointment =
-        IntervalRange(start: start, end: end);
+        IntervalRange(start: possibleStart, end: possibleEnd);
 
     final List<IntervalRange> fullList = [
       ...appointments,
@@ -487,39 +482,91 @@ mixin DayScheduleListWidgetMixin {
     return possibleNewAppointment;
   }
 
+  TimeOfDay _calculatePossibleStartOfNewAppointmentForTappedPosition({
+    required Offset startPosition,
+    required ScheduleTimeOfDay firstValidTimeList,
+  }) {
+    const offsetInMinutesToCenterAppointmentOnTouchArea = 30;
+
+    final now = DateTime.now();
+    final baseStartInMinutes = convertDeltaYToMinutes(deltaY: startPosition.dy);
+
+    final startInMinutes =
+        calculateCloserMinutesThatIsMultipleOfMinimumMinuteInterval(
+      minutes:
+          baseStartInMinutes - offsetInMinutesToCenterAppointmentOnTouchArea,
+    );
+
+    final baseStartDate = DateTime(now.year, now.month, now.day,
+        firstValidTimeList.time.hour, firstValidTimeList.time.minute, 0);
+    final startDate = baseStartDate.add(
+      Duration(minutes: startInMinutes),
+    );
+    return baseStartDate.isSameDay(dateTime: startDate)
+        ? TimeOfDay.fromDateTime(
+            startDate,
+          )
+        : firstValidTimeList.time;
+  }
+
+  TimeOfDay _calculatePossibleEndOfNewAppointment({
+    required TimeOfDay possibleStart,
+    required ScheduleTimeOfDay lastValidTimeList,
+  }) {
+    final now = DateTime.now();
+    final baseEndDate = DateTime(now.year, now.month, now.day,
+        possibleStart.hour, possibleStart.minute, 0);
+    final endDate = baseEndDate.add(const Duration(hours: 1));
+    return endDate.isSameDay(dateTime: baseEndDate)
+        ? TimeOfDay.fromDateTime(
+            endDate,
+          )
+        : lastValidTimeList.time;
+  }
+
   IntervalRange? _adjustPossibleNewAppointmentDurationAvoidingIntersections({
     required List<IntervalRange> intersections,
     required IntervalRange? possibleNewAppointment,
   }) {
+    IntervalRange? appointment = possibleNewAppointment;
     for (var index = 0; index < intersections.length; index++) {
-      if (possibleNewAppointment != null) {
+      if (appointment != null) {
         final intersectedInterval = intersections[index];
         final containsStart =
-            intersectedInterval.containsTimeOfDay(possibleNewAppointment.start);
+            intersectedInterval.containsTimeOfDay(appointment.start);
         final containsEnd =
-            intersectedInterval.containsTimeOfDay(possibleNewAppointment.end);
+            intersectedInterval.containsTimeOfDay(appointment.end);
         final needChangeStart = containsStart && !containsEnd;
         final needChangeEnd = !containsStart && containsEnd;
+        final intersectionIsContainedOnAppointment =
+            appointment.containsTimeOfDay(
+                  intersectedInterval.start,
+                ) &&
+                appointment.containsTimeOfDay(
+                  intersectedInterval.end,
+                );
 
         if (needChangeStart) {
           debugPrint('1');
-          possibleNewAppointment.start = intersectedInterval.end.add(
-            hours: 0,
-            minutes: 1,
-          );
+          appointment.start = intersectedInterval.end;
         } else if (needChangeEnd) {
           debugPrint('2');
-          possibleNewAppointment.end = intersectedInterval.start.subtract(
-            hours: 0,
-            minutes: 1,
-          );
+          appointment.end = intersectedInterval.start;
         } else if (containsStart && containsEnd) {
-          possibleNewAppointment = null;
+          appointment = null;
           break;
+        } else if (intersectionIsContainedOnAppointment &&
+            intersectedInterval.start.toMinutes - appointment.start.toMinutes >=
+                minimumMinuteInterval.numberValue) {
+          appointment.end = intersectedInterval.start;
+        } else if (intersectionIsContainedOnAppointment &&
+            appointment.end.toMinutes - intersectedInterval.end.toMinutes >=
+                minimumMinuteInterval.numberValue) {
+          appointment.start = intersectedInterval.end;
         }
       }
     }
-    return possibleNewAppointment;
+    return appointment;
   }
 
   void showUpdateOverlay<S extends IntervalRange>({

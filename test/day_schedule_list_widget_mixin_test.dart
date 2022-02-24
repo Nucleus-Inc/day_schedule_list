@@ -800,7 +800,7 @@ void _newAppointmentForTappedPositionTest() {
             lastValidTimeList: validTimes.last,
             unavailableIntervals: unavailableIntervals),
         predicate<IntervalRange>((result) {
-          return result.start == const TimeOfDay(hour: 10, minute: 1) &&
+          return result.start == const TimeOfDay(hour: 10, minute: 0) &&
               result.end == const TimeOfDay(hour: 10, minute: 36);
         }),
       );
@@ -825,7 +825,7 @@ void _newAppointmentForTappedPositionTest() {
                 unavailableIntervals: unavailableIntervals),
             predicate<IntervalRange>((result) {
               return result.start == const TimeOfDay(hour: 11, minute: 35) &&
-                  result.end == const TimeOfDay(hour: 11, minute: 59);
+                  result.end == const TimeOfDay(hour: 12, minute: 0);
             }),
           );
         });
