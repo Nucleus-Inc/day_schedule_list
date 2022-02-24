@@ -1,12 +1,60 @@
 import 'package:day_schedule_list/day_schedule_list.dart';
+import 'package:day_schedule_list/src/helpers/time_of_day_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  _initializerAssertTest();
   _containsTimeOfDayTests();
   _intersectsTests();
   _equalOperatorTests();
   _deltaIntervalInMinutesTests();
+  _hashCodeTests();
+}
+
+void _initializerAssertTest() {
+  group(
+    'Verify initializer assert',
+        () {
+      test(
+        'start > end',
+            () {
+          const end = TimeOfDay(hour: 10, minute: 0);
+          const start = TimeOfDay(hour: 12, minute: 39);
+
+          expect((){
+            IntervalRange(
+              start: start,
+              end: end,
+            );
+          }, throwsA(isAssertionError));
+        },
+      );
+      test(
+        'start == end',
+            () {
+          const start = TimeOfDay(hour: 12, minute: 39);
+          expect((){
+            IntervalRange(
+              start: start,
+              end: start,
+            );
+          }, throwsA(isAssertionError));
+        },
+      );
+      test(
+        'start < end',
+            () {
+          const start = TimeOfDay(hour: 12, minute: 39);
+          const end = TimeOfDay(hour: 13, minute: 39);
+          expect(IntervalRange(
+            start: start,
+            end: end,
+          ), isInstanceOf<IntervalRange>());
+        },
+      );
+    },
+  );
 }
 
 void _containsTimeOfDayTests() {
@@ -267,3 +315,16 @@ void _deltaIntervalInMinutesTests(){
     expect(intervalRange.deltaIntervalIMinutes, equals(159));
   });
 }
+
+void _hashCodeTests(){
+  test('.hashCode is equals to start.toMinutes + end.toMinutes',(){
+    const start = TimeOfDay(hour: 10, minute: 0);
+    const end = TimeOfDay(hour: 12, minute: 39);
+    final intervalRange = IntervalRange(
+      start: start,
+      end: end,
+    );
+    expect(intervalRange.hashCode, equals(start.toMinutes + end.toMinutes));
+  });
+}
+
