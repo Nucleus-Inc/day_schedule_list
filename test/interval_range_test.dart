@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   _containsTimeOfDayTests();
   _intersectsTests();
+  _equalOperatorTests();
   _deltaIntervalInMinutesTests();
 }
 
@@ -198,6 +199,58 @@ void _intersectsTests() {
 
         expect(intervalRange.intersects(intervalRangeTwo, closedRange: true), true);
         expect(intervalRange.intersects(intervalRangeTwo, closedRange: false), true);
+      });
+    },
+  );
+}
+
+void _equalOperatorTests(){
+  group(
+    '== operator verify some IntervalRange is equal another.',
+        () {
+      test('IntervalRange equals to itself', () {
+        final intervalRange = IntervalRange(
+          start: const TimeOfDay(hour: 10, minute: 0),
+          end: const TimeOfDay(hour: 12, minute: 39),
+        );
+        expect(intervalRange == intervalRange, true);
+      });
+      test('IntervalRange equals to other instance with same start and end values'
+          'is contained on the one', () {
+        final intervalRange = IntervalRange(
+          start: const TimeOfDay(hour: 10, minute: 0),
+          end: const TimeOfDay(hour: 12, minute: 39),
+        );
+        final intervalRangeTwo = IntervalRange(
+          start: const TimeOfDay(hour: 10, minute: 0),
+          end: const TimeOfDay(hour: 12, minute: 39),
+        );
+        expect(intervalRange == intervalRangeTwo, true);
+        expect(intervalRangeTwo == intervalRange, true);
+      },);
+      test('IntervalRange equals to other with different start', () {
+        final intervalRange = IntervalRange(
+          start: const TimeOfDay(hour: 10, minute: 0),
+          end: const TimeOfDay(hour: 12, minute: 39),
+        );
+        final intervalRangeTwo = IntervalRange(
+          start: const TimeOfDay(hour: 0, minute: 0),
+          end: const TimeOfDay(hour: 12, minute: 39),
+        );
+        expect(intervalRange == intervalRangeTwo, false);
+        expect(intervalRangeTwo == intervalRange, false);
+      });
+      test('IntervalRange equals to other with different end', () {
+        final intervalRange = IntervalRange(
+          start: const TimeOfDay(hour: 10, minute: 0),
+          end: const TimeOfDay(hour: 12, minute: 39),
+        );
+        final intervalRangeTwo = IntervalRange(
+          start: const TimeOfDay(hour: 10, minute: 0),
+          end: const TimeOfDay(hour: 16, minute: 0),
+        );
+        expect(intervalRange == intervalRangeTwo, false);
+        expect(intervalRangeTwo == intervalRange, false);
       });
     },
   );
