@@ -107,7 +107,7 @@ void _intersectsTests() {
           end: const TimeOfDay(hour: 12, minute: 0),
         );
         expect(intervalRange.intersects(intervalRangeTwo), true);
-      });
+      },);
       test('IntervalRange intersects other because is contained on the other', () {
         final intervalRange = IntervalRange(
           start: const TimeOfDay(hour: 10, minute: 0),

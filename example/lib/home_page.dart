@@ -32,24 +32,39 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<MyAppointment> myAppointments = [
     MyAppointment(
       title: 'Appointment 1',
-      start: const TimeOfDay(hour: 8, minute: 40),
-      end: const TimeOfDay(hour: 9, minute: 40),
+      start: const TimeOfDay(hour: 9, minute: 0),
+      end: const TimeOfDay(hour: 9, minute: 15),
     ),
     MyAppointment(
       title: 'Appointment 2',
-      start: const TimeOfDay(hour: 11, minute: 0),
-      end: const TimeOfDay(hour: 11, minute: 59),
+      start: const TimeOfDay(hour: 9, minute: 15),
+      end: const TimeOfDay(hour: 9, minute: 30),
     ),
     MyAppointment(
       title: 'Appointment 3',
-      start: const TimeOfDay(hour: 14, minute: 15),
-      end: const TimeOfDay(hour: 15, minute: 0),
+      start: const TimeOfDay(hour: 9, minute: 30),
+      end: const TimeOfDay(hour: 9, minute: 45),
     ),
     MyAppointment(
       title: 'Appointment 4',
-      start: const TimeOfDay(hour: 16, minute: 10),
-      end: const TimeOfDay(hour: 17, minute: 20),
+      start: const TimeOfDay(hour: 9, minute: 45),
+      end: const TimeOfDay(hour: 10, minute: 0),
     ),
+    MyAppointment(
+      title: 'Appointment 5',
+      start: const TimeOfDay(hour: 11, minute: 0),
+      end: const TimeOfDay(hour: 11, minute: 59),
+    ),
+    // MyAppointment(
+    //   title: 'Appointment 3',
+    //   start: const TimeOfDay(hour: 14, minute: 15),
+    //   end: const TimeOfDay(hour: 15, minute: 0),
+    // ),
+    // MyAppointment(
+    //   title: 'Appointment 4',
+    //   start: const TimeOfDay(hour: 16, minute: 10),
+    //   end: const TimeOfDay(hour: 17, minute: 20),
+    // ),
   ];
 
   @override
@@ -60,8 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         body: DayScheduleListWidget<MyAppointment>(
           hourHeight: 100,
-          minimumMinuteInterval: MinuteInterval.thirty,
-          appointmentMinimumDuration: MinuteInterval.thirty,
+          minimumMinuteInterval: MinuteInterval.fifteen,
+          appointmentMinimumDuration: MinuteInterval.fifteen,
           referenceDate: DateTime.now(),
           appointments: myAppointments,
           dragIndicatorColor: Colors.red,
