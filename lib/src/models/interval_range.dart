@@ -43,7 +43,7 @@ class IntervalRange {
   @override
   bool operator ==(Object other) {
     if(other is IntervalRange) {
-      final range = other as IntervalRange;
+      final IntervalRange range = other;
       return range.start == start && range.end == end;
     }
     return false;
@@ -53,4 +53,8 @@ class IntervalRange {
   String toString() {
     return 'start: ${start.toString()} - end:${end.toString()}';
   }
+
+  @override
+  int get hashCode => start.toMinutes + end.toMinutes;
+
 }
