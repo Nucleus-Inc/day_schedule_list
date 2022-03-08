@@ -34,3 +34,6 @@
 # 0.4.0
 * Issue: Dart code metrics
 * Issue: 1 hour interval should contain 4 appointments of 15 min, but it is not happening
+
+# 0.4.1
+* Bug fix

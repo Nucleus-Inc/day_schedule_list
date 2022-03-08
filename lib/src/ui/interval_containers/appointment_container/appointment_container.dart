@@ -77,6 +77,7 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
         ),
         child: DynamicPositionContainer(
           position: widget.position,
+          updateStep: widget.updateStep,
           canUpdatePositionTo: widget.canUpdatePositionTo,
           onNewPositionUpdate: _onNewPositionUpdate,
           onUpdatePositionEnd: _onPositionUpdateEnd,

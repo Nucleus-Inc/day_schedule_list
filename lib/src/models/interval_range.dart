@@ -24,18 +24,37 @@ class IntervalRange {
   TimeOfDay end;
 
   ///Verify if [time] belongs to this time interval.
-  bool containsTimeOfDay(TimeOfDay time) {
-    return start <= time && end >= time;
+  bool containsTimeOfDay(TimeOfDay time, {bool closedRange = true}) {
+    return closedRange ? start <= time && end >= time : start < time && end > time;
   }
 
   ///Verify if some time interval [range] intersects this one.
-  bool intersects(IntervalRange range) {
-    return containsTimeOfDay(range.start) ||
-        containsTimeOfDay(range.end) ||
-        range.containsTimeOfDay(start) ||
-        range.containsTimeOfDay(end);
+  bool intersects(IntervalRange range, {bool closedRange = false}) {
+    return containsTimeOfDay(range.start, closedRange: closedRange) ||
+        containsTimeOfDay(range.end, closedRange: closedRange) ||
+        range.containsTimeOfDay(start, closedRange: closedRange) ||
+        range.containsTimeOfDay(end, closedRange: closedRange) ||
+        this == range;
   }
 
   ///Returns the time interval between [start] and [end] in minutes.
   int get deltaIntervalIMinutes => end.toMinutes - start.toMinutes;
+
+  @override
+  bool operator ==(Object other) {
+    if(other is IntervalRange) {
+      final IntervalRange range = other;
+      return range.start == start && range.end == end;
+    }
+    return false;
+  }
+
+  @override
+  String toString() {
+    return 'start: ${start.toString()} - end:${end.toString()}';
+  }
+
+  @override
+  int get hashCode => start.toMinutes + end.toMinutes;
+
 }
