@@ -30,3 +30,10 @@
 # 0.3.0
 * Issue: Expand touch area of widget to change duration of appointment
 * Issue: Change time interval to update appointment duration from 1 min to 15 min
+
+# 0.4.0
+* Issue: Dart code metrics
+* Issue: 1 hour interval should contain 4 appointments of 15 min, but it is not happening
+
+# 0.4.1
+* Bug fix
