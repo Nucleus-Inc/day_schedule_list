@@ -68,6 +68,15 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  void listener(){
+    debugPrint('Changed');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -109,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 start: const TimeOfDay(hour: 12, minute: 0),
                 end: const TimeOfDay(hour: 13, minute: 15)),
             IntervalRange(
-                start: const TimeOfDay(hour: 18, minute: 0),
+                start: const TimeOfDay(hour: 18, minute: 30),
                 end: const TimeOfDay(hour: 22, minute: 30))
           ],
         ));
