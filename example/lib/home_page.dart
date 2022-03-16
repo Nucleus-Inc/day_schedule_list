@@ -88,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
           appointmentMinimumDuration: MinuteInterval.fifteen,
           referenceDate: DateTime.now(),
           appointments: myAppointments,
-          dragIndicatorColor: Colors.red,
+          dragIndicatorColor: Colors.white,
           updateAppointDuration: _updateAppointmentDuration,
           createNewAppointmentAt:
               (IntervalRange? interval, DayScheduleListWidgetErrors? error) {

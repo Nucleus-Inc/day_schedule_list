@@ -61,12 +61,6 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
 
   @override
   Widget build(BuildContext context) {
-    final inherited = DayScheduleListInherited.of(context);
-
-    final Color? dragIndicatorColor = inherited.dragIndicatorColor;
-    final Color? dragIndicatorBorderColor = inherited.dragIndicatorBorderColor;
-    final double? dragIndicatorBorderWidth = inherited.dragIndicatorBorderWidth;
-
     return Positioned(
       top: widget.position.top,
       right: 0,
@@ -96,9 +90,6 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
                 currentHeight: widget.position.height,
                 updateStep: widget.updateStep,
                 canUpdateHeightTo: widget.canUpdateHeightTo,
-                dragIndicatorBorderColor: dragIndicatorBorderColor,
-                dragIndicatorBorderWidth: dragIndicatorBorderWidth,
-                dragIndicatorColor: dragIndicatorColor,
                 onUpdateEnd: _onUpdateHeightEnd,
                 onUpdateStart: _onUpdateHeightStart,
                 onUpdateCancel: _onUpdateHeightCancel,

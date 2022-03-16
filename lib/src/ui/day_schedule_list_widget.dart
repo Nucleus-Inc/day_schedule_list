@@ -4,6 +4,7 @@ import 'package:day_schedule_list/src/models/minute_interval.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
 import 'package:day_schedule_list/src/ui/day_schedule_list_inherited.dart';
 import 'package:day_schedule_list/src/ui/day_schedule_list_stack.dart';
+import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/drag_indicator_widget.dart';
 import 'package:flutter/material.dart';
 
 import 'day_schedule_list_widget_mixin.dart';
@@ -53,6 +54,7 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     this.dragIndicatorBorderWidth,
     this.dragIndicatorColor,
     this.dragIndicatorBorderColor,
+    this.customDragIndicator,
     Key? key,
   })  : assert(
           minimumMinuteInterval <= appointmentMinimumDuration,
@@ -121,6 +123,16 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
   ///The width to be applied to the default drag indicator widget border.
   final double? dragIndicatorBorderWidth;
 
+  ///Custom drag indicator widget builder. Use it to customize the widget that
+  ///appears on top left and bottom right of appointment widget when it enters on
+  ///edit mode.
+  ///
+  ///
+  ///
+  ///When this value is not null [dragIndicatorColor], [dragIndicatorBorderColor]
+  ///and [dragIndicatorBorderWidth] values are not used.
+  final CustomDragIndicatorBuilder? customDragIndicator;
+
   @override
   _DayScheduleListWidgetState<T> createState() =>
       _DayScheduleListWidgetState<T>();
@@ -179,6 +191,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
         dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
         dragIndicatorColor: widget.dragIndicatorColor,
+        customDragIndicator: widget.customDragIndicator,
         child: Builder(
           builder: (context) {
             return DayScheduleListStack(
