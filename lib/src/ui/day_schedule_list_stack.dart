@@ -7,15 +7,15 @@ class DayScheduleListStack extends StatelessWidget {
   const DayScheduleListStack({
     required this.link,
     required this.validTimesListColumnKey,
-    required this.onTapUpOnDayScheduleList,
     required this.internalUnavailableIntervals,
     required this.appointments,
+    this.onTapUpOnDayScheduleList,
     Key? key,
   }) : super(key: key);
 
   final GlobalKey validTimesListColumnKey;
   final LayerLink link;
-  final GestureTapUpCallback onTapUpOnDayScheduleList;
+  final GestureTapUpCallback? onTapUpOnDayScheduleList;
   final List<UnavailableIntervalContainer> internalUnavailableIntervals;
   final List<AppointmentContainer> appointments;
 

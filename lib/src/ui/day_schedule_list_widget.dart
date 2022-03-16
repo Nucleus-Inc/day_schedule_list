@@ -43,7 +43,7 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     required this.appointments,
     required this.updateAppointDuration,
     required this.appointmentBuilder,
-    required this.createNewAppointmentAt,
+    this.createNewAppointmentAt,
     this.hourHeight = DayScheduleListWidgetMixin.defaultHourHeight,
     this.minimumMinuteInterval =
         DayScheduleListWidgetMixin.defaultMinimumMinuteInterval,
@@ -91,7 +91,8 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
 
   ///A Builder called for every appointment of [appointments] to build your
   /// widget that represents it.
-  final NewAppointmentAt createNewAppointmentAt;
+  /// When this value is null any kind of edition is disabled
+  final NewAppointmentAt? createNewAppointmentAt;
 
   ///The convertion parameter from one hour to height dimension.
   ///Choose a value that best fits your needs.
@@ -147,6 +148,8 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
   MinuteInterval get appointmentMinimumDuration =>
       widget.appointmentMinimumDuration;
 
+  bool get allowEdition => widget.createNewAppointmentAt != null;
+
   List<ScheduleTimeOfDay> validTimesList = [];
   final GlobalKey _validTimesListColumnKey = GlobalKey();
 
@@ -183,6 +186,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         horizontal: 2,
       ),
       child: DayScheduleListInherited(
+        allowEdition: allowEdition,
         minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
         timeOfDayWidgetHeight: timeOfDayWidgetHeight,
         minimumMinuteInterval: minimumMinuteInterval,
@@ -196,7 +200,9 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
             return DayScheduleListStack(
               validTimesListColumnKey: _validTimesListColumnKey,
               link: link,
-              onTapUpOnDayScheduleList: _onTapUpOnDayScheduleList,
+              onTapUpOnDayScheduleList: widget.createNewAppointmentAt != null
+                  ? _onTapUpOnDayScheduleList
+                  : null,
               internalUnavailableIntervals: buildInternalUnavailableIntervals(
                 unavailableIntervals: widget.unavailableIntervals,
               ).map((IntervalRange interval) {
@@ -284,12 +290,20 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         appointments: widget.appointments,
         unavailableIntervals: widget.unavailableIntervals,
       );
-      widget.createNewAppointmentAt(appointment, null);
+      _createNewAppointmentAt(appointment, null);
     } on UnavailableIntervalToAddAppointmentException {
-      widget.createNewAppointmentAt(
+      _createNewAppointmentAt(
         null,
         DayScheduleListWidgetErrors.unavailableIntervalToAddAppointment,
       );
+    }
+  }
+
+  void _createNewAppointmentAt(
+      IntervalRange? appointment, DayScheduleListWidgetErrors? error) {
+    final action = widget.createNewAppointmentAt;
+    if (action != null) {
+      action(appointment, error);
     }
   }
 

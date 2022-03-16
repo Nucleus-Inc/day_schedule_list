@@ -1,3 +1,4 @@
+import 'package:day_schedule_list/src/ui/day_schedule_list_inherited.dart';
 import 'package:flutter/material.dart';
 
 import '../../day_schedule_list_widget.dart';
@@ -43,23 +44,25 @@ class AppointmentContainer extends StatefulWidget {
 
 class _AppointmentContainerState extends State<AppointmentContainer> {
   late ValueNotifier<AppointmentUpdatingMode> _updateMode;
-  late ValueNotifier<bool> _editingMode;
+  late ValueNotifier<bool> _isEditing;
   @override
   void initState() {
-    _editingMode = ValueNotifier(false);
+    _isEditing = ValueNotifier(false);
     _updateMode = ValueNotifier(AppointmentUpdatingMode.none);
     super.initState();
   }
 
   @override
   void dispose() {
-    _editingMode.dispose();
+    _isEditing.dispose();
     _updateMode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final inherited = DayScheduleListInherited.of(context);
+
     return Positioned(
       top: widget.position.top,
       right: 0,
@@ -76,16 +79,16 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
           onUpdatePositionEnd: _onPositionUpdateEnd,
           onUpdatePositionCancel: _onUpdatePositionCancel,
           onUpdatePositionStart: _onUpdatePositionStart,
-          onUpdateEditingModeTap: (editing) => _editingMode.value = editing,
+          onUpdateEditingModeTap: inherited.allowEdition ? (editing) => _isEditing.value = editing : null,
           child: ValueListenableBuilder<bool>(
-            valueListenable: _editingMode,
+            valueListenable: _isEditing,
             builder: (
               context,
-              editingMode,
+              isEditing,
               child,
             ) {
               return DynamicHeightContainer(
-                editionEnabled: editingMode,
+                editionEnabled: isEditing,
                 currentHeight: widget.position.height,
                 updateStep: widget.updateStep,
                 canUpdateHeightTo: widget.canUpdateHeightTo,

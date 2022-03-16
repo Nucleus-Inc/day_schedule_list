@@ -13,6 +13,7 @@ class DayScheduleListInherited extends InheritedWidget {
     required this.dragIndicatorBorderWidth,
     required this.dragIndicatorBorderColor,
     required this.customDragIndicator,
+    this.allowEdition = false,
     Key? key,
   }) : super(
           child: child,
@@ -28,6 +29,8 @@ class DayScheduleListInherited extends InheritedWidget {
   final Color? dragIndicatorBorderColor;
   final double? dragIndicatorBorderWidth;
   final CustomDragIndicatorBuilder? customDragIndicator;
+
+  final bool allowEdition;
 
   @override
   bool updateShouldNotify(covariant InheritedWidget oldWidget) {

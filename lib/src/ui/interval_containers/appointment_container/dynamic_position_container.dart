@@ -74,6 +74,7 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
 
   @override
   Widget build(BuildContext context) {
+
     return ValueListenableBuilder<bool>(
       valueListenable: editingMode,
       builder: (context, editing, child) {
@@ -91,8 +92,8 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
   }
 
   void _onDynamicPositionContainerTap() {
-    HapticFeedback.selectionClick();
     if (widget.onUpdateEditingModeTap != null) {
+      HapticFeedback.selectionClick();
       editingMode.value = !editingMode.value;
       widget.onUpdateEditingModeTap!(editingMode.value);
     }
