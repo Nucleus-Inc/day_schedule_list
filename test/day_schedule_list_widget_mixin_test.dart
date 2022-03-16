@@ -397,7 +397,7 @@ void _canUpdatePositionOfIntervalTest() {
   final List<IntervalRange> unavailableItems = [
     IntervalRange(
       start: const TimeOfDay(hour: 0, minute: 0),
-      end: const TimeOfDay(hour: 7, minute: 59),
+      end: const TimeOfDay(hour: 8, minute: 0),
     ),
     IntervalRange(
       start: const TimeOfDay(hour: 21, minute: 0),
@@ -432,7 +432,7 @@ void _canUpdatePositionOfIntervalTest() {
     });
     test('update appointment start time to less than min possible one', () {
       final newAppointmentInterval = IntervalRange(
-        start: const TimeOfDay(hour: 7, minute: 59),
+        start: const TimeOfDay(hour: 7, minute: 58),
         end: const TimeOfDay(hour: 9, minute: 59),
       );
       final newPosition = methods.calculateItemRangePosition(
@@ -492,8 +492,8 @@ void _populateValidTimesListTest() {
         unavailableIntervals: unavailableItems,
       ),
       predicate<List<ScheduleTimeOfDay>>((result) {
-        return result.first.time == const TimeOfDay(hour: 8, minute: 0) &&
-            result.last.time == const TimeOfDay(hour: 20, minute: 59);
+        return result.first.time == const TimeOfDay(hour: 7, minute: 59) &&
+            result.last.time == const TimeOfDay(hour: 21, minute: 0);
       }),
     );
   });

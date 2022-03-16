@@ -35,7 +35,7 @@ class DayScheduleListInherited extends InheritedWidget {
   static DayScheduleListInherited of(BuildContext context) {
     final DayScheduleListInherited? result =
         context.dependOnInheritedWidgetOfExactType<DayScheduleListInherited>();
-    assert(result != null, 'No FrogColor found in context');
+    assert(result != null, 'No DayScheduleListInherited found in context');
     return result!;
   }
 }

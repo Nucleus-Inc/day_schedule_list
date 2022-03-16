@@ -25,7 +25,20 @@ class IntervalRange {
 
   ///Verify if [time] belongs to this time interval.
   bool containsTimeOfDay(TimeOfDay time, {bool closedRange = true}) {
-    return closedRange ? start <= time && end >= time : start < time && end > time;
+    return containsTimeOfDayPartialClosed(
+      time: time,
+      closedRangeOnStart: closedRange,
+      closedRangeOnEnd: closedRange,
+    );
+  }
+
+  bool containsTimeOfDayPartialClosed({
+    required TimeOfDay time,
+    required bool closedRangeOnStart,
+    required bool closedRangeOnEnd,
+  }) {
+    return (closedRangeOnStart ? start <= time : start < time) &&
+        (closedRangeOnEnd ? end >= time : end > time);
   }
 
   ///Verify if some time interval [range] intersects this one.
@@ -42,7 +55,7 @@ class IntervalRange {
 
   @override
   bool operator ==(Object other) {
-    if(other is IntervalRange) {
+    if (other is IntervalRange) {
       final IntervalRange range = other;
       return range.start == start && range.end == end;
     }
@@ -56,5 +69,4 @@ class IntervalRange {
 
   @override
   int get hashCode => start.toMinutes + end.toMinutes;
-
 }

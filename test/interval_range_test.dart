@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   _initializerAssertTest();
   _containsTimeOfDayTests();
+  _containsTimeOfDayPartialClosedTests();
   _intersectsTests();
   _equalOperatorTests();
   _deltaIntervalInMinutesTests();
@@ -71,7 +72,8 @@ void _containsTimeOfDayTests() {
             start: start,
             end: end,
           );
-          expect(intervalRange.containsTimeOfDay(start), true);
+          expect(intervalRange.containsTimeOfDay(start, closedRange: true), true);
+          expect(intervalRange.containsTimeOfDay(start, closedRange: false), false);
         },
       );
 
@@ -134,6 +136,259 @@ void _containsTimeOfDayTests() {
           expect(intervalRange.containsTimeOfDay(timeOfDayBetween, closedRange: false), true);
           },
       );
+    },
+  );
+}
+
+void _containsTimeOfDayPartialClosedTests() {
+  group(
+    '.containsTimeOfDayPartialClosed() verify that some TimeOfDay is inside of some '
+        'IntervalRange',
+        () {
+      test(
+        'start of IntervalRange belongs it full closed range',
+            () {
+          const start = TimeOfDay(hour: 10, minute: 0);
+          const end = TimeOfDay(hour: 12, minute: 39);
+          final intervalRange = IntervalRange(
+            start: start,
+            end: end,
+          );
+          expect(intervalRange.containsTimeOfDayPartialClosed(
+            time: start,
+            closedRangeOnStart: true,
+            closedRangeOnEnd: true,
+          ), true);
+        },
+      );
+
+      test(
+        'start of IntervalRange belongs it full unclosed range',
+            () {
+          const start = TimeOfDay(hour: 10, minute: 0);
+          const end = TimeOfDay(hour: 12, minute: 39);
+          final intervalRange = IntervalRange(
+            start: start,
+            end: end,
+          );
+          expect(intervalRange.containsTimeOfDayPartialClosed(
+            time: start,
+            closedRangeOnStart: false,
+            closedRangeOnEnd: false,
+          ), false);
+        },
+      );
+
+      test(
+        'start of IntervalRange belongs it closed range on start',
+            () {
+          const start = TimeOfDay(hour: 10, minute: 0);
+          const end = TimeOfDay(hour: 12, minute: 39);
+          final intervalRange = IntervalRange(
+            start: start,
+            end: end,
+          );
+          expect(intervalRange.containsTimeOfDayPartialClosed(
+            time: start,
+            closedRangeOnStart: true,
+            closedRangeOnEnd: false,
+          ), true);
+        },
+      );
+
+      test(
+        'start of IntervalRange belongs it closed range on end',
+            () {
+          const start = TimeOfDay(hour: 10, minute: 0);
+          const end = TimeOfDay(hour: 12, minute: 39);
+          final intervalRange = IntervalRange(
+            start: start,
+            end: end,
+          );
+          expect(intervalRange.containsTimeOfDayPartialClosed(
+            time: start,
+            closedRangeOnStart: false,
+            closedRangeOnEnd: true,
+          ), false);
+        },
+      );
+
+      test(
+        'end of IntervalRange belongs it full closed range',
+            () {
+          const start = TimeOfDay(hour: 10, minute: 0);
+          const end = TimeOfDay(hour: 12, minute: 39);
+          final intervalRange = IntervalRange(
+            start: start,
+            end: end,
+          );
+          expect(intervalRange.containsTimeOfDayPartialClosed(
+            time: end,
+            closedRangeOnStart: true,
+            closedRangeOnEnd: true,
+          ), true);
+        },
+      );
+
+      test(
+        'end of IntervalRange belongs it full unclosed range',
+            () {
+          const start = TimeOfDay(hour: 10, minute: 0);
+          const end = TimeOfDay(hour: 12, minute: 39);
+          final intervalRange = IntervalRange(
+            start: start,
+            end: end,
+          );
+          expect(intervalRange.containsTimeOfDayPartialClosed(
+            time: end,
+            closedRangeOnStart: false,
+            closedRangeOnEnd: false,
+          ), false);
+        },
+      );
+
+      test(
+        'end of IntervalRange belongs it closed range on start',
+            () {
+          const start = TimeOfDay(hour: 10, minute: 0);
+          const end = TimeOfDay(hour: 12, minute: 39);
+          final intervalRange = IntervalRange(
+            start: start,
+            end: end,
+          );
+          expect(intervalRange.containsTimeOfDayPartialClosed(
+            time: end,
+            closedRangeOnStart: true,
+            closedRangeOnEnd: false,
+          ), false);
+        },
+      );
+
+      test(
+        'end of IntervalRange belongs it closed range on end',
+            () {
+          const start = TimeOfDay(hour: 10, minute: 0);
+          const end = TimeOfDay(hour: 12, minute: 39);
+          final intervalRange = IntervalRange(
+            start: start,
+            end: end,
+          );
+          expect(intervalRange.containsTimeOfDayPartialClosed(
+            time: end,
+            closedRangeOnStart: false,
+            closedRangeOnEnd: true,
+          ), true);
+        },
+      );
+
+      test(
+        'Some TimeOfDay before IntervalRange.start is inside of IntervalRange full closed range',
+            () {
+              const start = TimeOfDay(hour: 10, minute: 0);
+              const end = TimeOfDay(hour: 12, minute: 39);
+              final intervalRange = IntervalRange(
+                start: start,
+                end: end,
+              );
+              const timeOfDayBefore = TimeOfDay(hour: 9, minute: 59);
+              expect(intervalRange.containsTimeOfDayPartialClosed(
+                time: timeOfDayBefore,
+                closedRangeOnStart: true,
+                closedRangeOnEnd: true,
+              ), false);
+            },
+      );
+
+      test(
+        'Some TimeOfDay before IntervalRange.start is inside of IntervalRange full unclosed range',
+            () {
+              const start = TimeOfDay(hour: 10, minute: 0);
+              const end = TimeOfDay(hour: 12, minute: 39);
+              final intervalRange = IntervalRange(
+                start: start,
+                end: end,
+              );
+              const timeOfDayBefore = TimeOfDay(hour: 9, minute: 59);
+              expect(intervalRange.containsTimeOfDayPartialClosed(
+                time: timeOfDayBefore,
+                closedRangeOnStart: false,
+                closedRangeOnEnd: false,
+              ), false);
+        },
+      );
+
+      test(
+        'Some TimeOfDay after IntervalRange.end is inside of IntervalRange full closed range',
+            () {
+          const start = TimeOfDay(hour: 10, minute: 0);
+          const end = TimeOfDay(hour: 12, minute: 39);
+          final intervalRange = IntervalRange(
+            start: start,
+            end: end,
+          );
+          const timeOfDayAfter = TimeOfDay(hour: 12, minute: 40);
+          expect(intervalRange.containsTimeOfDayPartialClosed(
+            time: timeOfDayAfter,
+            closedRangeOnStart: true,
+            closedRangeOnEnd: true,
+          ), false);
+        },
+      );
+
+      test(
+        'Some TimeOfDay after IntervalRange.end is inside of IntervalRange full unclosed range',
+            () {
+          const start = TimeOfDay(hour: 10, minute: 0);
+          const end = TimeOfDay(hour: 12, minute: 39);
+          final intervalRange = IntervalRange(
+            start: start,
+            end: end,
+          );
+          const timeOfDayAfter = TimeOfDay(hour: 12, minute: 40);
+          expect(intervalRange.containsTimeOfDayPartialClosed(
+            time: timeOfDayAfter,
+            closedRangeOnStart: false,
+            closedRangeOnEnd: false,
+          ), false);
+        },
+      );
+
+      test(
+        'Some TimeOfDay between IntervalRange.start and IntervalRange.end is inside of IntervalRange full closed range',
+            () {
+          const start = TimeOfDay(hour: 10, minute: 0);
+          const end = TimeOfDay(hour: 12, minute: 39);
+          final intervalRange = IntervalRange(
+            start: start,
+            end: end,
+          );
+          const timeOfDayBetween = TimeOfDay(hour: 11, minute: 59);
+          expect(intervalRange.containsTimeOfDayPartialClosed(
+            time: timeOfDayBetween,
+            closedRangeOnStart: true,
+            closedRangeOnEnd: true,
+          ), true);
+        },
+      );
+
+      test(
+        'Some TimeOfDay between IntervalRange.start and IntervalRange.end is inside of IntervalRange full unclosed range',
+            () {
+          const start = TimeOfDay(hour: 10, minute: 0);
+          const end = TimeOfDay(hour: 12, minute: 39);
+          final intervalRange = IntervalRange(
+            start: start,
+            end: end,
+          );
+          const timeOfDayBetween = TimeOfDay(hour: 11, minute: 59);
+          expect(intervalRange.containsTimeOfDayPartialClosed(
+            time: timeOfDayBetween,
+            closedRangeOnStart: false,
+            closedRangeOnEnd: false,
+          ), true);
+        },
+      );
+
     },
   );
 }
