@@ -1,8 +1,8 @@
 import 'package:day_schedule_list/src/models/interval_range.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
+import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
 import 'package:day_schedule_list/src/ui/day_schedule_list_widget_mixin.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/dynamic_height_container.dart';
-import 'package:day_schedule_list/src/ui/time_of_day_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:day_schedule_list/src/helpers/time_of_day_extensions.dart';

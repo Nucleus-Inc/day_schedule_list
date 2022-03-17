@@ -1,5 +1,5 @@
 import 'package:day_schedule_list/day_schedule_list.dart';
-import 'package:day_schedule_list/src/ui/time_of_day_widget.dart';
+import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
 import 'package:flutter/cupertino.dart';
 
 class DayScheduleListInherited extends InheritedWidget {

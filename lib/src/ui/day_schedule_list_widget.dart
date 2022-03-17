@@ -1,4 +1,5 @@
 import 'package:day_schedule_list/day_schedule_list.dart';
+import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
 import 'package:day_schedule_list/src/models/unavailable_interval_to_add_appointment_exception.dart';
 import 'package:day_schedule_list/src/models/minute_interval.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
@@ -9,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'day_schedule_list_widget_mixin.dart';
 import 'interval_containers/appointment_container/appointment_container.dart';
 import 'interval_containers/unavailable_interval_container.dart';
-import 'time_of_day_widget.dart';
 import '../helpers/time_of_day_extensions.dart';
 
 ///Signature of function to build your widget that represents an appointment.
