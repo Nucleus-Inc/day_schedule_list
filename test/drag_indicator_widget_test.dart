@@ -1,3 +1,5 @@
+import 'package:day_schedule_list/src/models/minute_interval.dart';
+import 'package:day_schedule_list/src/ui/day_schedule_list_inherited.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/drag_indicator_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,16 +15,26 @@ void main() {
 void _modeTopTest() {
   testWidgets('DragIndicatorWidget.top', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: Stack(
-        children: const [
-          DragIndicatorWidget.top(
-            enabled: true,
-            onLongPressDown: null,
-            onLongPressStart: null,
-            onLongPressEnd: null,
-            onLongPressMoveUpdate: null,
-          ),
-        ],
+      home: DayScheduleListInherited(
+        minimumMinuteInterval: MinuteInterval.fifteen,
+        minimumMinuteIntervalHeight: 35,
+        customDragIndicator: null,
+        timeOfDayWidgetHeight: 35*4,
+        dragIndicatorColor: null,
+        validTimesList: [],
+        dragIndicatorBorderWidth: null,
+        dragIndicatorBorderColor: null,
+        child: Stack(
+          children: const [
+            DragIndicatorWidget.top(
+              enabled: true,
+              onLongPressDown: null,
+              onLongPressStart: null,
+              onLongPressEnd: null,
+              onLongPressMoveUpdate: null,
+            ),
+          ],
+        ),
       ),
     ));
 
@@ -48,16 +60,26 @@ void _modeTopTest() {
 void _modeBottomTest() {
   testWidgets('DragIndicatorWidget.bottom', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: Stack(
-        children: [
-          DragIndicatorWidget.bottom(
-            enabled: true,
-            onLongPressDown: (){},
-            onLongPressStart: (_){},
-            onLongPressEnd: (_){},
-            onLongPressMoveUpdate: (_){},
-          )
-        ],
+      home: DayScheduleListInherited(
+        minimumMinuteInterval: MinuteInterval.fifteen,
+        minimumMinuteIntervalHeight: 35,
+        customDragIndicator: null,
+        timeOfDayWidgetHeight: 35*4,
+        dragIndicatorColor: null,
+        validTimesList: [],
+        dragIndicatorBorderWidth: null,
+        dragIndicatorBorderColor: null,
+        child: Stack(
+          children: [
+            DragIndicatorWidget.bottom(
+              enabled: true,
+              onLongPressDown: (){},
+              onLongPressStart: (_){},
+              onLongPressEnd: (_){},
+              onLongPressMoveUpdate: (_){},
+            )
+          ],
+        ),
       ),
     ));
 
@@ -83,10 +105,20 @@ void _modeBottomTest() {
 void _modeOverlayTopTest() {
   testWidgets('DragIndicatorWidget.overlayTop', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: Stack(
-        children: const [
-          DragIndicatorWidget.overlayTop()
-        ],
+      home: DayScheduleListInherited(
+        minimumMinuteInterval: MinuteInterval.fifteen,
+        minimumMinuteIntervalHeight: 35,
+        customDragIndicator: null,
+        timeOfDayWidgetHeight: 35*4,
+        dragIndicatorColor: null,
+        validTimesList: [],
+        dragIndicatorBorderWidth: null,
+        dragIndicatorBorderColor: null,
+        child: Stack(
+          children: const [
+            DragIndicatorWidget.overlayTop()
+          ],
+        ),
       ),
     ));
 
@@ -112,10 +144,20 @@ void _modeOverlayTopTest() {
 void _modeOverlayBottomTest() {
   testWidgets('DragIndicatorWidget.overlayBottom', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: Stack(
-        children: const [
-          DragIndicatorWidget.overlayBottom()
-        ],
+      home: DayScheduleListInherited(
+        minimumMinuteInterval: MinuteInterval.fifteen,
+        minimumMinuteIntervalHeight: 35,
+        customDragIndicator: null,
+        timeOfDayWidgetHeight: 35*4,
+        dragIndicatorColor: null,
+        validTimesList: [],
+        dragIndicatorBorderWidth: null,
+        dragIndicatorBorderColor: null,
+        child: Stack(
+          children: const [
+            DragIndicatorWidget.overlayBottom()
+          ],
+        ),
       ),
     ));
 
@@ -143,16 +185,26 @@ void _whenEnabledOrDisabled(){
   group('When enabled or disabled',(){
     testWidgets('enabled = true', (tester) async {
       await tester.pumpWidget(MaterialApp(
-        home: Stack(
-          children: [
-            DragIndicatorWidget.top(
-              enabled: true,
-              onLongPressDown: (){},
-              onLongPressStart: (_){},
-              onLongPressEnd: (_){},
-              onLongPressMoveUpdate: (_){},
-            )
-          ],
+        home: DayScheduleListInherited(
+          minimumMinuteInterval: MinuteInterval.fifteen,
+          minimumMinuteIntervalHeight: 35,
+          customDragIndicator: null,
+          timeOfDayWidgetHeight: 35*4,
+          dragIndicatorColor: null,
+          validTimesList: [],
+          dragIndicatorBorderWidth: null,
+          dragIndicatorBorderColor: null,
+          child: Stack(
+            children: [
+              DragIndicatorWidget.top(
+                enabled: true,
+                onLongPressDown: (){},
+                onLongPressStart: (_){},
+                onLongPressEnd: (_){},
+                onLongPressMoveUpdate: (_){},
+              )
+            ],
+          ),
         ),
       ));
 
@@ -184,16 +236,26 @@ void _whenEnabledOrDisabled(){
 
     testWidgets('enabled = false', (tester) async {
       await tester.pumpWidget(MaterialApp(
-        home: Stack(
-          children: const [
-            DragIndicatorWidget.top(
-              enabled: false,
-              onLongPressDown: null,
-              onLongPressStart: null,
-              onLongPressEnd: null,
-              onLongPressMoveUpdate: null,
-            )
-          ],
+        home: DayScheduleListInherited(
+          minimumMinuteInterval: MinuteInterval.fifteen,
+          minimumMinuteIntervalHeight: 35,
+          customDragIndicator: null,
+          timeOfDayWidgetHeight: 35*4,
+          dragIndicatorColor: null,
+          validTimesList: [],
+          dragIndicatorBorderWidth: null,
+          dragIndicatorBorderColor: null,
+          child: Stack(
+            children: const [
+              DragIndicatorWidget.top(
+                enabled: false,
+                onLongPressDown: null,
+                onLongPressStart: null,
+                onLongPressEnd: null,
+                onLongPressMoveUpdate: null,
+              )
+            ],
+          ),
         ),
       ));
 
