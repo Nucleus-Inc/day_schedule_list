@@ -1,10 +1,12 @@
 import 'package:day_schedule_list/day_schedule_list.dart';
+import 'package:day_schedule_list/src/ui/day_schedule_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   _minimumMinuteIntervalAndAppointmentMinimumDurationAssertionsTest();
   _hourHeightAssertionsTest();
+  _readOnlyTests();
 }
 
 void _minimumMinuteIntervalAndAppointmentMinimumDurationAssertionsTest(){
@@ -189,3 +191,68 @@ void _hourHeightAssertionsTest(){
   );
 }
 
+void _readOnlyTests(){
+  group(
+    'read only tests',
+      (){
+        testWidgets(
+            'read only active',
+                (WidgetTester tester) async {
+                  final DayScheduleListWidgetGlobalKey key = DayScheduleListWidgetGlobalKey();
+                  await tester.pumpWidget(MaterialApp(
+                    home: DayScheduleListWidget<IntervalRange>(
+                      minimumMinuteInterval: MinuteInterval.fifteen,
+                      appointmentMinimumDuration: MinuteInterval.fifteen,
+                      hourHeight: 120,
+                      unavailableIntervals: const [],
+                      appointments: const [],
+                      referenceDate: DateTime.now(),
+                      updateAppointDuration: (IntervalRange appointment,
+                          IntervalRange newInterval) {
+                        return Future.value(true);
+                      },
+                      appointmentBuilder: (BuildContext context,
+                          IntervalRange appointment, double height) {
+                        return Container();
+                      },
+                      key: key,
+                    ),
+                  ));
+
+                  final currentState = key.currentState;
+                  expect(currentState?.allowEdition, false);
+
+            });
+
+        testWidgets(
+            'read only inactive',
+                (WidgetTester tester) async {
+              final DayScheduleListWidgetGlobalKey key = DayScheduleListWidgetGlobalKey();
+              await tester.pumpWidget(MaterialApp(
+                home: DayScheduleListWidget<IntervalRange>(
+                  minimumMinuteInterval: MinuteInterval.fifteen,
+                  appointmentMinimumDuration: MinuteInterval.fifteen,
+                  hourHeight: 120,
+                  unavailableIntervals: const [],
+                  appointments: const [],
+                  referenceDate: DateTime.now(),
+                  createNewAppointmentAt: (intervalRange, error){},
+                  updateAppointDuration: (IntervalRange appointment,
+                      IntervalRange newInterval) {
+                    return Future.value(true);
+                  },
+                  appointmentBuilder: (BuildContext context,
+                      IntervalRange appointment, double height) {
+                    return Container();
+                  },
+                  key: key,
+                ),
+              ));
+
+              final currentState = key.currentState;
+              expect(currentState?.allowEdition, true);
+
+            });
+      }
+  );
+}

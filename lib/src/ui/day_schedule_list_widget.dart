@@ -12,27 +12,6 @@ import 'interval_containers/appointment_container/appointment_container.dart';
 import 'interval_containers/unavailable_interval_container.dart';
 import '../helpers/time_of_day_extensions.dart';
 
-///Signature of function to build your widget that represents an appointment.
-///Never forget to consider the parameter height, it is the available space you
-///have to alocate it.
-typedef AppointmentWidgetBuilder<K extends IntervalRange> = Widget Function(
-  BuildContext context,
-  K appointment,
-  double height,
-);
-
-///Signature of function to update some updated appointment.
-typedef UpdateAppointDuration<K extends IntervalRange> = Future<bool> Function(
-  K appointment,
-  IntervalRange newInterval,
-);
-
-///Signature of function to update some updated appointment.
-typedef NewAppointmentAt = void Function(
-  IntervalRange? interval,
-  DayScheduleListWidgetErrors? error,
-);
-
 ///This is the widget that represents your daily schedule.
 ///Here you will see all your appointments for the [referenceDate].
 class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
@@ -357,3 +336,27 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     return success;
   }
 }
+
+///Signature of function to build your widget that represents an appointment.
+///Never forget to consider the parameter height, it is the available space you
+///have to alocate it.
+typedef AppointmentWidgetBuilder<K extends IntervalRange> = Widget Function(
+    BuildContext context,
+    K appointment,
+    double height,
+    );
+
+///Signature of function to update some updated appointment.
+typedef UpdateAppointDuration<K extends IntervalRange> = Future<bool> Function(
+    K appointment,
+    IntervalRange newInterval,
+    );
+
+///Signature of function to update some updated appointment.
+typedef NewAppointmentAt = void Function(
+    IntervalRange? interval,
+    DayScheduleListWidgetErrors? error,
+    );
+
+@visibleForTesting
+typedef DayScheduleListWidgetGlobalKey = GlobalKey<_DayScheduleListWidgetState>;
