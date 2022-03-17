@@ -1,3 +1,4 @@
+import 'package:day_schedule_list/src/ui/day_schedule_list_inherited.dart';
 import 'package:flutter/material.dart';
 
 class DragIndicatorWidget extends StatelessWidget {
@@ -7,9 +8,6 @@ class DragIndicatorWidget extends StatelessWidget {
     required this.onLongPressStart,
     required this.onLongPressEnd,
     required this.onLongPressMoveUpdate,
-    this.dragIndicatorBorderColor,
-    this.dragIndicatorBorderWidth,
-    this.dragIndicatorColor,
     Key? key,
   })  : mode = _DragIndicatorMode.top,
         super(key: key);
@@ -20,17 +18,11 @@ class DragIndicatorWidget extends StatelessWidget {
     required this.onLongPressStart,
     required this.onLongPressEnd,
     required this.onLongPressMoveUpdate,
-    this.dragIndicatorBorderColor,
-    this.dragIndicatorBorderWidth,
-    this.dragIndicatorColor,
     Key? key,
   })  : mode = _DragIndicatorMode.bottom,
         super(key: key);
 
   const DragIndicatorWidget.overlayTop({
-    this.dragIndicatorBorderColor,
-    this.dragIndicatorBorderWidth,
-    this.dragIndicatorColor,
     Key? key,
   })  : enabled = true,
         mode = _DragIndicatorMode.overlayTop,
@@ -41,9 +33,6 @@ class DragIndicatorWidget extends StatelessWidget {
         super(key: key);
 
   const DragIndicatorWidget.overlayBottom({
-    this.dragIndicatorBorderColor,
-    this.dragIndicatorBorderWidth,
-    this.dragIndicatorColor,
     Key? key,
   })  : enabled = true,
         mode = _DragIndicatorMode.overlayBottom,
@@ -60,17 +49,14 @@ class DragIndicatorWidget extends StatelessWidget {
   final GestureLongPressEndCallback? onLongPressEnd;
   final GestureLongPressMoveUpdateCallback? onLongPressMoveUpdate;
 
-  ///The color to be applied to the default drag indicator widget.
-  final Color? dragIndicatorColor;
-
-  ///The color to be applied to the default drag indicator widget border.
-  final Color? dragIndicatorBorderColor;
-
-  ///The width to be applied to the default drag indicator widget border.
-  final double? dragIndicatorBorderWidth;
-
   @override
   Widget build(BuildContext context) {
+    final inherited = DayScheduleListInherited.of(context);
+
+    final Color? dragIndicatorColor = inherited.dragIndicatorColor;
+    final Color? dragIndicatorBorderColor = inherited.dragIndicatorBorderColor;
+    final double? dragIndicatorBorderWidth = inherited.dragIndicatorBorderWidth;
+
     final isTop =
         [_DragIndicatorMode.top, _DragIndicatorMode.overlayTop].contains(mode);
     final isBottom = [
@@ -82,17 +68,23 @@ class DragIndicatorWidget extends StatelessWidget {
       _DragIndicatorMode.overlayTop,
     ].contains(mode);
 
-    final Widget indicatorWidget = isBottom
-        ? _IndicatorWidget.bottom(
-            dragIndicatorBorderColor: dragIndicatorBorderColor,
-            dragIndicatorBorderWidth: dragIndicatorBorderWidth,
-            dragIndicatorColor: dragIndicatorColor,
+    final Widget indicatorWidget = inherited.customDragIndicator != null
+        ? inherited.customDragIndicator!(
+            isBottom
+                ? CustomDragIndicatorPosition.bottomRight
+                : CustomDragIndicatorPosition.topLeft,
           )
-        : _IndicatorWidget.top(
-            dragIndicatorBorderColor: dragIndicatorBorderColor,
-            dragIndicatorBorderWidth: dragIndicatorBorderWidth,
-            dragIndicatorColor: dragIndicatorColor,
-          );
+        : isBottom
+            ? _IndicatorWidget.bottom(
+                dragIndicatorBorderColor: dragIndicatorBorderColor,
+                dragIndicatorBorderWidth: dragIndicatorBorderWidth,
+                dragIndicatorColor: dragIndicatorColor,
+              )
+            : _IndicatorWidget.top(
+                dragIndicatorBorderColor: dragIndicatorBorderColor,
+                dragIndicatorBorderWidth: dragIndicatorBorderWidth,
+                dragIndicatorColor: dragIndicatorColor,
+              );
 
     return Positioned(
       top: isTop ? -0.5 : null,
@@ -117,6 +109,11 @@ class DragIndicatorWidget extends StatelessWidget {
     );
   }
 }
+
+typedef CustomDragIndicatorBuilder = Widget Function(
+    CustomDragIndicatorPosition);
+
+enum CustomDragIndicatorPosition { topLeft, bottomRight }
 
 enum _DragIndicatorMode {
   top,
