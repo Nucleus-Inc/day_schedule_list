@@ -21,7 +21,7 @@ void _modeTopTest() {
         customDragIndicator: null,
         timeOfDayWidgetHeight: 35*4,
         dragIndicatorColor: null,
-        validTimesList: [],
+        validTimesList: const [],
         dragIndicatorBorderWidth: null,
         dragIndicatorBorderColor: null,
         child: Stack(
@@ -66,7 +66,7 @@ void _modeBottomTest() {
         customDragIndicator: null,
         timeOfDayWidgetHeight: 35*4,
         dragIndicatorColor: null,
-        validTimesList: [],
+        validTimesList: const [],
         dragIndicatorBorderWidth: null,
         dragIndicatorBorderColor: null,
         child: Stack(
@@ -111,7 +111,7 @@ void _modeOverlayTopTest() {
         customDragIndicator: null,
         timeOfDayWidgetHeight: 35*4,
         dragIndicatorColor: null,
-        validTimesList: [],
+        validTimesList: const [],
         dragIndicatorBorderWidth: null,
         dragIndicatorBorderColor: null,
         child: Stack(
@@ -150,7 +150,7 @@ void _modeOverlayBottomTest() {
         customDragIndicator: null,
         timeOfDayWidgetHeight: 35*4,
         dragIndicatorColor: null,
-        validTimesList: [],
+        validTimesList: const [],
         dragIndicatorBorderWidth: null,
         dragIndicatorBorderColor: null,
         child: Stack(
@@ -191,7 +191,7 @@ void _whenEnabledOrDisabled(){
           customDragIndicator: null,
           timeOfDayWidgetHeight: 35*4,
           dragIndicatorColor: null,
-          validTimesList: [],
+          validTimesList: const [],
           dragIndicatorBorderWidth: null,
           dragIndicatorBorderColor: null,
           child: Stack(
@@ -242,7 +242,7 @@ void _whenEnabledOrDisabled(){
           customDragIndicator: null,
           timeOfDayWidgetHeight: 35*4,
           dragIndicatorColor: null,
-          validTimesList: [],
+          validTimesList: const [],
           dragIndicatorBorderWidth: null,
           dragIndicatorBorderColor: null,
           child: Stack(

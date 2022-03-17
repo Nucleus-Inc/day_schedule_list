@@ -1,4 +1,3 @@
-import 'package:day_schedule_list/src/ui/day_schedule_list_inherited.dart';
 import 'package:flutter/material.dart';
 
 import '../../day_schedule_list_widget.dart';
