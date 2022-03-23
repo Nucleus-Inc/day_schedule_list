@@ -1,5 +1,5 @@
 import 'package:day_schedule_list/day_schedule_list.dart';
-import 'package:day_schedule_list/src/ui/time_of_day_widget.dart';
+import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
 import 'package:flutter/cupertino.dart';
 
 class DayScheduleListInherited extends InheritedWidget {
@@ -12,6 +12,8 @@ class DayScheduleListInherited extends InheritedWidget {
     required this.dragIndicatorColor,
     required this.dragIndicatorBorderWidth,
     required this.dragIndicatorBorderColor,
+    required this.customDragIndicator,
+    this.allowEdition = false,
     Key? key,
   }) : super(
           child: child,
@@ -26,6 +28,9 @@ class DayScheduleListInherited extends InheritedWidget {
   final Color? dragIndicatorColor;
   final Color? dragIndicatorBorderColor;
   final double? dragIndicatorBorderWidth;
+  final CustomDragIndicatorBuilder? customDragIndicator;
+
+  final bool allowEdition;
 
   @override
   bool updateShouldNotify(covariant InheritedWidget oldWidget) {
@@ -35,7 +40,7 @@ class DayScheduleListInherited extends InheritedWidget {
   static DayScheduleListInherited of(BuildContext context) {
     final DayScheduleListInherited? result =
         context.dependOnInheritedWidgetOfExactType<DayScheduleListInherited>();
-    assert(result != null, 'No FrogColor found in context');
+    assert(result != null, 'No DayScheduleListInherited found in context');
     return result!;
   }
 }

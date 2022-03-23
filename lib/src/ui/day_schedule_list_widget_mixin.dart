@@ -1,3 +1,4 @@
+import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
 import 'package:day_schedule_list/src/models/unavailable_interval_to_add_appointment_exception.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/dynamic_height_container.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/appointment_container.dart';
@@ -7,7 +8,6 @@ import '../models/minute_interval.dart';
 import '../models/schedule_item_position.dart';
 import 'day_schedule_list_widget.dart';
 import 'interval_containers/appointment_container_overlay.dart';
-import 'time_of_day_widget.dart';
 import '../helpers/time_of_day_extensions.dart';
 import '../helpers/date_time_extensions.dart';
 
@@ -251,33 +251,27 @@ mixin DayScheduleListWidgetMixin {
     final IntervalRange firstUnavailableInterval = unavailableIntervals.first;
     final IntervalRange lastUnavailableInterval = unavailableIntervals.last;
 
-    final belongsToFirst = firstUnavailableInterval.containsTimeOfDay(time);
-    final belongsToLast = lastUnavailableInterval.containsTimeOfDay(time);
+    final belongsToFirst =
+        firstUnavailableInterval.containsTimeOfDayPartialClosed(
+      time: time,
+      closedRangeOnStart: true,
+      closedRangeOnEnd: false,
+    );
+    final belongsToLast =
+        lastUnavailableInterval.containsTimeOfDayPartialClosed(
+      time: time,
+      closedRangeOnStart: false,
+      closedRangeOnEnd: true,
+    );
 
     if (hasTimeBefore) {
-      final beforeDateTime = DateTime(
-        DateTime.now().year,
-        1,
-        1,
-        time.hour,
-        time.minute,
-      ).subtract(const Duration(hours: 1));
-
-      final timeBefore = TimeOfDay.fromDateTime(beforeDateTime);
-      final timeBeforeBelongsToFirst =
-          firstUnavailableInterval.containsTimeOfDay(timeBefore);
-      final timeBeforeBelongsToLast =
-          lastUnavailableInterval.containsTimeOfDay(timeBefore);
-
-      final validTime = _validScheduleTimeOfDayWhenHaveTimeBefore(
+      final validTime = _buildScheduleTimeOfDayWhenHaveTimeBeforeIfNeeded(
         time: time,
-        belongsToFirst: belongsToFirst,
         belongsToLast: belongsToLast,
-        timeBeforeBelongsToFirst: timeBeforeBelongsToFirst,
-        timeBeforeBelongsToLast: timeBeforeBelongsToLast,
+        belongsToFirst: belongsToFirst,
+        unavailableIntervals: unavailableIntervals,
         firstUnavailableInterval: firstUnavailableInterval,
         lastUnavailableInterval: lastUnavailableInterval,
-        unavailableIntervals: unavailableIntervals,
       );
 
       if (validTime != null) {
@@ -299,6 +293,41 @@ mixin DayScheduleListWidgetMixin {
     return validTimesList;
   }
 
+  ScheduleTimeOfDay? _buildScheduleTimeOfDayWhenHaveTimeBeforeIfNeeded({
+    required TimeOfDay time,
+    required bool belongsToFirst,
+    required bool belongsToLast,
+    required IntervalRange firstUnavailableInterval,
+    required IntervalRange lastUnavailableInterval,
+    required List<IntervalRange> unavailableIntervals
+}){
+    final timeBefore = time.subtract(hours: 1, minutes: 0);
+    final timeBeforeBelongsToFirst =
+    firstUnavailableInterval.containsTimeOfDayPartialClosed(
+      time: timeBefore,
+      closedRangeOnStart: true,
+      closedRangeOnEnd: false,
+    );
+    final timeBeforeBelongsToLast =
+    lastUnavailableInterval.containsTimeOfDayPartialClosed(
+      time: timeBefore,
+      closedRangeOnStart: false,
+      closedRangeOnEnd: true,
+    );
+
+    return _validScheduleTimeOfDayWhenHaveTimeBefore(
+      time: time,
+      belongsToFirst: belongsToFirst,
+      belongsToLast: belongsToLast,
+      timeBeforeBelongsToFirst: timeBeforeBelongsToFirst,
+      timeBeforeBelongsToLast: timeBeforeBelongsToLast,
+      firstUnavailableInterval: firstUnavailableInterval,
+      lastUnavailableInterval: lastUnavailableInterval,
+      unavailableIntervals: unavailableIntervals,
+    );
+
+  }
+
   ScheduleTimeOfDay? _validScheduleTimeOfDayWhenHaveTimeBefore(
       {required TimeOfDay time,
       required bool timeBeforeBelongsToFirst,
@@ -309,14 +338,7 @@ mixin DayScheduleListWidgetMixin {
       required IntervalRange lastUnavailableInterval,
       required List<IntervalRange> unavailableIntervals}) {
     if (timeBeforeBelongsToFirst && !belongsToFirst) {
-      final dateTimeToAdd = DateTime(
-              DateTime.now().year,
-              1,
-              1,
-              firstUnavailableInterval.end.hour,
-              firstUnavailableInterval.end.minute)
-          .add(Duration(minutes: minimumMinuteInterval.numberValue));
-      final timeOfDayToAdd = TimeOfDay.fromDateTime(dateTimeToAdd);
+      final timeOfDayToAdd = firstUnavailableInterval.end;
       if (time.toMinutes - timeOfDayToAdd.toMinutes >=
           minimumMinuteInterval.numberValue) {
         return belongsToInternalUnavailableRange(
@@ -327,14 +349,7 @@ mixin DayScheduleListWidgetMixin {
             : ScheduleTimeOfDay.available(time: timeOfDayToAdd);
       }
     } else if (!timeBeforeBelongsToLast && belongsToLast) {
-      final dateTimeToAdd = DateTime(
-              DateTime.now().year,
-              1,
-              1,
-              lastUnavailableInterval.start.hour,
-              lastUnavailableInterval.start.minute)
-          .subtract(Duration(minutes: minimumMinuteInterval.numberValue));
-      final timeOfDayToAdd = TimeOfDay.fromDateTime(dateTimeToAdd);
+      final timeOfDayToAdd = lastUnavailableInterval.start;
       if (time.toMinutes - timeOfDayToAdd.toMinutes >=
           minimumMinuteInterval.numberValue) {
         return belongsToInternalUnavailableRange(
@@ -422,7 +437,6 @@ mixin DayScheduleListWidgetMixin {
     required ScheduleTimeOfDay firstValidTimeList,
     required ScheduleTimeOfDay lastValidTimeList,
   }) {
-
     final possibleStart =
         _calculatePossibleStartOfNewAppointmentForTappedPosition(
       startPosition: startPosition,

@@ -19,16 +19,9 @@ class DynamicHeightContainer extends StatefulWidget {
     required this.onUpdateCancel,
     required this.currentHeight,
     required this.child,
-    this.dragIndicatorColor,
-    this.dragIndicatorBorderColor,
-    this.dragIndicatorBorderWidth,
     this.updateStep,
     Key? key,
   })  : assert(
-          dragIndicatorBorderWidth == null || dragIndicatorBorderWidth > 0,
-          'dragIndicatorBorderWidth must be null or > 0',
-        ),
-        assert(
           updateStep == null || updateStep > 0,
           'updateStep must be > 0',
         ),
@@ -36,15 +29,6 @@ class DynamicHeightContainer extends StatefulWidget {
 
   ///The widget that will have it's height changed.
   final Widget child;
-
-  ///The color to be applied to the default drag indicator widget.
-  final Color? dragIndicatorColor;
-
-  ///The color to be applied to the default drag indicator widget border.
-  final Color? dragIndicatorBorderColor;
-
-  ///The width to be applied to the default drag indicator widget border.
-  final double? dragIndicatorBorderWidth;
 
   ///How much [child] height should change by each update during vertical drag gesture.
   final double? updateStep;
@@ -110,9 +94,6 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
           onLongPressStart: null,
           onLongPressEnd: onLongPressEnd,
           onLongPressMoveUpdate: onLongPressMoveUpdate,
-          dragIndicatorColor: widget.dragIndicatorColor,
-          dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
-          dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
         ),
         DragIndicatorWidget.bottom(
           enabled: widget.editionEnabled,
@@ -120,9 +101,6 @@ class _DynamicHeightContainerState extends State<DynamicHeightContainer> {
           onLongPressStart: null,
           onLongPressEnd: onLongPressEnd,
           onLongPressMoveUpdate: onLongPressMoveUpdate,
-          dragIndicatorColor: widget.dragIndicatorColor,
-          dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
-          dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
         ),
       ],
     );

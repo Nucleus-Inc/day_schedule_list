@@ -1,3 +1,4 @@
+import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
 import 'package:flutter/material.dart';
 
 import 'time_of_day_text.dart';
@@ -35,14 +36,3 @@ class TimeOfDayWidget extends StatelessWidget {
     );
   }
 }
-
-class ScheduleTimeOfDay {
-  ScheduleTimeOfDay.available({required this.time})
-      : availability = TimeOfDayAvailability.available;
-  ScheduleTimeOfDay.unavailable({required this.time})
-      : availability = TimeOfDayAvailability.unavailable;
-  TimeOfDay time;
-  TimeOfDayAvailability availability;
-}
-
-enum TimeOfDayAvailability { available, unavailable }

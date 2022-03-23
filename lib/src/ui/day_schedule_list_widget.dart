@@ -1,4 +1,5 @@
 import 'package:day_schedule_list/day_schedule_list.dart';
+import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
 import 'package:day_schedule_list/src/models/unavailable_interval_to_add_appointment_exception.dart';
 import 'package:day_schedule_list/src/models/minute_interval.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
@@ -9,29 +10,7 @@ import 'package:flutter/material.dart';
 import 'day_schedule_list_widget_mixin.dart';
 import 'interval_containers/appointment_container/appointment_container.dart';
 import 'interval_containers/unavailable_interval_container.dart';
-import 'time_of_day_widget.dart';
 import '../helpers/time_of_day_extensions.dart';
-
-///Signature of function to build your widget that represents an appointment.
-///Never forget to consider the parameter height, it is the available space you
-///have to alocate it.
-typedef AppointmentWidgetBuilder<K extends IntervalRange> = Widget Function(
-  BuildContext context,
-  K appointment,
-  double height,
-);
-
-///Signature of function to update some updated appointment.
-typedef UpdateAppointDuration<K extends IntervalRange> = Future<bool> Function(
-  K appointment,
-  IntervalRange newInterval,
-);
-
-///Signature of function to update some updated appointment.
-typedef NewAppointmentAt = void Function(
-  IntervalRange? interval,
-  DayScheduleListWidgetErrors? error,
-);
 
 ///This is the widget that represents your daily schedule.
 ///Here you will see all your appointments for the [referenceDate].
@@ -43,7 +22,7 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     required this.appointments,
     required this.updateAppointDuration,
     required this.appointmentBuilder,
-    required this.createNewAppointmentAt,
+    this.createNewAppointmentAt,
     this.hourHeight = DayScheduleListWidgetMixin.defaultHourHeight,
     this.minimumMinuteInterval =
         DayScheduleListWidgetMixin.defaultMinimumMinuteInterval,
@@ -53,6 +32,7 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     this.dragIndicatorBorderWidth,
     this.dragIndicatorColor,
     this.dragIndicatorBorderColor,
+    this.customDragIndicator,
     Key? key,
   })  : assert(
           minimumMinuteInterval <= appointmentMinimumDuration,
@@ -90,7 +70,8 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
 
   ///A Builder called for every appointment of [appointments] to build your
   /// widget that represents it.
-  final NewAppointmentAt createNewAppointmentAt;
+  /// When this value is null any kind of edition is disabled
+  final NewAppointmentAt? createNewAppointmentAt;
 
   ///The convertion parameter from one hour to height dimension.
   ///Choose a value that best fits your needs.
@@ -121,6 +102,16 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
   ///The width to be applied to the default drag indicator widget border.
   final double? dragIndicatorBorderWidth;
 
+  ///Custom drag indicator widget builder. Use it to customize the widget that
+  ///appears on top left and bottom right of appointment widget when it enters on
+  ///edit mode.
+  ///
+  ///
+  ///
+  ///When this value is not null [dragIndicatorColor], [dragIndicatorBorderColor]
+  ///and [dragIndicatorBorderWidth] values are not used.
+  final CustomDragIndicatorBuilder? customDragIndicator;
+
   @override
   _DayScheduleListWidgetState<T> createState() =>
       _DayScheduleListWidgetState<T>();
@@ -135,6 +126,8 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
   @override
   MinuteInterval get appointmentMinimumDuration =>
       widget.appointmentMinimumDuration;
+
+  bool get allowEdition => widget.createNewAppointmentAt != null;
 
   List<ScheduleTimeOfDay> validTimesList = [];
   final GlobalKey _validTimesListColumnKey = GlobalKey();
@@ -172,6 +165,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         horizontal: 2,
       ),
       child: DayScheduleListInherited(
+        allowEdition: allowEdition,
         minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
         timeOfDayWidgetHeight: timeOfDayWidgetHeight,
         minimumMinuteInterval: minimumMinuteInterval,
@@ -179,12 +173,15 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
         dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
         dragIndicatorColor: widget.dragIndicatorColor,
+        customDragIndicator: widget.customDragIndicator,
         child: Builder(
           builder: (context) {
             return DayScheduleListStack(
               validTimesListColumnKey: _validTimesListColumnKey,
               link: link,
-              onTapUpOnDayScheduleList: _onTapUpOnDayScheduleList,
+              onTapUpOnDayScheduleList: widget.createNewAppointmentAt != null
+                  ? _onTapUpOnDayScheduleList
+                  : null,
               internalUnavailableIntervals: buildInternalUnavailableIntervals(
                 unavailableIntervals: widget.unavailableIntervals,
               ).map((IntervalRange interval) {
@@ -272,12 +269,20 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         appointments: widget.appointments,
         unavailableIntervals: widget.unavailableIntervals,
       );
-      widget.createNewAppointmentAt(appointment, null);
+      _createNewAppointmentAt(appointment, null);
     } on UnavailableIntervalToAddAppointmentException {
-      widget.createNewAppointmentAt(
+      _createNewAppointmentAt(
         null,
         DayScheduleListWidgetErrors.unavailableIntervalToAddAppointment,
       );
+    }
+  }
+
+  void _createNewAppointmentAt(
+      IntervalRange? appointment, DayScheduleListWidgetErrors? error) {
+    final action = widget.createNewAppointmentAt;
+    if (action != null) {
+      action(appointment, error);
     }
   }
 
@@ -331,3 +336,27 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     return success;
   }
 }
+
+///Signature of function to build your widget that represents an appointment.
+///Never forget to consider the parameter height, it is the available space you
+///have to alocate it.
+typedef AppointmentWidgetBuilder<K extends IntervalRange> = Widget Function(
+    BuildContext context,
+    K appointment,
+    double height,
+    );
+
+///Signature of function to update some updated appointment.
+typedef UpdateAppointDuration<K extends IntervalRange> = Future<bool> Function(
+    K appointment,
+    IntervalRange newInterval,
+    );
+
+///Signature of function to update some updated appointment.
+typedef NewAppointmentAt = void Function(
+    IntervalRange? interval,
+    DayScheduleListWidgetErrors? error,
+    );
+
+@visibleForTesting
+typedef DayScheduleListWidgetGlobalKey = GlobalKey<_DayScheduleListWidgetState>;
