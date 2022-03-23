@@ -1,6 +1,6 @@
+import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
 import 'package:flutter/material.dart';
 
-import 'time_of_day_widget.dart';
 
 class TimeOfDayText extends Text {
   TimeOfDayText({

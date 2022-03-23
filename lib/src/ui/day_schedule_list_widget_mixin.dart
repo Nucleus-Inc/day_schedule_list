@@ -1,3 +1,4 @@
+import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
 import 'package:day_schedule_list/src/models/unavailable_interval_to_add_appointment_exception.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/dynamic_height_container.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/appointment_container.dart';
@@ -7,7 +8,6 @@ import '../models/minute_interval.dart';
 import '../models/schedule_item_position.dart';
 import 'day_schedule_list_widget.dart';
 import 'interval_containers/appointment_container_overlay.dart';
-import 'time_of_day_widget.dart';
 import '../helpers/time_of_day_extensions.dart';
 import '../helpers/date_time_extensions.dart';
 
