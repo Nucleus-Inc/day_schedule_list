@@ -37,3 +37,8 @@
 
 # 0.4.1
 * Bug fix
+
+# 0.4.2
+* Issue: Fix error when defining first and last available hours
+* Issue: Create possibility to customize drag indicator widget
+* Issue: Add Read only mode
