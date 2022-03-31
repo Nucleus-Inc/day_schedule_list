@@ -11,28 +11,32 @@ import 'interval_containers/appointment_container_overlay.dart';
 import '../helpers/time_of_day_extensions.dart';
 import '../helpers/date_time_extensions.dart';
 
+
+
 mixin DayScheduleListWidgetMixin {
   static const double defaultHourHeight = 100;
   static const MinuteInterval defaultMinimumMinuteInterval = MinuteInterval.one;
   static const MinuteInterval defaultAppointmentMinimumDuration =
       MinuteInterval.fifteen;
-  double get hourHeight => 0;
 
+  double get hourHeight => 0;
   MinuteInterval get minimumMinuteInterval => defaultMinimumMinuteInterval;
   MinuteInterval get appointmentMinimumDuration =>
       defaultAppointmentMinimumDuration;
-
-  late double minimumMinuteIntervalHeight =
-      (hourHeight * minimumMinuteInterval.numberValue) / 60.0;
-
   double get timeOfDayWidgetHeight {
     return minimumMinuteIntervalHeight < 2
         ? 10 * minimumMinuteIntervalHeight
         : 17;
   }
 
+  late double minimumMinuteIntervalHeight =
+      (hourHeight * minimumMinuteInterval.numberValue) / 60.0;
+
+  late ScrollController scrollController;
+
   final LayerLink link = LayerLink();
   OverlayEntry? appointmentOverlayEntry;
+
   late ScheduleItemPosition appointmentOverlayPosition;
   late AppointmentUpdatingMode appointmentUpdateMode;
 
@@ -293,23 +297,22 @@ mixin DayScheduleListWidgetMixin {
     return validTimesList;
   }
 
-  ScheduleTimeOfDay? _buildScheduleTimeOfDayWhenHaveTimeBeforeIfNeeded({
-    required TimeOfDay time,
-    required bool belongsToFirst,
-    required bool belongsToLast,
-    required IntervalRange firstUnavailableInterval,
-    required IntervalRange lastUnavailableInterval,
-    required List<IntervalRange> unavailableIntervals
-}){
+  ScheduleTimeOfDay? _buildScheduleTimeOfDayWhenHaveTimeBeforeIfNeeded(
+      {required TimeOfDay time,
+      required bool belongsToFirst,
+      required bool belongsToLast,
+      required IntervalRange firstUnavailableInterval,
+      required IntervalRange lastUnavailableInterval,
+      required List<IntervalRange> unavailableIntervals}) {
     final timeBefore = time.subtract(hours: 1, minutes: 0);
     final timeBeforeBelongsToFirst =
-    firstUnavailableInterval.containsTimeOfDayPartialClosed(
+        firstUnavailableInterval.containsTimeOfDayPartialClosed(
       time: timeBefore,
       closedRangeOnStart: true,
       closedRangeOnEnd: false,
     );
     final timeBeforeBelongsToLast =
-    lastUnavailableInterval.containsTimeOfDayPartialClosed(
+        lastUnavailableInterval.containsTimeOfDayPartialClosed(
       time: timeBefore,
       closedRangeOnStart: false,
       closedRangeOnEnd: true,
@@ -325,7 +328,6 @@ mixin DayScheduleListWidgetMixin {
       lastUnavailableInterval: lastUnavailableInterval,
       unavailableIntervals: unavailableIntervals,
     );
-
   }
 
   ScheduleTimeOfDay? _validScheduleTimeOfDayWhenHaveTimeBefore(
@@ -583,6 +585,25 @@ mixin DayScheduleListWidgetMixin {
     return appointment;
   }
 
+  void updateScrollViewOffsetBy({
+    required Size scrollViewSize,
+    required ScheduleItemPosition newPosition,
+    required ScheduleItemPosition oldPosition,
+  }) {
+    final offsetIncrement = newPosition.top - oldPosition.top;
+
+    final currentOffset = scrollController.offset;
+    final visibleWindowFrameStart = currentOffset;
+    final visibleWindowFrameEnd = scrollViewSize.height + visibleWindowFrameStart;
+    var resultOffset = currentOffset + offsetIncrement;
+    if(resultOffset < 0) {
+      scrollController.jumpTo(0);
+    }
+    else {
+      scrollController.jumpTo(resultOffset);
+    }
+  }
+
   void showUpdateOverlay<S extends IntervalRange>({
     required BuildContext context,
     required S interval,
@@ -599,7 +620,6 @@ mixin DayScheduleListWidgetMixin {
     );
     appointmentUpdateMode = mode;
 
-    debugPrint('$mode');
     hideAppoinmentOverlay();
     appointmentOverlayEntry = OverlayEntry(
       builder: (BuildContext context) {

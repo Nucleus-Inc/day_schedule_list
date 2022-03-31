@@ -131,13 +131,23 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
 
   List<ScheduleTimeOfDay> validTimesList = [];
   final GlobalKey _validTimesListColumnKey = GlobalKey();
+  final _scrollViewKey = GlobalKey();
 
   @override
   void initState() {
+    scrollController = widget.scrollController ?? ScrollController();
     validTimesList = populateValidTimesList(
       unavailableIntervals: widget.unavailableIntervals,
     );
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    if (widget.scrollController == null) {
+      scrollController.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -160,11 +170,14 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     List<IntervalRange> unavailableIntervals = widget.unavailableIntervals;
 
     return SingleChildScrollView(
-      controller: widget.scrollController,
+      key: _scrollViewKey,
+      controller: scrollController,
       padding: const EdgeInsets.symmetric(
         horizontal: 2,
       ),
       child: DayScheduleListInherited(
+        scrollController: scrollController,
+        mediaQueryData: MediaQuery.of(context),
         allowEdition: allowEdition,
         minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
         timeOfDayWidgetHeight: timeOfDayWidgetHeight,
@@ -182,18 +195,17 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
               onTapUpOnDayScheduleList: widget.createNewAppointmentAt != null
                   ? _onTapUpOnDayScheduleList
                   : null,
-              internalUnavailableIntervals: buildInternalUnavailableIntervals(
-                unavailableIntervals: widget.unavailableIntervals,
-              ).map((IntervalRange interval) {
-                return UnavailableIntervalContainer(
-                  interval: interval,
-                  position: calculateItemRangePosition(
-                    itemRange: interval,
-                    insetVertical: insetVertical,
-                    firstValidTime: validTimesList.first,
-                  ),
-                );
-              }).toList(),
+              internalUnavailableIntervals:
+                  UnavailableIntervalContainer.buildList(
+                unavailableIntervals: buildInternalUnavailableIntervals(
+                  unavailableIntervals: widget.unavailableIntervals,
+                ),
+                calculatePosition: (interval) => calculateItemRangePosition(
+                  itemRange: interval,
+                  insetVertical: insetVertical,
+                  firstValidTime: validTimesList.first,
+                ),
+              ),
               appointments: [
                 ...appointments.map((appointment) {
                   final index = appointments.indexOf(appointment);
@@ -239,8 +251,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
                       validTimesList: validTimesList,
                       appointmentBuilder: widget.appointmentBuilder,
                     ),
-                    onNewUpdatePosition: (newPosition) =>
-                        updateAppointmentOverlay(newPosition),
+                    onNewUpdatePosition: (position) => _onNewUpdatePosition(context, position),
                     onUpdatePositionCancel: () => hideAppoinmentOverlay(),
                     child: widget.appointmentBuilder(
                       context,
@@ -258,6 +269,31 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
         ),
       ),
     );
+  }
+
+  void _onNewUpdatePosition(BuildContext context, ScheduleItemPosition newPosition) {
+    final oldPosition = appointmentOverlayPosition;
+    updateAppointmentOverlay(newPosition);
+    final scrollViewSize = _scrollViewKey.currentContext?.size;
+
+    final inherited = DayScheduleListInherited.of(context);
+    final isOnMaxVisibleTop = inherited.newSchedulePositionIsOnMaxVisibleTop(
+      newPosition,
+      oldPosition,
+    );
+    final isOnMaxVisibleBottom = inherited.newSchedulePositionIsOnMaxVisibleBottom(
+      newPosition,
+      oldPosition,
+    );
+    if ((isOnMaxVisibleTop || isOnMaxVisibleBottom) && scrollViewSize != null) {
+      updateScrollViewOffsetBy(
+        scrollViewSize: scrollViewSize,
+        newPosition: newPosition,
+        oldPosition: oldPosition,
+      );
+    } else {
+      updateAppointmentOverlay(newPosition);
+    }
   }
 
   void _onTapUpOnDayScheduleList(TapUpDetails details) {
@@ -341,22 +377,22 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
 ///Never forget to consider the parameter height, it is the available space you
 ///have to alocate it.
 typedef AppointmentWidgetBuilder<K extends IntervalRange> = Widget Function(
-    BuildContext context,
-    K appointment,
-    double height,
-    );
+  BuildContext context,
+  K appointment,
+  double height,
+);
 
 ///Signature of function to update some updated appointment.
 typedef UpdateAppointDuration<K extends IntervalRange> = Future<bool> Function(
-    K appointment,
-    IntervalRange newInterval,
-    );
+  K appointment,
+  IntervalRange newInterval,
+);
 
 ///Signature of function to update some updated appointment.
 typedef NewAppointmentAt = void Function(
-    IntervalRange? interval,
-    DayScheduleListWidgetErrors? error,
-    );
+  IntervalRange? interval,
+  DayScheduleListWidgetErrors? error,
+);
 
 @visibleForTesting
 typedef DayScheduleListWidgetGlobalKey = GlobalKey<_DayScheduleListWidgetState>;

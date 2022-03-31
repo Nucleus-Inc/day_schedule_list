@@ -1,4 +1,5 @@
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
+import 'package:day_schedule_list/src/ui/day_schedule_list_inherited.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -59,6 +60,9 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
   Offset _oldOffsetFromOrigin = Offset.zero;
   bool _didMove = false;
   late ValueNotifier<bool> editingMode;
+
+  LoopDirection _runningUpdatePositionLoopDirection = LoopDirection.none;
+
   @override
   void initState() {
     editingMode = ValueNotifier(false);
@@ -74,7 +78,6 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
 
   @override
   Widget build(BuildContext context) {
-
     return ValueListenableBuilder<bool>(
       valueListenable: editingMode,
       builder: (context, editing, child) {
@@ -114,20 +117,28 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
     if (updateStep != null) {
       final double nextPendingIncrement = _pendingDeltaYForUpdateStep + offsetY;
       if (nextPendingIncrement.abs() >= updateStep) {
-        _performRescheduleIncrementBy(
-          updateStep * (nextPendingIncrement / nextPendingIncrement.abs()),
+        final multiplier = (nextPendingIncrement / updateStep).roundToDouble();
+        _tryToPerformRescheduleIncrementBy(
+          updateStep * multiplier,
         );
         _pendingDeltaYForUpdateStep = 0;
       } else {
+        final inherited = DayScheduleListInherited.of(context);
+        final newTop = _currentPosition.top + offsetY;
+        final newPosition = _currentPosition.withNewTop(newTop);
+        if (inherited.newSchedulePositionIsOnMaxVisibleTop(
+            newPosition, _currentPosition)) {
+        }
         _pendingDeltaYForUpdateStep = nextPendingIncrement;
       }
     } else {
-      _performRescheduleIncrementBy(offsetY);
+      _tryToPerformRescheduleIncrementBy(offsetY);
     }
     _oldOffsetFromOrigin = details.offsetFromOrigin;
   }
 
   void onRescheduleLongPressEnd(LongPressEndDetails _) {
+    _runningUpdatePositionLoopDirection = LoopDirection.none;
     if (_didMove && widget.canUpdatePositionTo(_currentPosition)) {
       if (widget.canUpdatePositionTo(_currentPosition)) {
         widget.onUpdatePositionEnd(_currentPosition);
@@ -139,22 +150,88 @@ class _DynamicPositionContainerState extends State<DynamicPositionContainer> {
   }
 
   void onRescheduleLongPressCancel() {
-    debugPrint('cancel');
+    _runningUpdatePositionLoopDirection = LoopDirection.none;
     widget.onUpdatePositionCancel();
     _resetCurrentPosition();
   }
 
-  void _performRescheduleIncrementBy(double value) {
+  void _tryToPerformRescheduleIncrementBy(double value) {
     final localCurrentTop = _currentPosition.top;
-    final finalTop = localCurrentTop + value;
-    final finalPosition = _currentPosition.withNewTop(finalTop);
-    if (widget.canUpdatePositionTo(finalPosition)) {
-      _currentPosition = finalPosition;
-      widget.onNewPositionUpdate(_currentPosition);
+    final newTop = localCurrentTop + value;
+    final newPosition = _currentPosition.withNewTop(newTop);
+    final inherited = DayScheduleListInherited.of(context);
+    if (inherited.newSchedulePositionIsOnMaxVisibleTop(
+        newPosition, _currentPosition)) {
+      if (_runningUpdatePositionLoopDirection != LoopDirection.top) {
+        _runningUpdatePositionLoopDirection = LoopDirection.top;
+        _runUpdatePositionLoop(
+          newTop: newTop,
+          newPosition: newPosition,
+          increment: value,
+          direction: LoopDirection.top,
+        );
+      }
+    } else if (inherited.newSchedulePositionIsOnMaxVisibleBottom(
+        newPosition, _currentPosition)) {
+      if (_runningUpdatePositionLoopDirection != LoopDirection.bottom) {
+        _runningUpdatePositionLoopDirection = LoopDirection.bottom;
+        _runUpdatePositionLoop(
+          newTop: newTop,
+          newPosition: newPosition,
+          increment: value,
+          direction: LoopDirection.bottom,
+        );
+      }
+    } else {
+      _runningUpdatePositionLoopDirection = LoopDirection.none;
+      if (widget.canUpdatePositionTo(newPosition)) {
+        _updatePositionAndInform(newPosition);
+      }
     }
+  }
+
+  void _runUpdatePositionLoop({
+    required ScheduleItemPosition newPosition,
+    required double newTop,
+    required double increment,
+    required LoopDirection direction,
+  }) {
+    var loopNewPosition = newPosition;
+    var loopNewTop = newTop;
+    Future.doWhile(() {
+      if (widget.canUpdatePositionTo(loopNewPosition)) {
+        _updatePositionAndInform(loopNewPosition);
+        loopNewTop = loopNewTop + increment;
+        loopNewPosition = _currentPosition.withNewTop(loopNewTop);
+        return Future.delayed(
+          const Duration(milliseconds: 100),
+          () => _runningUpdatePositionLoopDirection == direction,
+        );
+      } else {
+        return false;
+      }
+    });
+  }
+
+  void _updatePositionAndInform(ScheduleItemPosition newPosition) {
+    _currentPosition = newPosition;
+    widget.onNewPositionUpdate(_currentPosition);
   }
 
   void _resetCurrentPosition() {
     _currentPosition = widget.position;
   }
+
+  bool _verifyShouldContinueLoop(
+      {required LoopDirection direction, required double currentOffset}) {
+    bool keepRunning = _runningUpdatePositionLoopDirection == direction;
+    if (direction == LoopDirection.top) {
+      keepRunning = keepRunning && currentOffset <= 0;
+    } else if (direction == LoopDirection.bottom) {
+      keepRunning = keepRunning && currentOffset <= 0;
+    }
+    return keepRunning;
+  }
 }
+
+enum LoopDirection { top, bottom, none }
