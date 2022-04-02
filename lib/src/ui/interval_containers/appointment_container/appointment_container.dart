@@ -1,9 +1,6 @@
 import 'package:day_schedule_list/day_schedule_list.dart';
-import 'package:day_schedule_list/src/helpers/schedule_item_position_utils.dart';
 import 'package:day_schedule_list/src/models/schedule_item_position.dart';
-import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
 import 'package:day_schedule_list/src/ui/day_schedule_list_inherited.dart';
-import 'package:day_schedule_list/src/ui/day_schedule_list_widget.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/drag_indicator_widget.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/appointment_update_controller.dart';
 import 'package:flutter/material.dart';
