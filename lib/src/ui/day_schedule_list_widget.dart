@@ -1,4 +1,5 @@
 import 'package:day_schedule_list/day_schedule_list.dart';
+import 'package:day_schedule_list/src/helpers/appointment_container_utils.dart';
 import 'package:day_schedule_list/src/helpers/generic_utils.dart';
 import 'package:day_schedule_list/src/helpers/interval_range_utils.dart';
 import 'package:day_schedule_list/src/helpers/schedule_item_position_utils.dart';
@@ -9,7 +10,6 @@ import 'package:day_schedule_list/src/models/schedule_item_position.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container_overlay/appointment_overlay_controller.dart';
 import 'package:day_schedule_list/src/ui/day_schedule_list_inherited.dart';
 import 'package:day_schedule_list/src/ui/day_schedule_list_stack.dart';
-import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/appointment_container.dart';
 import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/appointment_update_controller.dart';
 import 'package:flutter/material.dart';
 
@@ -218,27 +218,20 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
                   firstValidTime: validTimesList.first,
                 ),
               ),
-              appointments: [
-                ...appointments.map((appointment) {
-                  final index = appointments.indexOf(appointment);
-                  final position = calculateItemRangePosition(
-                    itemRange: appointment,
-                    insetVertical: insetVertical,
-                    firstValidTime: validTimesList.first,
-                  );
-                  return AppointmentContainer(
-                    appointment: appointment,
-                    callbackController: this,
-                    itemIndex: index,
-                    position: position,
-                    child: widget.appointmentBuilder(
-                      context,
-                      appointments[index],
-                      position.height,
-                    ),
-                  );
-                }).toList(),
-              ],
+              appointments: AppointmentContainerUtils.buildList<S>(
+                callbackController: this,
+                appointments: appointments,
+                appointmentBuilder: (appointment, height) =>
+                    widget.appointmentBuilder(
+                  context,
+                  appointment,
+                  height,
+                ),
+                firstValidTime: validTimesList.first,
+                insetVertical: insetVertical,
+                minimumMinuteInterval: minimumMinuteInterval,
+                minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
+              ),
             );
           },
         ),
@@ -334,10 +327,11 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
   bool newSchedulePositionIsOnMaxVisibleBottom(
     ScheduleItemPosition newPosition,
     ScheduleItemPosition oldPosition,
-      AppointmentUpdateMode updateMode,
+    AppointmentUpdateMode updateMode,
   ) {
     final windowSize = MediaQuery.of(context).size;
-    final double offsetIncrement = ScheduleItemPositionUtils.calculateOffsetIncrement(
+    final double offsetIncrement =
+        ScheduleItemPositionUtils.calculateOffsetIncrement(
       oldPosition: oldPosition,
       newPosition: newPosition,
       updateMode: updateMode,
@@ -353,10 +347,11 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
   bool newSchedulePositionIsOnMaxVisibleTop(
     ScheduleItemPosition newPosition,
     ScheduleItemPosition oldPosition,
-      AppointmentUpdateMode updateMode,
+    AppointmentUpdateMode updateMode,
   ) {
     //final offsetIncrement = newPosition.top - oldPosition.top;
-    final double offsetIncrement = ScheduleItemPositionUtils.calculateOffsetIncrement(
+    final double offsetIncrement =
+        ScheduleItemPositionUtils.calculateOffsetIncrement(
       oldPosition: oldPosition,
       newPosition: newPosition,
       updateMode: updateMode,
