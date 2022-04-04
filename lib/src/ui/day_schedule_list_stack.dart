@@ -22,6 +22,7 @@ class DayScheduleListStack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      clipBehavior: Clip.hardEdge,
       alignment: Alignment.topCenter,
       children: [
         CompositedTransformTarget(

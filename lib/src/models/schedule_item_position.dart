@@ -14,6 +14,10 @@ class ScheduleItemPosition {
     );
   }
 
+  ScheduleItemPosition.fromPosition(ScheduleItemPosition position):
+        top = position.top,
+        height = position.height;
+
   ScheduleItemPosition withNewHeight(double height) {
     return ScheduleItemPosition(
       top: top,

@@ -51,6 +51,7 @@ class DragIndicatorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final inherited = DayScheduleListInherited.of(context);
 
     final Color? dragIndicatorColor = inherited.dragIndicatorColor;
@@ -88,8 +89,8 @@ class DragIndicatorWidget extends StatelessWidget {
 
     return Positioned(
       top: isTop ? -0.5 : null,
-      right: isBottom ? 0 : null, //0,
-      left: isTop ? 0 : null, //0,
+      right: isBottom ? 0 : null,
+      left: isTop ? 0 : null,
       width: 100,
       bottom: isBottom ? -0.5 : null,
       child: isOverlay

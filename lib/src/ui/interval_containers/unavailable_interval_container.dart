@@ -29,4 +29,18 @@ class UnavailableIntervalContainer extends StatelessWidget {
       ),
     );
   }
+
+  static List<UnavailableIntervalContainer> buildList({
+    required List<IntervalRange> unavailableIntervals,
+    required ScheduleItemPosition Function(IntervalRange) calculatePosition,
+  }) {
+    return unavailableIntervals.map((IntervalRange interval) {
+      return UnavailableIntervalContainer(
+        interval: interval,
+        position: calculatePosition(
+          interval,
+        ),
+      );
+    }).toList();
+  }
 }
