@@ -5,6 +5,7 @@ void main() {
   _scheduleItemPositionInitTest();
   _scheduleItemPositionWithNewHeight();
   _scheduleItemPositionWithNewTop();
+  _scheduleItemPositionFromPosition();
 }
 
 void _scheduleItemPositionInitTest() {
@@ -30,6 +31,15 @@ void _scheduleItemPositionWithNewTop(){
     final position = ScheduleItemPosition(top: 10, height: 10);
     final newPosition = position.withNewTop(120);
     expect(newPosition.top, 120);
+    expect(newPosition.height, position.height);
+  });
+}
+
+void _scheduleItemPositionFromPosition(){
+  test('ScheduleItemPosition.fromPosition', () {
+    final position = ScheduleItemPosition(top: 10, height: 10);
+    final newPosition = ScheduleItemPosition.fromPosition(position);
+    expect(newPosition.top, position.top);
     expect(newPosition.height, position.height);
   });
 }

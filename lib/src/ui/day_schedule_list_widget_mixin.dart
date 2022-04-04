@@ -1,13 +1,14 @@
+import 'package:day_schedule_list/src/helpers/generic_utils.dart';
+import 'package:day_schedule_list/src/helpers/interval_range_utils.dart';
+import 'package:day_schedule_list/src/helpers/schedule_item_position_utils.dart';
 import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
 import 'package:day_schedule_list/src/models/unavailable_interval_to_add_appointment_exception.dart';
-import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/dynamic_height_container.dart';
-import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/appointment_container.dart';
+import 'package:day_schedule_list/src/ui/interval_containers/appointment_container_overlay/appointment_overlay_controller.dart';
+import 'package:day_schedule_list/src/ui/interval_containers/appointment_container/appointment_update_controller.dart';
 import 'package:flutter/material.dart';
 import '../models/interval_range.dart';
 import '../models/minute_interval.dart';
 import '../models/schedule_item_position.dart';
-import 'day_schedule_list_widget.dart';
-import 'interval_containers/appointment_container_overlay.dart';
 import '../helpers/time_of_day_extensions.dart';
 import '../helpers/date_time_extensions.dart';
 
@@ -16,29 +17,22 @@ mixin DayScheduleListWidgetMixin {
   static const MinuteInterval defaultMinimumMinuteInterval = MinuteInterval.one;
   static const MinuteInterval defaultAppointmentMinimumDuration =
       MinuteInterval.fifteen;
-  double get hourHeight => 0;
 
+  double get hourHeight => 0;
   MinuteInterval get minimumMinuteInterval => defaultMinimumMinuteInterval;
   MinuteInterval get appointmentMinimumDuration =>
       defaultAppointmentMinimumDuration;
-
-  late double minimumMinuteIntervalHeight =
-      (hourHeight * minimumMinuteInterval.numberValue) / 60.0;
-
   double get timeOfDayWidgetHeight {
     return minimumMinuteIntervalHeight < 2
         ? 10 * minimumMinuteIntervalHeight
         : 17;
   }
 
-  final LayerLink link = LayerLink();
-  OverlayEntry? appointmentOverlayEntry;
-  late ScheduleItemPosition appointmentOverlayPosition;
-  late AppointmentUpdatingMode appointmentUpdateMode;
+  late double minimumMinuteIntervalHeight =
+      (hourHeight * minimumMinuteInterval.numberValue) / 60.0;
 
-  double calculateTimeOfDayIndicatorsInset(double timeOfDayWidgetHeight) {
-    return timeOfDayWidgetHeight / 2.0;
-  }
+  late ScrollController scrollController;
+  late AppointmentOverlayController overlayController;
 
   bool intersectsOtherInterval<T extends IntervalRange>({
     required List<T> intervals,
@@ -85,127 +79,22 @@ mixin DayScheduleListWidgetMixin {
     required double insetVertical,
     required ScheduleTimeOfDay? firstValidTime,
   }) {
-    final int deltaTop =
-        itemRange.start.toMinutes - (firstValidTime?.time.toMinutes ?? 0);
-    final deltaIntervalInMinutes = itemRange.deltaIntervalIMinutes;
-
-    return ScheduleItemPosition(
-      top: minimumMinuteIntervalHeight *
-              (deltaTop / minimumMinuteInterval.numberValue) +
-          insetVertical,
-      height: minimumMinuteIntervalHeight *
-          (deltaIntervalInMinutes / minimumMinuteInterval.numberValue),
+    return ScheduleItemPositionUtils.calculateItemRangePosition(
+      itemRange: itemRange,
+      insetVertical: insetVertical,
+      firstValidTime: firstValidTime,
+      minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
+      minimumMinuteInterval: minimumMinuteInterval,
     );
-  }
-
-  IntervalRange calculateItervalRangeForNewHeight({
-    required TimeOfDay start,
-    required double newDurationHeight,
-  }) {
-    final int durationInMinutes = convertDeltaYToMinutes(
-      deltaY: newDurationHeight,
-    );
-    final DateTime endDateTime = DateTime(
-      DateTime.now().year,
-      1,
-      1,
-      start.hour,
-      start.minute,
-    ).add(Duration(minutes: durationInMinutes));
-    TimeOfDay end;
-    end = endDateTime.day != 1
-        ? const TimeOfDay(hour: 23, minute: 59)
-        : TimeOfDay.fromDateTime(endDateTime);
-    return IntervalRange(
-      start: start,
-      end: end,
-    );
-  }
-
-  IntervalRange calculateItervalRangeForNewHeightFromTop({
-    required TimeOfDay end,
-    required double newDurationHeight,
-  }) {
-    final int durationInMinutes = convertDeltaYToMinutes(
-      deltaY: newDurationHeight,
-    );
-    final DateTime startDateTime = DateTime(
-      DateTime.now().year,
-      1,
-      1,
-      end.hour,
-      end.minute,
-    ).subtract(
-      Duration(minutes: durationInMinutes),
-    );
-    TimeOfDay newStart;
-    newStart = startDateTime.day != 1
-        ? const TimeOfDay(hour: 0, minute: 0)
-        : TimeOfDay.fromDateTime(startDateTime);
-    return IntervalRange(start: newStart, end: end);
-  }
-
-  IntervalRange calculateItervalRangeForNewPosition({
-    required IntervalRange range,
-    required ScheduleItemPosition newPosition,
-    required ScheduleTimeOfDay firstValidTime,
-    required double insetVertical,
-  }) {
-    final start = range.start;
-    final end = range.end;
-    final int newStartIncrement =
-        firstValidTime.time.hour > 0 || firstValidTime.time.minute > 0
-            ? firstValidTime.time.toMinutes
-            : 0;
-    final int newStartInMinutes = convertDeltaYToMinutes(
-          deltaY: newPosition.top - insetVertical,
-        ) +
-        newStartIncrement;
-
-    final int newEndInMinutes = convertDeltaYToMinutes(
-          deltaY: newPosition.top + newPosition.height - insetVertical,
-        ) +
-        newStartIncrement;
-
-    final startDeltaInMinutes = newStartInMinutes - start.toMinutes;
-    final endDeltaInMinutes = newEndInMinutes - end.toMinutes;
-
-    final DateTime startDateTime = DateTime(
-      DateTime.now().year,
-      1,
-      1,
-      start.hour,
-      start.minute,
-    ).add(Duration(minutes: startDeltaInMinutes));
-    final TimeOfDay newStart = TimeOfDay.fromDateTime(startDateTime);
-
-    final DateTime endDateTime = DateTime(
-      DateTime.now().year,
-      1,
-      1,
-      end.hour,
-      end.minute,
-    ).add(Duration(minutes: endDeltaInMinutes));
-    final TimeOfDay newEnd = TimeOfDay.fromDateTime(endDateTime);
-
-    if (newStart < newEnd) {
-      return IntervalRange(start: newStart, end: newEnd);
-    }
-    return IntervalRange(start: start, end: end);
-  }
-
-  int convertDeltaYToMinutes({
-    required double deltaY,
-  }) {
-    return ((deltaY * minimumMinuteInterval.numberValue) /
-            minimumMinuteIntervalHeight)
-        .round();
   }
 
   int calculateCloserMinutesThatIsMultipleOfMinimumMinuteInterval(
       {required int minutes}) {
-    return (minutes ~/ minimumMinuteInterval.numberValue) *
-        minimumMinuteInterval.numberValue;
+    return GenericUtils
+        .calculateCloserMinutesThatIsMultipleOfMinimumMinuteInterval(
+      minutes: minutes,
+      minimumMinuteInterval: minimumMinuteInterval,
+    );
   }
 
   List<ScheduleTimeOfDay> populateValidTimesList({
@@ -293,23 +182,22 @@ mixin DayScheduleListWidgetMixin {
     return validTimesList;
   }
 
-  ScheduleTimeOfDay? _buildScheduleTimeOfDayWhenHaveTimeBeforeIfNeeded({
-    required TimeOfDay time,
-    required bool belongsToFirst,
-    required bool belongsToLast,
-    required IntervalRange firstUnavailableInterval,
-    required IntervalRange lastUnavailableInterval,
-    required List<IntervalRange> unavailableIntervals
-}){
+  ScheduleTimeOfDay? _buildScheduleTimeOfDayWhenHaveTimeBeforeIfNeeded(
+      {required TimeOfDay time,
+      required bool belongsToFirst,
+      required bool belongsToLast,
+      required IntervalRange firstUnavailableInterval,
+      required IntervalRange lastUnavailableInterval,
+      required List<IntervalRange> unavailableIntervals}) {
     final timeBefore = time.subtract(hours: 1, minutes: 0);
     final timeBeforeBelongsToFirst =
-    firstUnavailableInterval.containsTimeOfDayPartialClosed(
+        firstUnavailableInterval.containsTimeOfDayPartialClosed(
       time: timeBefore,
       closedRangeOnStart: true,
       closedRangeOnEnd: false,
     );
     final timeBeforeBelongsToLast =
-    lastUnavailableInterval.containsTimeOfDayPartialClosed(
+        lastUnavailableInterval.containsTimeOfDayPartialClosed(
       time: timeBefore,
       closedRangeOnStart: false,
       closedRangeOnEnd: true,
@@ -325,7 +213,6 @@ mixin DayScheduleListWidgetMixin {
       lastUnavailableInterval: lastUnavailableInterval,
       unavailableIntervals: unavailableIntervals,
     );
-
   }
 
   ScheduleTimeOfDay? _validScheduleTimeOfDayWhenHaveTimeBefore(
@@ -364,7 +251,7 @@ mixin DayScheduleListWidgetMixin {
   }
 
   bool canUpdateHeightOfInterval<S extends IntervalRange>({
-    required HeightUpdateFrom from,
+    required AppointmentUpdateMode mode,
     required int index,
     required List<S> appointments,
     required List<IntervalRange> unavailableIntervals,
@@ -373,19 +260,28 @@ mixin DayScheduleListWidgetMixin {
   }) {
     bool canUpdate = true;
     final interval = appointments[index];
-
-    final possibleNewInterval = from == HeightUpdateFrom.bottom
-        ? calculateItervalRangeForNewHeight(
+    if (![
+      AppointmentUpdateMode.durationFromBottom,
+      AppointmentUpdateMode.durationFromTop
+    ].contains(mode)) {
+      return false;
+    }
+    final possibleNewInterval = mode == AppointmentUpdateMode.durationFromBottom
+        ? IntervalRangeUtils.calculateItervalRangeForNewHeight(
             start: interval.start,
             newDurationHeight: newHeight,
+            minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
+            minimumMinuteInterval: minimumMinuteInterval,
           )
-        : calculateItervalRangeForNewHeightFromTop(
+        : IntervalRangeUtils.calculateItervalRangeForNewHeightFromTop(
             newDurationHeight: newHeight,
             end: interval.end,
+            minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
+            minimumMinuteInterval: minimumMinuteInterval,
           );
 
-    switch (from) {
-      case HeightUpdateFrom.top:
+    switch (mode) {
+      case AppointmentUpdateMode.durationFromTop:
         final hasBeforeInterval = index > 0;
         if (hasBeforeInterval) {
           final beforeInterval = appointments[index - 1];
@@ -395,7 +291,7 @@ mixin DayScheduleListWidgetMixin {
             possibleNewInterval.start < validTimesList.first.time;
         canUpdate &= !exceedsMinValidTime;
         break;
-      case HeightUpdateFrom.bottom:
+      case AppointmentUpdateMode.durationFromBottom:
         final hasNextInterval = index < appointments.length - 1;
         if (hasNextInterval) {
           final nextInterval = appointments[index + 1];
@@ -405,15 +301,19 @@ mixin DayScheduleListWidgetMixin {
             possibleNewInterval.end > validTimesList.last.time;
         canUpdate &= !exceedsMaxValidTime;
         break;
+      default:
+        return false;
     }
 
     final intersectsUnavailableInterval = unavailableIntervals
         .any((element) => element.intersects(possibleNewInterval));
+
     final isBiggerThanMinimumDuration =
         possibleNewInterval.deltaIntervalIMinutes >=
             appointmentMinimumDuration.numberValue;
     canUpdate &= isBiggerThanMinimumDuration;
     canUpdate &= !intersectsUnavailableInterval;
+
     return canUpdate;
   }
 
@@ -503,7 +403,11 @@ mixin DayScheduleListWidgetMixin {
     const offsetInMinutesToCenterAppointmentOnTouchArea = 30;
 
     final now = DateTime.now();
-    final baseStartInMinutes = convertDeltaYToMinutes(deltaY: startPosition.dy);
+    final baseStartInMinutes = GenericUtils.convertDeltaYToMinutes(
+      deltaY: startPosition.dy,
+      minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
+      minimumMinuteInterval: minimumMinuteInterval,
+    );
 
     final startInMinutes =
         calculateCloserMinutesThatIsMultipleOfMinimumMinuteInterval(
@@ -583,65 +487,23 @@ mixin DayScheduleListWidgetMixin {
     return appointment;
   }
 
-  void showUpdateOverlay<S extends IntervalRange>({
-    required BuildContext context,
-    required S interval,
-    required AppointmentUpdatingMode mode,
-    required double insetVertical,
-    required List<ScheduleTimeOfDay> validTimesList,
-    required double timeOfDayWidgetHeight,
-    required AppointmentWidgetBuilder<S> appointmentBuilder,
+  void updateScrollViewOffsetBy({
+    required ScheduleItemPosition newPosition,
+    required ScheduleItemPosition oldPosition,
+    required AppointmentUpdateMode updateMode,
   }) {
-    appointmentOverlayPosition = calculateItemRangePosition<S>(
-      itemRange: interval,
-      insetVertical: insetVertical,
-      firstValidTime: validTimesList.first,
+    double offsetIncrement = ScheduleItemPositionUtils.calculateOffsetIncrement(
+      oldPosition: oldPosition,
+      newPosition: newPosition,
+      updateMode: updateMode,
     );
-    appointmentUpdateMode = mode;
 
-    debugPrint('$mode');
-    hideAppoinmentOverlay();
-    appointmentOverlayEntry = OverlayEntry(
-      builder: (BuildContext context) {
-        final updatedInterval = calculateItervalRangeForNewPosition(
-          range: interval,
-          newPosition: appointmentOverlayPosition,
-          firstValidTime: validTimesList.first,
-          insetVertical: insetVertical,
-        );
-
-        return AppointmentContainerOverlay(
-          position: appointmentOverlayPosition,
-          updateMode: mode,
-          interval: updatedInterval,
-          link: link,
-          timeIndicatorsInset:
-              calculateTimeOfDayIndicatorsInset(timeOfDayWidgetHeight),
-          child: appointmentBuilder(
-            context,
-            interval,
-            appointmentOverlayPosition.height,
-          ),
-        );
-      },
-    );
-    Overlay.of(context)?.insert(appointmentOverlayEntry!);
-  }
-
-  void updateAppointmentOverlay(ScheduleItemPosition newPosition) {
-    appointmentOverlayPosition = newPosition;
-    appointmentOverlayEntry?.markNeedsBuild();
-  }
-
-  void hideAppoinmentOverlay() {
-    try {
-      final overlay = appointmentOverlayEntry;
-      if (overlay != null) {
-        appointmentOverlayEntry = null;
-        overlay.remove();
-      }
-    } catch (error) {
-      debugPrint('$error');
+    final currentOffset = scrollController.offset;
+    var resultOffset = currentOffset + offsetIncrement;
+    if (resultOffset < 0) {
+      scrollController.jumpTo(0);
+    } else {
+      scrollController.jumpTo(resultOffset);
     }
   }
 }
