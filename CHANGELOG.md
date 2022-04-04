@@ -42,3 +42,7 @@
 * Issue: Fix error when defining first and last available hours
 * Issue: Create possibility to customize drag indicator widget
 * Issue: Add Read only mode
+
+# 0.4.3
+* Issue: Scroll day schedule list when changing schedule start time
+* Issue: Improve internal classes organization
