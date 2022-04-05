@@ -46,3 +46,6 @@
 # 0.4.3
 * Issue: Scroll day schedule list when changing schedule start time
 * Issue: Improve internal classes organization
+
+# 0.4.4
+* Issue: Correção do bug na scroll na lista dos agendamentos, para funcionar em diferentes tamanhos de telas. 
