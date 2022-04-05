@@ -330,6 +330,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     AppointmentUpdateMode updateMode,
   ) {
     final windowSize = MediaQuery.of(context).size;
+    int sizeCalculation = 0;
     final double offsetIncrement =
         ScheduleItemPositionUtils.calculateOffsetIncrement(
       oldPosition: oldPosition,
@@ -337,10 +338,15 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
       updateMode: updateMode,
     );
     final currentScrollOffset = scrollController.offset;
-    return windowSize.height -
-                (newPosition.top + newPosition.height - currentScrollOffset) <=
-            130 &&
-        offsetIncrement >= 0;
+    if (windowSize.height < 600) {
+      sizeCalculation = 350;
+    } else if (windowSize.height >= 600 && windowSize.height < 800) {
+      sizeCalculation = 380;
+    } else if (windowSize.height >= 800) {
+      sizeCalculation = 465;
+    }
+    return windowSize.height -(newPosition.top + newPosition.height - currentScrollOffset) <=
+            sizeCalculation && offsetIncrement >= 0;
   }
 
   @override
@@ -349,7 +355,6 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     ScheduleItemPosition oldPosition,
     AppointmentUpdateMode updateMode,
   ) {
-    //final offsetIncrement = newPosition.top - oldPosition.top;
     final double offsetIncrement =
         ScheduleItemPositionUtils.calculateOffsetIncrement(
       oldPosition: oldPosition,
@@ -357,7 +362,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
       updateMode: updateMode,
     );
     final currentScrollOffset = scrollController.offset;
-    return newPosition.top - currentScrollOffset <= 50 && offsetIncrement < 0;
+    return newPosition.top - currentScrollOffset <= 60 && offsetIncrement < 0;
   }
 
   @override
