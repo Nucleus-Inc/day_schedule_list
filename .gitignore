@@ -29,6 +29,7 @@
 .pub-cache/
 .pub/
 build/
+.lock
 
 # Codcov things
 **/coverage/

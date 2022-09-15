@@ -2,4 +2,4 @@ ignore:
   - '**/example/'
   - '**/*.g.dart'
   - '**/test/'
-  - '**/*.lock'
+  - '**/*.lock/'

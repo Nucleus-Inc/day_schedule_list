@@ -27,7 +27,7 @@ class AppointmentContainer<S extends IntervalRange> extends StatefulWidget {
   final AppointmentUpdateCallbackController callbackController;
 
   @override
-  _AppointmentContainerState createState() => _AppointmentContainerState();
+  State<AppointmentContainer> createState() => _AppointmentContainerState();
 }
 
 class _AppointmentContainerState extends State<AppointmentContainer> {
@@ -51,7 +51,8 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
   void didChangeDependencies() {
     updateController = AppointmentUpdateController(
       itemIndex: widget.itemIndex,
-      updateStep: DayScheduleListInherited.of(context).minimumMinuteIntervalHeight, 
+      updateStep:
+          DayScheduleListInherited.of(context).minimumMinuteIntervalHeight,
       //error because calling this code inside initState
       originalPosition: widget.position,
       callbackController: widget.callbackController,
@@ -62,8 +63,10 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
   @override
   Widget build(BuildContext context) {
     final inherited = DayScheduleListInherited.of(context);
-    final double width = MediaQuery.of(context).size.width - 
-    (DayScheduleListWidget.intervalContainerLeftInset + 5 + widget.optionalChildWidthLine);
+    final double width = MediaQuery.of(context).size.width -
+        (DayScheduleListWidget.intervalContainerLeftInset +
+            5 +
+            widget.optionalChildWidthLine);
     return Positioned(
       top: widget.position.top,
       right: 0,
@@ -86,13 +89,14 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
                           )
                       : null,
                   onLongPressEnd: isEditing ? _onLongPressEnd : null,
-                  onLongPressMoveUpdate: isEditing ? _onLongPressMoveUpdate : null,
+                  onLongPressMoveUpdate:
+                      isEditing ? _onLongPressMoveUpdate : null,
                   child: Container(
                     height: widget.position.height,
                     constraints: BoxConstraints(
-                        maxWidth: width,
-                        minWidth: width,
-                      ),
+                      maxWidth: width,
+                      minWidth: width,
+                    ),
                     child: ValueListenableBuilder<bool>(
                       valueListenable: didMove,
                       builder: (context, didMove, child) {
@@ -113,7 +117,8 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
                   ),
                   onLongPressStart: null,
                   onLongPressEnd: _onLongPressEnd, //onLongPressEnd,
-                  onLongPressMoveUpdate: _onLongPressMoveUpdate, //onLongPressMoveUpdate,
+                  onLongPressMoveUpdate:
+                      _onLongPressMoveUpdate, //onLongPressMoveUpdate,
                 ),
                 DragIndicatorWidget.bottom(
                   enabled: isEditing,
@@ -123,7 +128,8 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
                   ),
                   onLongPressStart: null,
                   onLongPressEnd: _onLongPressEnd, //onLongPressEnd,
-                  onLongPressMoveUpdate: _onLongPressMoveUpdate, //onLongPressMoveUpdate,
+                  onLongPressMoveUpdate:
+                      _onLongPressMoveUpdate, //onLongPressMoveUpdate,
                 ),
               ],
             ),

@@ -126,11 +126,11 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
   final CustomDragIndicatorBuilder? customDragIndicator;
 
   @override
-  _DayScheduleListWidgetState<T> createState() =>
-      _DayScheduleListWidgetState<T>();
+  DayScheduleListWidgetState<T> createState() =>
+      DayScheduleListWidgetState<T>();
 }
 
-class _DayScheduleListWidgetState<S extends IntervalRange>
+class DayScheduleListWidgetState<S extends IntervalRange>
     extends State<DayScheduleListWidget<S>>
     with DayScheduleListWidgetMixin, AppointmentUpdateCallbackController<S> {
   @override
@@ -314,7 +314,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
   }
 
   @override
-  bool canUpdateTo(ScheduleItemPosition position, int itemIndex,
+  bool canUpdateTo(ScheduleItemPosition position, int index,
       AppointmentUpdateMode mode) {
     if (mode == AppointmentUpdateMode.position) {
       return canUpdatePositionOfInterval(
@@ -326,7 +326,7 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     } else {
       return canUpdateHeightOfInterval<S>(
         mode: mode,
-        index: itemIndex,
+        index: index,
         appointments: widget.appointments,
         newHeight: position.height,
         unavailableIntervals: widget.unavailableIntervals,
@@ -381,30 +381,30 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
 
   @override
   void onNewUpdate(
-    ScheduleItemPosition newPosition,
+    ScheduleItemPosition position,
     AppointmentUpdateMode mode,
   ) {
     final oldPosition = overlayController.appointmentOverlayPosition;
-    overlayController.updateAppointmentOverlay(newPosition);
+    overlayController.updateAppointmentOverlay(position);
 
     final isOnMaxVisibleTop = newSchedulePositionIsOnMaxVisibleTop(
-      newPosition,
+      position,
       oldPosition,
       mode,
     );
     final isOnMaxVisibleBottom = newSchedulePositionIsOnMaxVisibleBottom(
-      newPosition,
+      position,
       oldPosition,
       mode,
     );
     if ((isOnMaxVisibleTop || isOnMaxVisibleBottom)) {
       updateScrollViewOffsetBy(
-        newPosition: newPosition,
+        newPosition: position,
         oldPosition: oldPosition,
         updateMode: mode,
       );
     } else {
-      overlayController.updateAppointmentOverlay(newPosition);
+      overlayController.updateAppointmentOverlay(position);
     }
   }
 
@@ -414,10 +414,10 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
   }
 
   @override
-  void onUpdateEnd(ScheduleItemPosition position, int itemIndex) {
+  void onUpdateEnd(ScheduleItemPosition position, int index) {
     overlayController.hideAppoinmentOverlay();
     _updateAppointIntervalForNewPosition(
-      index: itemIndex,
+      index: index,
       appointments: widget.appointments,
       newPosition: position,
       insetVertical: insetVertical(),
@@ -462,4 +462,4 @@ typedef NewAppointmentAt = void Function(
 );
 
 @visibleForTesting
-typedef DayScheduleListWidgetGlobalKey = GlobalKey<_DayScheduleListWidgetState>;
+typedef DayScheduleListWidgetGlobalKey = GlobalKey<DayScheduleListWidgetState>;
