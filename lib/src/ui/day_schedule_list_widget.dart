@@ -27,6 +27,8 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     required this.appointments,
     required this.updateAppointDuration,
     required this.appointmentBuilder,
+    this.optionalChildWidthLine,
+    this.optionalChildLine,
     this.createNewAppointmentAt,
     this.hourHeight = DayScheduleListWidgetMixin.defaultHourHeight,
     this.minimumMinuteInterval =
@@ -106,6 +108,12 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
 
   ///The width to be applied to the default drag indicator widget border.
   final double? dragIndicatorBorderWidth;
+
+  //Add a new widget next to the main widget
+  final AppointmentWidgetBuilder<T>? optionalChildLine;
+
+  // Add a width to the secondary widget
+  final num? optionalChildWidthLine;
 
   ///Custom drag indicator widget builder. Use it to customize the widget that
   ///appears on top left and bottom right of appointment widget when it enters on
@@ -231,6 +239,10 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
                 insetVertical: insetVertical,
                 minimumMinuteInterval: minimumMinuteInterval,
                 minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
+                childWidthLine: widget.optionalChildWidthLine,
+                optionalChildLine: (appointment, height) => widget.optionalChildLine != null
+                  ? widget.optionalChildLine!(context, appointment, height)
+                  : Container(),
               ),
             );
           },
@@ -345,8 +357,10 @@ class _DayScheduleListWidgetState<S extends IntervalRange>
     } else if (windowSize.height >= 800) {
       sizeCalculation = 465;
     }
-    return windowSize.height -(newPosition.top + newPosition.height - currentScrollOffset) <=
-            sizeCalculation && offsetIncrement >= 0;
+    return windowSize.height -
+                (newPosition.top + newPosition.height - currentScrollOffset) <=
+            sizeCalculation &&
+        offsetIncrement >= 0;
   }
 
   @override

@@ -337,8 +337,8 @@ mixin DayScheduleListWidgetMixin {
     required ScheduleTimeOfDay firstValidTimeList,
     required ScheduleTimeOfDay lastValidTimeList,
   }) {
-    final possibleStart =
-        _calculatePossibleStartOfNewAppointmentForTappedPosition(
+    
+    final possibleStart = _calculatePossibleStartOfNewAppointmentForTappedPosition(
       startPosition: startPosition,
       firstValidTimeList: firstValidTimeList,
     );

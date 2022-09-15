@@ -27,6 +27,9 @@ void _minimumMinuteIntervalAndAppointmentMinimumDurationAssertionsTest(){
                   updateAppointDuration: (IntervalRange appointment, IntervalRange newInterval) {
                     return Future.value(true);
                   },
+                  optionalChildLine: (context, appointment, height) {
+                    return Container();
+                  },
                   appointmentBuilder: (BuildContext context, IntervalRange appointment, double height) {
                     return Container();
                   },
@@ -54,6 +57,9 @@ void _minimumMinuteIntervalAndAppointmentMinimumDurationAssertionsTest(){
                     updateAppointDuration: (IntervalRange appointment, IntervalRange newInterval) {
                       return Future.value(true);
                     },
+                    optionalChildLine: (context, appointment, height) {
+                    return Container();
+                  },
                     appointmentBuilder: (BuildContext context, IntervalRange appointment, double height) {
                       return Container();
                     },
@@ -82,6 +88,9 @@ void _minimumMinuteIntervalAndAppointmentMinimumDurationAssertionsTest(){
                     updateAppointDuration: (IntervalRange appointment, IntervalRange newInterval) {
                       return Future.value(true);
                     },
+                    optionalChildLine: (context, appointment, height) {
+                    return Container();
+                  },
                     appointmentBuilder: (BuildContext context, IntervalRange appointment, double height) {
                       return Container();
                     },
@@ -118,6 +127,9 @@ void _hourHeightAssertionsTest(){
                       IntervalRange newInterval) {
                     return Future.value(true);
                   },
+                  optionalChildLine: (context, appointment, height) {
+                    return Container();
+                  },
                   appointmentBuilder: (BuildContext context,
                       IntervalRange appointment, double height) {
                     return Container();
@@ -144,6 +156,9 @@ void _hourHeightAssertionsTest(){
                   updateAppointDuration: (IntervalRange appointment,
                       IntervalRange newInterval) {
                     return Future.value(true);
+                  },
+                  optionalChildLine: (context, appointment, height) {
+                    return Container();
                   },
                   appointmentBuilder: (BuildContext context,
                       IntervalRange appointment, double height) {
@@ -175,6 +190,9 @@ void _hourHeightAssertionsTest(){
                         IntervalRange newInterval) {
                       return Future.value(true);
                     },
+                    optionalChildLine: (context, appointment, height) {
+                    return Container();
+                  },
                     appointmentBuilder: (BuildContext context,
                         IntervalRange appointment, double height) {
                       return Container();
@@ -211,6 +229,9 @@ void _readOnlyTests(){
                           IntervalRange newInterval) {
                         return Future.value(true);
                       },
+                      optionalChildLine: (context, appointment, height) {
+                    return Container();
+                  },
                       appointmentBuilder: (BuildContext context,
                           IntervalRange appointment, double height) {
                         return Container();
@@ -240,6 +261,9 @@ void _readOnlyTests(){
                   updateAppointDuration: (IntervalRange appointment,
                       IntervalRange newInterval) {
                     return Future.value(true);
+                  },
+                  optionalChildLine: (context, appointment, height) {
+                    return Container();
                   },
                   appointmentBuilder: (BuildContext context,
                       IntervalRange appointment, double height) {

@@ -10,10 +10,12 @@ class AppointmentContainerUtils {
     required List<S> appointments,
     required AppointmentUpdateCallbackController callbackController,
     required double insetVertical,
+    required num? childWidthLine,
     required ScheduleTimeOfDay firstValidTime,
     required double minimumMinuteIntervalHeight,
     required MinuteInterval minimumMinuteInterval,
     required Widget Function(S appointment, double height) appointmentBuilder,
+    required Widget? Function(S appointment, double height) optionalChildLine,
   }) {
     return appointments.map((appointment) {
       final index = appointments.indexOf(appointment);
@@ -30,6 +32,11 @@ class AppointmentContainerUtils {
         callbackController: callbackController,
         itemIndex: index,
         position: position,
+        optionalChildWidthLine: childWidthLine ?? 0,
+        optionalChildLine: optionalChildLine(
+          appointments[index],
+          position.height
+        ),
         child: appointmentBuilder(
           appointments[index],
           position.height,
