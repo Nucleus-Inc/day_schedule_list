@@ -35,7 +35,7 @@ class AppointmentContainerUtils {
         optionalChildWidthLine: childWidthLine ?? 0,
         optionalChildLine: optionalChildLine(
           appointments[index],
-          position.height
+          position.height,
         ),
         child: appointmentBuilder(
           appointments[index],

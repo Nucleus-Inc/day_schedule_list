@@ -241,8 +241,7 @@ class DayScheduleListWidgetState<S extends IntervalRange>
                 minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
                 childWidthLine: widget.optionalChildWidthLine,
                 optionalChildLine: (appointment, height) => widget.optionalChildLine != null
-                  ? widget.optionalChildLine!(context, appointment, height)
-                  : Container(),
+                  ? widget.optionalChildLine!(context, appointment, height) : Container(),
               ),
             );
           },
@@ -357,10 +356,7 @@ class DayScheduleListWidgetState<S extends IntervalRange>
     } else if (windowSize.height >= 800) {
       sizeCalculation = 465;
     }
-    return windowSize.height -
-                (newPosition.top + newPosition.height - currentScrollOffset) <=
-            sizeCalculation &&
-        offsetIncrement >= 0;
+    return windowSize.height - (newPosition.top + newPosition.height - currentScrollOffset) <= sizeCalculation && offsetIncrement >= 0;
   }
 
   @override
