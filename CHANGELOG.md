@@ -48,4 +48,7 @@
 * Issue: Improve internal classes organization
 
 # 0.4.4
-* Issue: Correção do bug na scroll na lista dos agendamentos, para funcionar em diferentes tamanhos de telas. 
+* Issue: Correção do bug na scroll na lista dos agendamentos, para funcionar em diferentes tamanhos de telas.
+
+# 0.4.5
+* Issue: Make it possible to add a new widget next to the main one

@@ -28,13 +28,12 @@ class AppointmentContainerOverlay extends StatefulWidget {
   final void Function() onTapToStopEditing;
 
   @override
-  _AppointmentContainerOverlayState createState() =>
+  State<AppointmentContainerOverlay> createState() =>
       _AppointmentContainerOverlayState();
 }
 
 class _AppointmentContainerOverlayState
     extends State<AppointmentContainerOverlay> {
-
   @override
   Widget build(BuildContext context) {
     return Positioned(

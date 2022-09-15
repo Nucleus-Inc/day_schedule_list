@@ -72,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  void listener(){
+  void listener() {
     debugPrint('Changed');
   }
 
@@ -90,6 +90,19 @@ class _MyHomePageState extends State<MyHomePage> {
           appointments: myAppointments,
           dragIndicatorColor: Colors.white,
           updateAppointDuration: _updateAppointmentDuration,
+          optionalChildWidthLine: 30,
+          optionalChildLine: (context, appointment, height) => Container(
+            width: 30,
+            height: height - 1,
+            decoration: BoxDecoration(
+              color: Colors.yellow,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.abc_outlined),
+            ),
+          ),
           createNewAppointmentAt:
               (IntervalRange? interval, DayScheduleListWidgetErrors? error) {
             if (error != null || interval == null) {

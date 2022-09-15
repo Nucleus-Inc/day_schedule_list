@@ -194,7 +194,7 @@ enum AppointmentUpdateMode {
   position,
   durationFromTop,
   durationFromBottom,
-  none
+  none,
 }
 
-enum LoopDirection { top, bottom, none }
+enum LoopDirection { top, bottom, none,}

@@ -9,7 +9,7 @@ class DragIndicatorWidget extends StatelessWidget {
     required this.onLongPressEnd,
     required this.onLongPressMoveUpdate,
     Key? key,
-  })  : mode = _DragIndicatorMode.top,
+  })  : mode = DragIndicatorMode.top,
         super(key: key);
 
   const DragIndicatorWidget.bottom({
@@ -19,13 +19,13 @@ class DragIndicatorWidget extends StatelessWidget {
     required this.onLongPressEnd,
     required this.onLongPressMoveUpdate,
     Key? key,
-  })  : mode = _DragIndicatorMode.bottom,
+  })  : mode = DragIndicatorMode.bottom,
         super(key: key);
 
   const DragIndicatorWidget.overlayTop({
     Key? key,
   })  : enabled = true,
-        mode = _DragIndicatorMode.overlayTop,
+        mode = DragIndicatorMode.overlayTop,
         onLongPressDown = null,
         onLongPressStart = null,
         onLongPressMoveUpdate = null,
@@ -35,14 +35,14 @@ class DragIndicatorWidget extends StatelessWidget {
   const DragIndicatorWidget.overlayBottom({
     Key? key,
   })  : enabled = true,
-        mode = _DragIndicatorMode.overlayBottom,
+        mode = DragIndicatorMode.overlayBottom,
         onLongPressDown = null,
         onLongPressStart = null,
         onLongPressMoveUpdate = null,
         onLongPressEnd = null,
         super(key: key);
 
-  final _DragIndicatorMode mode;
+  final DragIndicatorMode mode;
   final bool enabled;
   final GestureLongPressCallback? onLongPressDown;
   final GestureLongPressStartCallback? onLongPressStart;
@@ -59,14 +59,14 @@ class DragIndicatorWidget extends StatelessWidget {
     final double? dragIndicatorBorderWidth = inherited.dragIndicatorBorderWidth;
 
     final isTop =
-        [_DragIndicatorMode.top, _DragIndicatorMode.overlayTop].contains(mode);
+        [DragIndicatorMode.top, DragIndicatorMode.overlayTop].contains(mode);
     final isBottom = [
-      _DragIndicatorMode.bottom,
-      _DragIndicatorMode.overlayBottom,
+      DragIndicatorMode.bottom,
+      DragIndicatorMode.overlayBottom,
     ].contains(mode);
     final isOverlay = [
-      _DragIndicatorMode.overlayBottom,
-      _DragIndicatorMode.overlayTop,
+      DragIndicatorMode.overlayBottom,
+      DragIndicatorMode.overlayTop,
     ].contains(mode);
 
     final Widget indicatorWidget = inherited.customDragIndicator != null
@@ -116,7 +116,7 @@ typedef CustomDragIndicatorBuilder = Widget Function(
 
 enum CustomDragIndicatorPosition { topLeft, bottomRight }
 
-enum _DragIndicatorMode {
+enum DragIndicatorMode {
   top,
   bottom,
   overlayTop,
