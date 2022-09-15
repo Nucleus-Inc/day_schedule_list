@@ -27,6 +27,7 @@ void _minimumMinuteIntervalAndAppointmentMinimumDurationAssertionsTest(){
                   updateAppointDuration: (IntervalRange appointment, IntervalRange newInterval) {
                     return Future.value(true);
                   },
+                  optionalChildWidthLine: 0,
                   optionalChildLine: (context, appointment, height) {
                     return Container();
                   },
@@ -57,6 +58,7 @@ void _minimumMinuteIntervalAndAppointmentMinimumDurationAssertionsTest(){
                     updateAppointDuration: (IntervalRange appointment, IntervalRange newInterval) {
                       return Future.value(true);
                     },
+                    optionalChildWidthLine: 0,
                     optionalChildLine: (context, appointment, height) {
                     return Container();
                   },
@@ -88,6 +90,7 @@ void _minimumMinuteIntervalAndAppointmentMinimumDurationAssertionsTest(){
                     updateAppointDuration: (IntervalRange appointment, IntervalRange newInterval) {
                       return Future.value(true);
                     },
+                    optionalChildWidthLine: 0,
                     optionalChildLine: (context, appointment, height) {
                     return Container();
                   },
@@ -127,6 +130,7 @@ void _hourHeightAssertionsTest(){
                       IntervalRange newInterval) {
                     return Future.value(true);
                   },
+                  optionalChildWidthLine: 0,
                   optionalChildLine: (context, appointment, height) {
                     return Container();
                   },
@@ -157,6 +161,7 @@ void _hourHeightAssertionsTest(){
                       IntervalRange newInterval) {
                     return Future.value(true);
                   },
+                  optionalChildWidthLine: 0,
                   optionalChildLine: (context, appointment, height) {
                     return Container();
                   },
@@ -190,6 +195,7 @@ void _hourHeightAssertionsTest(){
                         IntervalRange newInterval) {
                       return Future.value(true);
                     },
+                    optionalChildWidthLine: 0,
                     optionalChildLine: (context, appointment, height) {
                     return Container();
                   },
@@ -229,6 +235,7 @@ void _readOnlyTests(){
                           IntervalRange newInterval) {
                         return Future.value(true);
                       },
+                      optionalChildWidthLine: 0,
                       optionalChildLine: (context, appointment, height) {
                     return Container();
                   },
@@ -262,6 +269,7 @@ void _readOnlyTests(){
                       IntervalRange newInterval) {
                     return Future.value(true);
                   },
+                  optionalChildWidthLine: 0,
                   optionalChildLine: (context, appointment, height) {
                     return Container();
                   },
