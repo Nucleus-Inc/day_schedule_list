@@ -58,11 +58,10 @@ void _timeOfDayWidgetListTest() {
       final columnFinder = find.byWidgetPredicate((widget) => widget is Column);
       expect(columnFinder, isNotNull);
 
-      final List<Widget>? columnChildren =
-          (columnFinder.evaluate().first.widget as Column).children;
+      final List<Widget> columnChildren = (columnFinder.evaluate().first.widget as Column).children;
       expect(columnChildren, isNotNull);
-      expect(columnChildren?.whereType<TimeOfDayWidget>().length, 25);
-      expect(columnChildren?.whereType<SizedBox>().length, 26);
+      expect(columnChildren.whereType<TimeOfDayWidget>().length, 25);
+      expect(columnChildren.whereType<SizedBox>().length, 26);
     });
 
     testWidgets(
@@ -92,11 +91,10 @@ void _timeOfDayWidgetListTest() {
       final columnFinder = find.byWidgetPredicate((widget) => widget is Column);
       expect(columnFinder, isNotNull);
 
-      final List<Widget>? columnChildren =
-          (columnFinder.evaluate().first.widget as Column).children;
+      final List<Widget> columnChildren = (columnFinder.evaluate().first.widget as Column).children;
 
-      expect(columnChildren?.whereType<TimeOfDayWidget>().length, 11);
-      expect(columnChildren?.whereType<SizedBox>().length, 12);
+      expect(columnChildren.whereType<TimeOfDayWidget>().length, 11);
+      expect(columnChildren.whereType<SizedBox>().length, 12);
     });
   });
 }

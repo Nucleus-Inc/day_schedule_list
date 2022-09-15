@@ -13,6 +13,8 @@ class AppointmentContainer<S extends IntervalRange> extends StatefulWidget {
     required this.itemIndex,
     required this.callbackController,
     required this.child,
+    this.optionalChildLine = const SizedBox.shrink(),
+    this.optionalChildWidthLine = 0,
     Key? key,
   }) : super(key: key);
 
@@ -20,10 +22,12 @@ class AppointmentContainer<S extends IntervalRange> extends StatefulWidget {
   final ScheduleItemPosition position;
   final int itemIndex;
   final Widget child;
+  final num optionalChildWidthLine;
+  final Widget? optionalChildLine;
   final AppointmentUpdateCallbackController callbackController;
 
   @override
-  _AppointmentContainerState createState() => _AppointmentContainerState();
+  State<AppointmentContainer> createState() => _AppointmentContainerState();
 }
 
 class _AppointmentContainerState extends State<AppointmentContainer> {
@@ -47,8 +51,9 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
   void didChangeDependencies() {
     updateController = AppointmentUpdateController(
       itemIndex: widget.itemIndex,
-      updateStep: DayScheduleListInherited.of(context)
-          .minimumMinuteIntervalHeight, //error because calling this code inside initState
+      updateStep:
+          DayScheduleListInherited.of(context).minimumMinuteIntervalHeight,
+      //error because calling this code inside initState
       originalPosition: widget.position,
       callbackController: widget.callbackController,
     );
@@ -58,6 +63,10 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
   @override
   Widget build(BuildContext context) {
     final inherited = DayScheduleListInherited.of(context);
+    final double width = MediaQuery.of(context).size.width -
+        (DayScheduleListWidget.intervalContainerLeftInset +
+            5 +
+            widget.optionalChildWidthLine);
     return Positioned(
       top: widget.position.top,
       right: 0,
@@ -66,56 +75,65 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
         padding: const EdgeInsets.only(
           left: DayScheduleListWidget.intervalContainerLeftInset,
         ),
-        child: Stack(
-          clipBehavior: Clip.none,
+        child: Row(
           children: [
-            GestureDetector(
-              onTap: inherited.allowEdition ? _onTapToStartEditing : null,
-              onLongPress: isEditing
-                  ? () => updateController.onLongPressDown(
-                        AppointmentUpdateMode.position,
-                        widget.appointment,
-                      )
-                  : null,
-              onLongPressEnd: isEditing ? _onLongPressEnd : null,
-              onLongPressMoveUpdate: isEditing ? _onLongPressMoveUpdate : null,
-              child: SizedBox(
-                width: double.infinity,
-                height: widget.position.height,
-                child: ValueListenableBuilder<bool>(
-                  valueListenable: didMove,
-                  builder: (context, didMove, child) {
-                    return Opacity(
-                      opacity: didMove ? 0.7 : 1,
-                      child: child!,
-                    );
-                  },
-                  child: widget.child,
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                GestureDetector(
+                  onTap: inherited.allowEdition ? _onTapToStartEditing : null,
+                  onLongPress: isEditing
+                      ? () => updateController.onLongPressDown(
+                            AppointmentUpdateMode.position,
+                            widget.appointment,
+                          )
+                      : null,
+                  onLongPressEnd: isEditing ? _onLongPressEnd : null,
+                  onLongPressMoveUpdate:
+                      isEditing ? _onLongPressMoveUpdate : null,
+                  child: Container(
+                    height: widget.position.height,
+                    constraints: BoxConstraints(
+                      maxWidth: width,
+                      minWidth: width,
+                    ),
+                    child: ValueListenableBuilder<bool>(
+                      valueListenable: didMove,
+                      builder: (context, didMove, child) {
+                        return Opacity(
+                          opacity: didMove ? 0.7 : 1,
+                          child: child!,
+                        );
+                      },
+                      child: widget.child,
+                    ),
+                  ),
                 ),
-              ),
+                DragIndicatorWidget.top(
+                  enabled: isEditing,
+                  onLongPressDown: () => updateController.onLongPressDown(
+                    AppointmentUpdateMode.durationFromTop,
+                    widget.appointment,
+                  ),
+                  onLongPressStart: null,
+                  onLongPressEnd: _onLongPressEnd, //onLongPressEnd,
+                  onLongPressMoveUpdate:
+                      _onLongPressMoveUpdate, //onLongPressMoveUpdate,
+                ),
+                DragIndicatorWidget.bottom(
+                  enabled: isEditing,
+                  onLongPressDown: () => updateController.onLongPressDown(
+                    AppointmentUpdateMode.durationFromBottom,
+                    widget.appointment,
+                  ),
+                  onLongPressStart: null,
+                  onLongPressEnd: _onLongPressEnd, //onLongPressEnd,
+                  onLongPressMoveUpdate:
+                      _onLongPressMoveUpdate, //onLongPressMoveUpdate,
+                ),
+              ],
             ),
-            DragIndicatorWidget.top(
-              enabled: isEditing,
-              onLongPressDown: () => updateController.onLongPressDown(
-                AppointmentUpdateMode.durationFromTop,
-                widget.appointment,
-              ),
-              onLongPressStart: null,
-              onLongPressEnd: _onLongPressEnd, //onLongPressEnd,
-              onLongPressMoveUpdate:
-                  _onLongPressMoveUpdate, //onLongPressMoveUpdate,
-            ),
-            DragIndicatorWidget.bottom(
-              enabled: isEditing,
-              onLongPressDown: () => updateController.onLongPressDown(
-                AppointmentUpdateMode.durationFromBottom,
-                widget.appointment,
-              ),
-              onLongPressStart: null,
-              onLongPressEnd: _onLongPressEnd, //onLongPressEnd,
-              onLongPressMoveUpdate:
-                  _onLongPressMoveUpdate, //onLongPressMoveUpdate,
-            ),
+            widget.optionalChildLine ?? Container()
           ],
         ),
       ),
@@ -124,9 +142,7 @@ class _AppointmentContainerState extends State<AppointmentContainer> {
 
   void _onTapToStartEditing() {
     HapticFeedback.selectionClick();
-    setState(() {
-      isEditing = !isEditing;
-    });
+    setState(() => isEditing = !isEditing);
   }
 
   void _onLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
