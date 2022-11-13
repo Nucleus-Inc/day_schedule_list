@@ -36,6 +36,7 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     this.appointmentMinimumDuration =
         DayScheduleListWidgetMixin.defaultAppointmentMinimumDuration,
     this.scrollController,
+    this.timeOfDayColor,
     this.dragIndicatorBorderWidth,
     this.dragIndicatorColor,
     this.dragIndicatorBorderColor,
@@ -99,6 +100,10 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
   /// An object that can be used to control the position to which the scroll
   /// view is scrolled.
   final ScrollController? scrollController;
+
+  /// The color to be applied to the presented  hours:minutes. Pass null
+  /// if you want the Theme.of(context).textTheme.caption.color to be used.
+  final Color? timeOfDayColor;
 
   ///The color to be applied to the default drag indicator widget.
   final Color? dragIndicatorColor;
@@ -197,6 +202,7 @@ class DayScheduleListWidgetState<S extends IntervalRange>
       timeOfDayWidgetHeight: timeOfDayWidgetHeight,
       minimumMinuteInterval: minimumMinuteInterval,
       validTimesList: validTimesList,
+      timeOfDayColor: widget.timeOfDayColor,
       dragIndicatorBorderColor: widget.dragIndicatorBorderColor,
       dragIndicatorBorderWidth: widget.dragIndicatorBorderWidth,
       dragIndicatorColor: widget.dragIndicatorColor,
