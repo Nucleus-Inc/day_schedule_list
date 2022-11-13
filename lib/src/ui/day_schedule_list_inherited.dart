@@ -9,6 +9,7 @@ class DayScheduleListInherited extends InheritedWidget {
     required this.minimumMinuteIntervalHeight,
     required this.timeOfDayWidgetHeight,
     required this.minimumMinuteInterval,
+    required this.timeOfDayColor,
     required this.dragIndicatorColor,
     required this.dragIndicatorBorderWidth,
     required this.dragIndicatorBorderColor,
@@ -25,6 +26,7 @@ class DayScheduleListInherited extends InheritedWidget {
   final double timeOfDayWidgetHeight;
   final MinuteInterval minimumMinuteInterval;
 
+  final Color? timeOfDayColor;
   final Color? dragIndicatorColor;
   final Color? dragIndicatorBorderColor;
   final double? dragIndicatorBorderWidth;

@@ -47,6 +47,7 @@ void _timeOfDayWidgetListTest() {
           timeOfDayWidgetHeight: 35 * 4,
           dragIndicatorColor: null,
           validTimesList: validIntervals,
+          timeOfDayColor: null,
           dragIndicatorBorderWidth: null,
           dragIndicatorBorderColor: null,
           child: const SingleChildScrollView(
@@ -81,6 +82,7 @@ void _timeOfDayWidgetListTest() {
           timeOfDayWidgetHeight: 35 * 4,
           dragIndicatorColor: null,
           validTimesList: validIntervals,
+          timeOfDayColor: null,
           dragIndicatorBorderWidth: null,
           dragIndicatorBorderColor: null,
           child: const SingleChildScrollView(

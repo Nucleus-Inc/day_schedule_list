@@ -1,4 +1,5 @@
 import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
+import 'package:day_schedule_list/src/ui/day_schedule_list_inherited.dart';
 import 'package:flutter/material.dart';
 
 import 'time_of_day_text.dart';
@@ -15,6 +16,7 @@ class TimeOfDayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color? timeOfDayText = DayScheduleListInherited.of(context).timeOfDayColor;
     return SizedBox(
       height: height,
       child: Row(
@@ -23,6 +25,7 @@ class TimeOfDayWidget extends StatelessWidget {
           TimeOfDayText(
             time: scheduleTime.time,
             availability: scheduleTime.availability,
+            color: timeOfDayText,
             context: context,
           ),
           const SizedBox(
