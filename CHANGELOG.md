@@ -52,3 +52,6 @@
 
 # 0.4.5
 * Issue: Make it possible to add a new widget next to the main one
+
+# 0.4.6
+* Issue: Make it possible to change color of hours
