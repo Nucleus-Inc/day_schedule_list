@@ -41,6 +41,7 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     this.dragIndicatorColor,
     this.dragIndicatorBorderColor,
     this.customDragIndicator,
+    this.is24Hours = false,
     Key? key,
   })  : assert(
           minimumMinuteInterval <= appointmentMinimumDuration,
@@ -130,6 +131,12 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
   ///and [dragIndicatorBorderWidth] values are not used.
   final CustomDragIndicatorBuilder? customDragIndicator;
 
+  /// Determines whether the time should be displayed in 24-hour format.
+  /// When set to true, time will be displayed in 24-hour format (0:00 to 23:59).
+  /// When set to false, time will be displayed in 12-hour format with AM/PM indicators (12:00 AM to 11:59 PM).
+  /// Default value is false, meaning the 12-hour format is used by default.
+  final bool is24Hours;
+
   @override
   DayScheduleListWidgetState<T> createState() =>
       DayScheduleListWidgetState<T>();
@@ -169,6 +176,7 @@ class DayScheduleListWidgetState<S extends IntervalRange>
     );
     validTimesList = populateValidTimesList(
       unavailableIntervals: widget.unavailableIntervals,
+      is24Hours: widget.is24Hours,
     );
     super.initState();
   }
@@ -188,6 +196,7 @@ class DayScheduleListWidgetState<S extends IntervalRange>
     widget.appointments.sort((a, b) => a.start <= b.start ? -1 : 1);
     validTimesList = populateValidTimesList(
       unavailableIntervals: widget.unavailableIntervals,
+      is24Hours: widget.is24Hours,
     );
   }
 
@@ -246,8 +255,11 @@ class DayScheduleListWidgetState<S extends IntervalRange>
                 minimumMinuteInterval: minimumMinuteInterval,
                 minimumMinuteIntervalHeight: minimumMinuteIntervalHeight,
                 childWidthLine: widget.optionalChildWidthLine,
-                optionalChildLine: (appointment, height) => widget.optionalChildLine != null
-                  ? widget.optionalChildLine!(context, appointment, height) : Container(),
+                optionalChildLine: (appointment, height) => widget
+                            .optionalChildLine !=
+                        null
+                    ? widget.optionalChildLine!(context, appointment, height)
+                    : Container(),
               ),
             );
           },
@@ -319,8 +331,8 @@ class DayScheduleListWidgetState<S extends IntervalRange>
   }
 
   @override
-  bool canUpdateTo(ScheduleItemPosition position, int index,
-      AppointmentUpdateMode mode) {
+  bool canUpdateTo(
+      ScheduleItemPosition position, int index, AppointmentUpdateMode mode) {
     if (mode == AppointmentUpdateMode.position) {
       return canUpdatePositionOfInterval(
         newPosition: position,
@@ -362,7 +374,10 @@ class DayScheduleListWidgetState<S extends IntervalRange>
     } else if (windowSize.height >= 800) {
       sizeCalculation = 465;
     }
-    return windowSize.height - (newPosition.top + newPosition.height - currentScrollOffset) <= sizeCalculation && offsetIncrement >= 0;
+    return windowSize.height -
+                (newPosition.top + newPosition.height - currentScrollOffset) <=
+            sizeCalculation &&
+        offsetIncrement >= 0;
   }
 
   @override

@@ -97,37 +97,56 @@ mixin DayScheduleListWidgetMixin {
     );
   }
 
-  List<ScheduleTimeOfDay> populateValidTimesList({
-    required List<IntervalRange> unavailableIntervals,
-  }) {
-    List<ScheduleTimeOfDay> validTimesList = [];
-    final verifyUnavailableIntervals = unavailableIntervals.isNotEmpty;
+// This method is assumed to be defined within the mixin.
+// Instead of adding a parameter to control the 24-hour state,
+// it's assumed that this state will be provided from a superclass or through another mechanism.
 
-    for (var item = 0; item < 25; item++) {
-      final hasTimeBefore = item > 0;
-      final TimeOfDay time =
-          TimeOfDay(hour: item == 24 ? 23 : item, minute: item == 24 ? 59 : 0);
-      if (verifyUnavailableIntervals) {
-        validTimesList.addAll(
-          _validScheduleTimeOfDayListWhenNeedToVerifyForUnavailableIntervals(
-            time: time,
-            hasTimeBefore: hasTimeBefore,
-            unavailableIntervals: unavailableIntervals,
-          ),
-        );
-      } else {
-        validTimesList.add(
-          belongsToInternalUnavailableRange(
-            time: time,
-            unavailableIntervals: unavailableIntervals,
-          )
-              ? ScheduleTimeOfDay.unavailable(time: time)
-              : ScheduleTimeOfDay.available(time: time),
-        );
-      }
+List<ScheduleTimeOfDay> populateValidTimesList({
+  required List<IntervalRange> unavailableIntervals,
+  bool is24Hours = false, // This parameter should be provided when the method is called.
+}) {
+  List<ScheduleTimeOfDay> validTimesList = [];
+  final verifyUnavailableIntervals = unavailableIntervals.isNotEmpty;
+
+  // Loop from 0 to 23 for 24-hour format, and from 1 to 12 for 12-hour format.
+  int hours = is24Hours ? 24 : 12;
+  for (var i = 0; i < hours; i++) {
+    int hour = is24Hours ? i : ((i % 12) + 1); // Adjust for 12-hour format
+    TimeOfDay time = TimeOfDay(hour: hour, minute: 0);
+    // For 12-hour format, add 12 for PM hours if i >= 12.
+    if (!is24Hours && i >= 12) {
+      time = TimeOfDay(hour: hour + 12, minute: 0);
     }
-    return validTimesList;
+
+    // Special case for 24th hour, representing the end of the day.
+    if (i == 23 && is24Hours) {
+      time = const TimeOfDay(hour: 23, minute: 59);
+    }
+
+    // Use existing logic to calculate available and unavailable times.
+    if (verifyUnavailableIntervals) {
+      validTimesList.addAll(
+        _validScheduleTimeOfDayListWhenNeedToVerifyForUnavailableIntervals(
+          time: time,
+          hasTimeBefore: i > 0,
+          unavailableIntervals: unavailableIntervals,
+        ),
+      );
+    } else {
+      validTimesList.add(
+        belongsToInternalUnavailableRange(
+          time: time,
+          unavailableIntervals: unavailableIntervals,
+        )
+            ? ScheduleTimeOfDay.unavailable(time: time)
+            : ScheduleTimeOfDay.available(time: time),
+      );
+    }
   }
+
+  return validTimesList;
+}
+
 
   List<ScheduleTimeOfDay>
       _validScheduleTimeOfDayListWhenNeedToVerifyForUnavailableIntervals({
@@ -337,7 +356,7 @@ mixin DayScheduleListWidgetMixin {
     required ScheduleTimeOfDay firstValidTimeList,
     required ScheduleTimeOfDay lastValidTimeList,
   }) {
-    
+
     final possibleStart = _calculatePossibleStartOfNewAppointmentForTappedPosition(
       startPosition: startPosition,
       firstValidTimeList: firstValidTimeList,
