@@ -6,7 +6,7 @@ import 'package:day_schedule_list/src/models/schedule_time_of_day.dart';
 import 'package:flutter/material.dart';
 
 class IntervalRangeUtils {
-  static IntervalRange calculateItervalRangeForNewPosition({
+  static IntervalRange calculateIntervalRangeForNewPosition({
     required IntervalRange range,
     required ScheduleItemPosition newPosition,
     required ScheduleTimeOfDay firstValidTime,

@@ -37,11 +37,11 @@ class AppointmentOverlayController {
     required double timeOfDayWidgetHeight,
   }) {
     appointmentOverlayPosition = ScheduleItemPosition.fromPosition(position);
-    hideAppoinmentOverlay();
+    hideAppointmentOverlay();
     appointmentOverlayEntry = OverlayEntry(
       builder: (BuildContext context) {
         final updatedInterval =
-            IntervalRangeUtils.calculateItervalRangeForNewPosition(
+            IntervalRangeUtils.calculateIntervalRangeForNewPosition(
           range: interval,
           newPosition: appointmentOverlayPosition,
           firstValidTime: validTimesList.first,
@@ -58,7 +58,7 @@ class AppointmentOverlayController {
           timeIndicatorsInset: GenericUtils.calculateTimeOfDayIndicatorsInset(
             timeOfDayWidgetHeight,
           ),
-          onTapToStopEditing: () => hideAppoinmentOverlay(),
+          onTapToStopEditing: () => hideAppointmentOverlay(),
           child: appointmentBuilder(
             context,
             interval,
@@ -68,7 +68,7 @@ class AppointmentOverlayController {
       },
     );
 
-    Overlay.of(context)?.insert(appointmentOverlayEntry!);
+    Overlay.of(context).insert(appointmentOverlayEntry!);
 
   }
 
@@ -78,7 +78,7 @@ class AppointmentOverlayController {
     appointmentOverlayEntry?.markNeedsBuild();
   }
 
-  void hideAppoinmentOverlay() {
+  void hideAppointmentOverlay() {
     try {
       final overlay = appointmentOverlayEntry;
       if (overlay != null) {

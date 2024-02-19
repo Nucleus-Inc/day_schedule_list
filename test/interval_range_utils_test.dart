@@ -104,7 +104,7 @@ void _calculateItervalRangeForNewPositionTest() {
         firstValidTime: validTimes.first,
       );
       expect(
-          IntervalRangeUtils.calculateItervalRangeForNewPosition(
+          IntervalRangeUtils.calculateIntervalRangeForNewPosition(
             range: originalAppointment,
             newPosition: newPosition,
             firstValidTime: validTimes.first,
@@ -128,7 +128,7 @@ void _calculateItervalRangeForNewPositionTest() {
         firstValidTime: validTimes.first,
       );
       expect(
-        IntervalRangeUtils.calculateItervalRangeForNewPosition(
+        IntervalRangeUtils.calculateIntervalRangeForNewPosition(
           range: originalAppointment,
           newPosition: newPosition,
           firstValidTime: validTimes.first,
@@ -153,7 +153,7 @@ void _calculateItervalRangeForNewPositionTest() {
         firstValidTime: validTimes.first,
       );
       expect(
-        IntervalRangeUtils.calculateItervalRangeForNewPosition(
+        IntervalRangeUtils.calculateIntervalRangeForNewPosition(
           range: originalAppointment,
           newPosition: newPosition,
           firstValidTime: validTimes.first,

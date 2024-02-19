@@ -289,7 +289,7 @@ class DayScheduleListWidgetState<S extends IntervalRange>
     required double insetVertical,
   }) async {
     final appointment = appointments[index];
-    final newInterval = IntervalRangeUtils.calculateItervalRangeForNewPosition(
+    final newInterval = IntervalRangeUtils.calculateIntervalRangeForNewPosition(
       range: appointment,
       newPosition: newPosition,
       firstValidTime: validTimesList.first,
@@ -412,12 +412,12 @@ class DayScheduleListWidgetState<S extends IntervalRange>
 
   @override
   void onUpdateCancel() {
-    overlayController.hideAppoinmentOverlay();
+    overlayController.hideAppointmentOverlay();
   }
 
   @override
   void onUpdateEnd(ScheduleItemPosition position, int index) {
-    overlayController.hideAppoinmentOverlay();
+    overlayController.hideAppointmentOverlay();
     _updateAppointIntervalForNewPosition(
       index: index,
       appointments: widget.appointments,
