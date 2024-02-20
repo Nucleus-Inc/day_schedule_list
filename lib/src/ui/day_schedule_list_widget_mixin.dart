@@ -97,55 +97,50 @@ mixin DayScheduleListWidgetMixin {
     );
   }
 
-// This method is assumed to be defined within the mixin.
-// Instead of adding a parameter to control the 24-hour state,
-// it's assumed that this state will be provided from a superclass or through another mechanism.
-
 List<ScheduleTimeOfDay> populateValidTimesList({
   required List<IntervalRange> unavailableIntervals,
-  bool is24Hours = false, // This parameter should be provided when the method is called.
+  bool is24Hours = false,
+  TimeOfDay startTime = const TimeOfDay(hour: 08, minute: 30),
+  TimeOfDay endTime = const TimeOfDay(hour: 18, minute: 30),
 }) {
   List<ScheduleTimeOfDay> validTimesList = [];
-  final verifyUnavailableIntervals = unavailableIntervals.isNotEmpty;
 
-  // Loop from 0 to 23 for 24-hour format, and from 1 to 12 for 12-hour format.
-  int hours = is24Hours ? 24 : 12;
-  for (var i = 0; i < hours; i++) {
-    int hour = is24Hours ? i : ((i % 12) + 1); // Adjust for 12-hour format
-    TimeOfDay time = TimeOfDay(hour: hour, minute: 0);
-    // For 12-hour format, add 12 for PM hours if i >= 12.
-    if (!is24Hours && i >= 12) {
-      time = TimeOfDay(hour: hour + 12, minute: 0);
-    }
+  // Başlangıç ve bitiş dakikalarını hesapla.
+  int startMinutes = startTime.hour * 60 + startTime.minute;
+  int endMinutes = endTime.hour * 60 + endTime.minute;
 
-    // Special case for 24th hour, representing the end of the day.
-    if (i == 23 && is24Hours) {
-      time = const TimeOfDay(hour: 23, minute: 59);
-    }
+  // Eğer başlangıç bitişten büyükse veya eşitse, 24 saat ekleyerek bir sonraki güne geç.
+  if (!is24Hours && endMinutes <= startMinutes) {
+    endMinutes += 1440; // 24 * 60
+  }
 
-    // Use existing logic to calculate available and unavailable times.
-    if (verifyUnavailableIntervals) {
-      validTimesList.addAll(
-        _validScheduleTimeOfDayListWhenNeedToVerifyForUnavailableIntervals(
-          time: time,
-          hasTimeBefore: i > 0,
-          unavailableIntervals: unavailableIntervals,
-        ),
-      );
-    } else {
-      validTimesList.add(
-        belongsToInternalUnavailableRange(
-          time: time,
-          unavailableIntervals: unavailableIntervals,
-        )
-            ? ScheduleTimeOfDay.unavailable(time: time)
-            : ScheduleTimeOfDay.available(time: time),
-      );
+  int currentMinutes = startMinutes;
+  while (currentMinutes < endMinutes) {
+    int hour = (currentMinutes / 60).floor() % 24; // .floor() ile double'dan int'e çevirme
+    int minute = currentMinutes % 60;
+    TimeOfDay currentTime = TimeOfDay(hour: hour, minute: minute);
+
+    bool isUnavailable = unavailableIntervals.any((interval) => interval.containsTimeOfDay(currentTime)) ||
+      belongsToInternalUnavailableRange(time: currentTime, unavailableIntervals: unavailableIntervals);
+
+    ScheduleTimeOfDay scheduleTimeOfDay = isUnavailable
+        ? ScheduleTimeOfDay.unavailable(time: currentTime)
+        : ScheduleTimeOfDay.available(time: currentTime);
+
+    validTimesList.add(scheduleTimeOfDay);
+
+    // Minimum dakika aralığı kadar sonraki zamanı hesapla.
+    currentMinutes += minimumMinuteInterval.numberValue;
+    if (!is24Hours && currentMinutes >= 1440) {
+      // 24 saatlik format dışında, bir sonraki günün başlangıç saatiyle bitiş saati arasında döngü yapma.
+      break;
     }
   }
 
   return validTimesList;
 }
+
+
 
 
   List<ScheduleTimeOfDay>

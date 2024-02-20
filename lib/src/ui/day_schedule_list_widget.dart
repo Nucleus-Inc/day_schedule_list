@@ -42,6 +42,8 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
     this.dragIndicatorBorderColor,
     this.customDragIndicator,
     this.is24Hours = false,
+    this.startTime = const TimeOfDay(hour: 8, minute: 30), // Default start time
+    this.endTime = const TimeOfDay(hour: 18, minute: 30), // Default end time
     Key? key,
   })  : assert(
           minimumMinuteInterval <= appointmentMinimumDuration,
@@ -137,6 +139,12 @@ class DayScheduleListWidget<T extends IntervalRange> extends StatefulWidget {
   /// Default value is false, meaning the 12-hour format is used by default.
   final bool is24Hours;
 
+  ///
+  final TimeOfDay startTime;
+
+  ///
+  final TimeOfDay endTime;
+
   @override
   DayScheduleListWidgetState<T> createState() =>
       DayScheduleListWidgetState<T>();
@@ -177,6 +185,8 @@ class DayScheduleListWidgetState<S extends IntervalRange>
     validTimesList = populateValidTimesList(
       unavailableIntervals: widget.unavailableIntervals,
       is24Hours: widget.is24Hours,
+      startTime: widget.startTime,
+      endTime: widget.endTime,
     );
     super.initState();
   }
@@ -197,6 +207,8 @@ class DayScheduleListWidgetState<S extends IntervalRange>
     validTimesList = populateValidTimesList(
       unavailableIntervals: widget.unavailableIntervals,
       is24Hours: widget.is24Hours,
+      startTime: widget.startTime,
+      endTime: widget.endTime,
     );
   }
 
