@@ -92,6 +92,9 @@ class _MyHomePageState extends State<MyHomePage> {
           timeOfDayColor: Colors.brown,
           updateAppointDuration: _updateAppointmentDuration,
           optionalChildWidthLine: 30,
+          startTime: const TimeOfDay(hour: 9, minute: 0),
+          endTime: const TimeOfDay(hour: 18, minute: 0),
+          is24Hours: true,
           optionalChildLine: (context, appointment, height) => Container(
             width: 30,
             height: height - 1,
@@ -150,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: const EdgeInsets.all(5.0),
         child: Text(
           appointment.title,
-          style: Theme.of(context).textTheme.caption?.copyWith(
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: color,
               ),
         ),

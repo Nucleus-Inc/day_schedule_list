@@ -97,37 +97,51 @@ mixin DayScheduleListWidgetMixin {
     );
   }
 
-  List<ScheduleTimeOfDay> populateValidTimesList({
-    required List<IntervalRange> unavailableIntervals,
-  }) {
-    List<ScheduleTimeOfDay> validTimesList = [];
-    final verifyUnavailableIntervals = unavailableIntervals.isNotEmpty;
+List<ScheduleTimeOfDay> populateValidTimesList({
+  required List<IntervalRange> unavailableIntervals,
+  bool is24Hours = false,
+  TimeOfDay startTime = const TimeOfDay(hour: 08, minute: 30),
+  TimeOfDay endTime = const TimeOfDay(hour: 18, minute: 30),
+}) {
+  List<ScheduleTimeOfDay> validTimesList = [];
 
-    for (var item = 0; item < 25; item++) {
-      final hasTimeBefore = item > 0;
-      final TimeOfDay time =
-          TimeOfDay(hour: item == 24 ? 23 : item, minute: item == 24 ? 59 : 0);
-      if (verifyUnavailableIntervals) {
-        validTimesList.addAll(
-          _validScheduleTimeOfDayListWhenNeedToVerifyForUnavailableIntervals(
-            time: time,
-            hasTimeBefore: hasTimeBefore,
-            unavailableIntervals: unavailableIntervals,
-          ),
-        );
-      } else {
-        validTimesList.add(
-          belongsToInternalUnavailableRange(
-            time: time,
-            unavailableIntervals: unavailableIntervals,
-          )
-              ? ScheduleTimeOfDay.unavailable(time: time)
-              : ScheduleTimeOfDay.available(time: time),
-        );
-      }
-    }
-    return validTimesList;
+  // Başlangıç ve bitiş dakikalarını hesapla.
+  int startMinutes = startTime.hour * 60 + startTime.minute;
+  int endMinutes = endTime.hour * 60 + endTime.minute;
+
+  // Eğer başlangıç bitişten büyükse veya eşitse, 24 saat ekleyerek bir sonraki güne geç.
+  if (!is24Hours && endMinutes <= startMinutes) {
+    endMinutes += 1440; // 24 * 60
   }
+
+  int currentMinutes = startMinutes;
+  while (currentMinutes < endMinutes) {
+    int hour = (currentMinutes / 60).floor() % 24; // .floor() ile double'dan int'e çevirme
+    int minute = currentMinutes % 60;
+    TimeOfDay currentTime = TimeOfDay(hour: hour, minute: minute);
+
+    bool isUnavailable = unavailableIntervals.any((interval) => interval.containsTimeOfDay(currentTime)) ||
+      belongsToInternalUnavailableRange(time: currentTime, unavailableIntervals: unavailableIntervals);
+
+    ScheduleTimeOfDay scheduleTimeOfDay = isUnavailable
+        ? ScheduleTimeOfDay.unavailable(time: currentTime)
+        : ScheduleTimeOfDay.available(time: currentTime);
+
+    validTimesList.add(scheduleTimeOfDay);
+
+    // Minimum dakika aralığı kadar sonraki zamanı hesapla.
+    currentMinutes += minimumMinuteInterval.numberValue;
+    if (!is24Hours && currentMinutes >= 1440) {
+      // 24 saatlik format dışında, bir sonraki günün başlangıç saatiyle bitiş saati arasında döngü yapma.
+      break;
+    }
+  }
+
+  return validTimesList;
+}
+
+
+
 
   List<ScheduleTimeOfDay>
       _validScheduleTimeOfDayListWhenNeedToVerifyForUnavailableIntervals({
@@ -337,7 +351,7 @@ mixin DayScheduleListWidgetMixin {
     required ScheduleTimeOfDay firstValidTimeList,
     required ScheduleTimeOfDay lastValidTimeList,
   }) {
-    
+
     final possibleStart = _calculatePossibleStartOfNewAppointmentForTappedPosition(
       startPosition: startPosition,
       firstValidTimeList: firstValidTimeList,
